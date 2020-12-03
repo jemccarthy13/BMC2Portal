@@ -4,21 +4,17 @@ import Canvas from './canvas'
 
 import {randomNumber } from '../utils/mathutilities'
 import { drawArrow, drawBullseye } from './draw/drawutils'
-import { Bullseye, DrawAnswer, DrawFunction, Group } from '../utils/interfaces'
-import { drawAzimuth, drawChampagne, drawLadder, drawLeadEdge, drawPackage, drawRange, drawVic, drawWall } from './draw/intercept/picturedraw'
-import { drawThreat } from './draw/intercept/threatdraw'
-import { drawCap } from './draw/intercept/capdraw'
-import { drawEA } from './draw/intercept/eadraw'
-import { drawPOD } from './draw/intercept/poddraw'
-import { animateGroups, pauseFight } from './draw/intercept/animate'
+import { drawProcedural } from './draw/procedural/draw'
+import { Bullseye, DrawAnswer, Group } from '../utils/interfaces'
+//import { Bullseye, DrawAnswer, DrawFunction, Group } from '../utils/interfaces'
+import { animateGroups, pauseFight } from './draw/procedural/animate'
 
-export type PicCanvasProps = {
+export type ProcCanvasProps = {
     height: number,
     width: number,
     picType: string,
     orientation: string,
     braaFirst: boolean,
-    format:string,
     showMeasurements:boolean,
     isHardMode: boolean,
     setAnswer: {(answer:string):void},
@@ -33,7 +29,7 @@ export interface ReDrawFunction {
     (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, forced?: boolean, start?: Bullseye):DrawAnswer
 }
 
-export type PicCanvasState = {
+export type ProcCanvasState = {
     bullseye: Bullseye
     bluePos: Group,
     reDraw: ReDrawFunction,
@@ -45,9 +41,9 @@ export type PicCanvasState = {
 /**
  * This component is the main control for drawing pictures for intercepts
  */
-export default class PictureCanvas extends React.PureComponent<PicCanvasProps, PicCanvasState> {
+export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProps, ProcCanvasState> {
 
-    constructor(props: PicCanvasProps){
+    constructor(props: ProcCanvasProps){
         super(props)
         this.state = {
             bullseye: {x:0, y:0},
@@ -63,7 +59,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
      * animation is not re-triggered when any other prop value changes 
      * @param prevProps - previous set of PicCanvasProps
      */
-    componentDidUpdate = (prevProps: PicCanvasProps):void => {
+    componentDidUpdate = (prevProps: ProcCanvasProps):void => {
         // eslint-disable-next-line
         var {animate, ...rest} = prevProps
         const oldAnimate = animate
@@ -90,23 +86,13 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
             const { canvas, animateCanvas, answer } = this.state
             if (animate){
                 if (canvas && animateCanvas){
-                  animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
+                    // TODO - animate for procedural
+                    // animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
                 }
             } else {
                 pauseFight(showMeasurements)
             }
         }
-    }
-
-    /**
-     * Pick a random picture type for drawing
-     * @param leadingEdge - true iff leading edge or packages. Set to true to avoid
-     * recursive redraw
-     */
-    getRandomPicType = (leadingEdge: boolean):string => {
-        const numType = randomNumber(0,(leadingEdge)? 7 : 9)
-        const types = ["azimuth", "range", "vic", "wall","ladder", "champagne", "cap","leading edge","package"];
-        return types[numType];
     }
     
     /**
@@ -117,39 +103,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
      * @param start (optional) start position for the picture
      */
     drawPicture = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, forced?: boolean, start?: Bullseye):DrawAnswer => {
-        const { picType } = this.props
-
-        const isLeadEdge = (picType === "leading edge" || picType === "package" || picType==="ea")
-
-        let type = "azimuth"
-        if (forced) {
-            type = this.getRandomPicType(true)
-        } else {
-            type = ((picType ==="random") ? this.getRandomPicType(isLeadEdge) : picType)
-        }
-      
-        let drawFunc:DrawFunction = this.functions[type];
-        if (drawFunc === undefined) drawFunc = drawAzimuth;
-      
-        const answer = drawFunc(canvas, context, this.props, this.state, start);
-
-        return answer
-    }
-
-    // A list of all avaiable functions
-    functions: { [key:string]: DrawFunction } = {
-        "azimuth": drawAzimuth,
-        "range": drawRange,
-        "ladder" : drawLadder,
-        "wall" : drawWall,
-        "vic": drawVic,
-        "champagne":drawChampagne,
-        "cap": drawCap,
-        "threat": drawThreat,
-        "ea": drawEA,
-        "pod": drawPOD,
-        "leading edge": drawLeadEdge,
-        "package": drawPackage,
+        return drawProcedural(canvas, context, this.props, this.state, start);
     }
 
     /**

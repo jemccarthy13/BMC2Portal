@@ -387,3 +387,59 @@ export function drawGroupCap(
 
   return group;
 }
+
+export function drawBullseye (
+  canvas:HTMLCanvasElement, 
+  context:CanvasRenderingContext2D,
+  bull?:Bullseye): Bullseye {
+
+  context.lineWidth = 1;
+  context.fillStyle = "black";
+  context.strokeStyle = "black";
+
+  const centerPointX = bull ? bull.x: randomNumber(canvas.width * 0.33, canvas.width * 0.66);
+  const centerPointY = bull ? bull.y: randomNumber(canvas.height * 0.33, canvas.height * 0.66);
+  
+  context.beginPath();
+  context.arc(centerPointX, centerPointY, 2, 0, 2 * Math.PI, true);
+  context.stroke();
+  context.fill();
+  
+  context.moveTo(centerPointX, centerPointY + 6);
+  context.lineTo(centerPointX, centerPointY - 6);
+  context.stroke();
+  
+  context.moveTo(centerPointX + 6, centerPointY);
+  context.lineTo(centerPointX - 6, centerPointY);
+  context.stroke();
+  
+  return {x: centerPointX, y:centerPointY}
+}
+
+export type Bounds = {
+  tall: {
+    lowX: number,
+    hiX: number,
+    lowY: number,
+    hiY: number
+  },
+  wide:{
+    lowX: number,
+    hiX: number,
+    lowY: number,
+    hiY: number
+  },
+}
+
+export const getStartPos = (canvas: HTMLCanvasElement, orientation:string, bounds: Bounds, start?: Bullseye):Bullseye => {
+  const lowXMult = (orientation ==="NS") ? bounds.tall.lowX : bounds.wide.lowX
+  const hiXMult = (orientation === "NS") ? bounds.tall.hiX : bounds.wide.hiX
+  const lowYMult = (orientation === "NS") ? bounds.tall.lowY : bounds.wide.lowY
+  const hiYMult = (orientation === "NS") ? bounds.tall.hiY : bounds.wide.hiY
+  const startY:number = (start && start.y) || randomNumber(canvas.height * lowYMult, canvas.height * hiYMult);
+  const startX:number = (start && start.x) || randomNumber(canvas.width * lowXMult, canvas.width * hiXMult);
+  return {
+    x: startX,
+    y: startY
+  }
+}
