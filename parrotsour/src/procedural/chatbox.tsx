@@ -8,7 +8,8 @@ type CBProps = {
 }
  
 type CBState = {
-    text: string
+    text: string,
+    sender: string
 }
 
 export default class ChatBox extends React.PureComponent<CBProps, CBState>{
@@ -16,7 +17,10 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
     constructor(props:CBProps){
         super(props)
         this.state={
-            text:"*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n",
+            text:
+                "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n" +
+                "*** Use /nick to set your callsign. ***\r\n",
+            sender:"UR_CALLSIGN"
         }
     }
 
@@ -38,19 +42,34 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         this.sendChatMessage(text)
     }
 
-    sendChatMessage = (msg:string):void => {
+    sendSystemMsg = (msg:string): void => {
         const { text } = this.state
-        this.setState({text:text + getTimeStamp() + " <SENDER> " + msg + "\r\n"})
+        this.setState({text:text + getTimeStamp() + " *** " + msg + "\r\n"})
+    }
 
+    sendChatMessage = (msg:string):void => {
+        let success= false
+        if (msg.indexOf('/') === 0){
+            if (msg.indexOf('/nick') === 0){
+                const newCs = msg.replace('/nick','').trim()
+                this.setState({sender: newCs})
+                this.sendSystemMsg("changed nick to " + newCs )
+            }
+            success=true
+        } else {
+            const { text, sender } = this.state
+            this.setState({text:text + getTimeStamp() + " <"+sender+"> " + msg + "\r\n"})
+            success = true
+        }
         const current: HTMLTextAreaElement|null = this.inputRef.current
-        if (current !== null)
-            current.value = ""
+            if (current !== null && success)
+                current.value = ""
     }
 
     componentDidUpdate(){
         const msgBox: HTMLTextAreaElement|null = this.chatroomRef.current
         if (msgBox !== null)
-            msgBox.scrollTop = msgBox.scrollHeight //- msgBox.clientHeight
+            msgBox.scrollTop = msgBox.scrollHeight
     }
 
     render(): ReactElement {

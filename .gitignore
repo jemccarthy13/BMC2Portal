@@ -16,7 +16,6 @@ bmc2server/src/loas.index/store
 .vscode/settings.json
 
 ## TODO - remove this when done converting
-parrotsour/src/procedural/procedural.html
 parrotsour/src/procedural/proceduralanimation.js
 parrotsour/src/procedural/proceduralarrows.js
 parrotsour/src/procedural/proceduralcanvas.js

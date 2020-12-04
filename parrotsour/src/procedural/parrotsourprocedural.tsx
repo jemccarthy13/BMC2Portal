@@ -11,7 +11,7 @@ import { ProceduralQT } from '../quicktips/proceduralQT'
 import DifficultySelector from './difficultyselector'
 import ChatBox from './chatbox'
 
-const ProceduralCanvas = lazy(()=>import('../canvas/proceduralcanvas'))
+const ProceduralCanvas = lazy(()=>import('../canvas/draw/procedural/proceduralcanvas'))
 
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))

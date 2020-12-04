@@ -3,7 +3,7 @@
  * to be imported elsewhere
  */
 
-import { PicCanvasProps, PicCanvasState } from "../canvas/picturecanvas"
+import { PicCanvasProps, PicCanvasState } from "../canvas/draw/intercept/picturecanvas"
 
 export type Bullseye = {
     x: number,
@@ -39,6 +39,7 @@ export type Group = {
     y: number,
     heading: number,
     desiredHeading:number,
+    desiredAlt?: number,
     z: number[],
     numContacts: number,
     type: string,
@@ -47,7 +48,8 @@ export type Group = {
     braaseye?: Braaseye,
     maneuvers?: boolean,
     maneuvered?: boolean,
-    trackDir?: string
+    trackDir?: string,
+    callsign?: string
 }
 
 export type DrawAnswer = {

@@ -1,13 +1,13 @@
 import React, { ReactElement } from 'react'
 
-import Canvas from './canvas'
+import Canvas from '../../canvas'
 
-import { randomNumber } from '../utils/mathutilities'
-import { drawBullseye, drawGroupCap, drawLine, drawText } from './draw/drawutils'
-import { drawProcedural } from './draw/procedural/draw'
-import { Bullseye, DrawAnswer, Group } from '../utils/interfaces'
+import { randomNumber } from '../../../utils/mathutilities'
+import { drawBullseye, drawGroupCap, drawLine, drawText } from '../drawutils'
+import { drawProcedural } from './draw'
+import { Bullseye, DrawAnswer, Group } from '../../../utils/interfaces'
 //import { animateGroups, pauseFight } from './draw/procedural/animate'
-import { pauseFight } from './draw/procedural/animate'
+import { pauseFight } from './animate'
 
 export type ProcCanvasProps = {
     height: number,

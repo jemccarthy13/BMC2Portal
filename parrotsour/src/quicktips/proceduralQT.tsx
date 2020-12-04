@@ -18,10 +18,10 @@ export const ProceduralQT = (): ReactElement => {
             </DialogContentText>
             <DialogContentText>
                 <b> Chat </b> An &quot;airspace&quot; window, where assets will request transits and working airspaces.
-                This room will interpret travel commands when formatted appropriately.
+                This room will interpret travel commands when formatted appropriately. <br/><br/>
                 <b> Difficulty Selection </b> The difficulty can be ramped up from basic building 
                 blocks to a flushed out tactical problem. Your solution is not graded for efficiency or
-                 correctness, only for safe transits and airspace adherence.
+                 correctness, only for safe transits and airspace adherence.<br/><br/>
                 <b> Fights On / Pause </b>
                 The simulation will run unless paused, and when paused no commands will be executed nor will there be additional injects. <br/><br/><br/>
             </DialogContentText>

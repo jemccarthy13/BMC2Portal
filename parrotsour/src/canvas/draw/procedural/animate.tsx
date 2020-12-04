@@ -1,6 +1,6 @@
 import { getBR, randomNumber, toRadians } from "../../../utils/mathutilities";
 import { BRAA, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../../picturecanvas";
+import { PicCanvasProps, PicCanvasState } from "../intercept/picturecanvas";
 import { drawAltitudes, drawArrow, drawBraaseye, headingToDeg } from "../drawutils";
 
 let continueAnimation = false;

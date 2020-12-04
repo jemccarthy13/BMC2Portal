@@ -3,7 +3,7 @@ import { AltStack, Braaseye, Bullseye, DrawAnswer } from '../../../utils/interfa
 import { randomNumber, randomHeading, getBR, getAltStack, getTrackDir } from '../../../utils/mathutilities'
 import { Bounds, drawAltitudes, drawArrow, drawBraaseye, drawBullseye, drawMeasurement, getStartPos } from '../drawutils'
 import { DrawFunction, Group } from '../../../utils/interfaces'
-import { PicCanvasProps, PicCanvasState } from '../../picturecanvas';
+import { PicCanvasProps, PicCanvasState } from './picturecanvas';
 import { formatGroup, getGroupOpenClose } from '../formatutils';
 
 const isAnchorNorth = ( ngBraaseye: Braaseye, sgBraaseye: Braaseye, ng:Group, sg:Group) =>

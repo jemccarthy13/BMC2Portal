@@ -4,7 +4,7 @@ import { Bullseye, DrawAnswer } from '../../../utils/interfaces'
 // import { randomNumber, randomHeading, getBR, getAltStack, getTrackDir } from '../../../utils/mathutilities'
 // import { drawAltitudes, drawArrow, drawBraaseye, drawMeasurement } from '../drawutils'
 // import { DrawFunction, Group } from '../../../utils/interfaces'
-import { ProcCanvasProps, ProcCanvasState } from '../../proceduralcanvas';
+import { ProcCanvasProps, ProcCanvasState } from './proceduralcanvas';
 import { Bounds, drawArrow, getStartPos } from '../drawutils';
 // import { formatGroup, getGroupOpenClose } from '../formatutils';
 

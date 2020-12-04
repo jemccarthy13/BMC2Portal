@@ -1,16 +1,16 @@
 import React, { ReactElement } from 'react'
 
-import Canvas from './canvas'
+import Canvas from '../../canvas'
 
-import {randomNumber } from '../utils/mathutilities'
-import { drawArrow, drawBullseye } from './draw/drawutils'
-import { Bullseye, DrawAnswer, DrawFunction, Group } from '../utils/interfaces'
-import { drawAzimuth, drawChampagne, drawLadder, drawLeadEdge, drawPackage, drawRange, drawVic, drawWall } from './draw/intercept/picturedraw'
-import { drawThreat } from './draw/intercept/threatdraw'
-import { drawCap } from './draw/intercept/capdraw'
-import { drawEA } from './draw/intercept/eadraw'
-import { drawPOD } from './draw/intercept/poddraw'
-import { animateGroups, pauseFight } from './draw/intercept/animate'
+import {randomNumber } from '../../../utils/mathutilities'
+import { drawArrow, drawBullseye } from '../drawutils'
+import { Bullseye, DrawAnswer, DrawFunction, Group } from '../../../utils/interfaces'
+import { drawAzimuth, drawChampagne, drawLadder, drawLeadEdge, drawPackage, drawRange, drawVic, drawWall } from './picturedraw'
+import { drawThreat } from './threatdraw'
+import { drawCap } from './capdraw'
+import { drawEA } from './eadraw'
+import { drawPOD } from './poddraw'
+import { animateGroups, pauseFight } from './animate'
 
 export type PicCanvasProps = {
     height: number,

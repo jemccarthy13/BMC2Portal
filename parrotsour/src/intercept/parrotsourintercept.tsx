@@ -13,7 +13,7 @@ const StandardSelector = lazy(()=>import('./standardselector'))
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))
 
-const PictureCanvas = lazy(()=>import('../canvas/picturecanvas'))
+const PictureCanvas = lazy(()=>import('../canvas/draw/intercept/picturecanvas'))
 const VersionInfo = lazy(()=>import('../versioninfo'))
 
 interface CanvasConfig {
