@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react'
 import Canvas from './canvas'
 
 import { randomNumber } from '../utils/mathutilities'
-import { drawArrow, drawBullseye } from './draw/drawutils'
+import { drawBullseye, drawGroupCap, drawLine, drawText } from './draw/drawutils'
 import { drawProcedural } from './draw/procedural/draw'
 import { Bullseye, DrawAnswer, Group } from '../utils/interfaces'
 //import { animateGroups, pauseFight } from './draw/procedural/animate'
@@ -109,6 +109,51 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         return drawProcedural(canvas, context, this.props, this.state, start);
     }
 
+    drawCGRSGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
+        for (let x = 0; x < canvas.width; x+=40){
+            if (x % 120 === 0){
+                drawLine(context, x, 0, x, canvas.height)
+            } else {
+                drawLine(context, x, 0, x, canvas.height, "gray")
+            }
+        }
+        for (let y = 0; y < canvas.height; y += 40){
+            if (y % 120 === 0){
+                drawLine(context, 0, y, canvas.width, y)
+            } else {
+                drawLine(context, 0, y, canvas.width, y, "gray")
+            }
+        }
+
+        const startRow = randomNumber(5, 158)
+        const startCol1 = randomNumber(0,25)
+        const startCol2 = randomNumber(0,26)
+
+        const chr = (n:number):string => {
+            return String.fromCharCode (65+n)
+        }
+
+        let colC = 0
+        let off = 0
+        let rowC = startRow
+        let col2Chr = startCol2
+        for (let y = 10; y < canvas.height; y+=120){
+            for (let x = 10; x < canvas.width; x+=120){
+                if (col2Chr + colC > 25){
+                    col2Chr = 0
+                    off++
+                    colC = 0
+                }
+                drawText(canvas,context, rowC+chr(startCol1+off)+ chr(col2Chr+colC), x+33, y+60)
+                colC ++
+            }
+            col2Chr = startCol2
+            colC = 0;
+            off = 0;
+            rowC++
+        }
+    }
+
     /**
      * Draw function to be called from the Canvas component - handles pre-picture logic 
      * (i.e. blue arrows, bullseye, and image 'snap' for mouse draw)
@@ -120,29 +165,24 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         if (context === null || context ===undefined) return
         const bullseye = drawBullseye(canvas, context)
 
-        let xPos = canvas.width-20
+        this.drawCGRSGrid(canvas, context)
+
+        let xPos = randomNumber(canvas.width * 0.33, canvas.height * 0.66)
         let yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
-        let heading = 270
-
+       
         const { orientation } = this.props 
-
-        if (orientation === "NS"){
-            xPos = randomNumber(canvas.width * 0.33, canvas.width * 0.66);
-            yPos = 20;
-            heading = 180;
-        }
         
-        const bluePos = drawArrow(canvas, orientation, 4, xPos, yPos, heading, "blue");
+        //const bluePos = drawArrow(canvas, orientation, 1, xPos, yPos, heading, "blue");
+        const bluePos = drawGroupCap(canvas, orientation, 1, xPos, yPos, "blue")
         await this.setState({bluePos, bullseye})
         
-        const blueOnly = context.getImageData(0, 0, canvas.width, canvas.height)
-
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
         const answer: DrawAnswer = await this.drawPicture(canvas, context)
 
         const { setAnswer } = this.props
         setAnswer(answer.pic)
         
-        this.setState({canvas, answer, animateCanvas: blueOnly})
+        this.setState({canvas, answer, animateCanvas: imageData})
     }
 
     render(): ReactElement{

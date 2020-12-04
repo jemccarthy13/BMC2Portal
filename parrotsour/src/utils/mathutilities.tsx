@@ -150,7 +150,7 @@ export function randomNumber(min: number, max: number): number {
  * Return a random heading (0-360 for ALSA, HOT/FLANK blue for !ALSA) 
  * @param format 
  */
-export function randomHeading(format: string, blueHeading:number): number {
+export function randomHeading(format: string, blueHeading = -1): number {
   const bound = (format==="ipe" ? 45: 360)
   const offset = randomNumber(-bound, bound)
 

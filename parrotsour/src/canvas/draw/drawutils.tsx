@@ -324,7 +324,8 @@ export function drawGroupCap(
   contacts: number,
   startX:number,
   startY:number, 
-  color = "red"): Group{
+  color = "red",
+  type="ftr"): Group{
 
   const c = canvas.getContext("2d");
   if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr"}}
@@ -342,7 +343,7 @@ export function drawGroupCap(
   if (contacts === 1 ){
     c.arc(startX, startY, 10, 1.0*Math.PI, 0.8*Math.PI);
     c.stroke();
-    drawLine(c, startX-8, startY+6, startX-6, startY+12, "red");
+    drawLine(c, startX-8, startY+6, startX-6, startY+12, color);
   } else{
     const ratio = 2/contacts - 0.1; 
     let startPI = 0;
@@ -382,7 +383,7 @@ export function drawGroupCap(
     desiredHeading: 90,
     z: alts,
     numContacts: contacts,
-    type:"ftr"
+    type
   };
 
   return group;
