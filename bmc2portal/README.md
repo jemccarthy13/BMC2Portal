@@ -1,10 +1,25 @@
+## Frontend Developer Quick Start
+
+- Primary: Run `make frontend-dev` to install and start a hotloading development environment.
+
+- Manually:
+1. Install npm or yarn 
+2. In bmc2porta/src, add a .env with the following:
+REACT_APP_SERVER_BASE_URL=FRONTEND
+3. cd bmc2portal/src
+4. `npm install && npm run start` to launch frontend only web app
+
 This frontend UI was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
-Assuming you have installed npm and yarn, the following scripts are available.
+Assuming you have installed npm and/or yarn, the following scripts are available.
 
-In the 'bmc2portal' directory run:
+(Note: replace yarn with npm if npm is your preffered package manager).
+
+### `yarn install`
+
+Required be run before any other script to download and install dependencies.
 
 ### `yarn start`
 
