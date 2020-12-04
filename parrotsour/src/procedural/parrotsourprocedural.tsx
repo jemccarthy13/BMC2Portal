@@ -7,15 +7,15 @@ import '../css/parrotsour.css'
 import '../css/toggle.css'
 import '../css/togglebuttongroup.css'
 
-import { InterceptQT } from '../quicktips/interceptQT'
-import { ToggleButton, ToggleButtonGroup } from '@material-ui/core'
+import { ProceduralQT } from '../quicktips/proceduralQT'
+import DifficultySelector from './difficultyselector'
+import ChatBox from './chatbox'
 
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+const ProceduralCanvas = lazy(()=>import('../canvas/proceduralcanvas'))
 
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))
 
-const PictureCanvas = lazy(()=>import('../canvas/picturecanvas'))
 const VersionInfo = lazy(()=>import('../versioninfo'))
 
 interface CanvasConfig {
@@ -31,8 +31,8 @@ interface PSPState {
     canvasConfig: CanvasConfig,
     braaFirst: boolean,
     animate:boolean,
-    newPic: boolean,
-    picType: string
+    newPic: boolean
+    // picType: string // for easy/med/hard tracking
 }
 
 /**
@@ -53,8 +53,8 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
             },
             braaFirst: true,
             newPic: false,
-            animate: false,
-            picType: "easy"
+            animate: false
+            // picType: "easy" // to be added later, to change simulation difficulty
         }
     }
 
@@ -128,52 +128,19 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
         return ""
     }
 
-    handlePicTypeChange = (_event: React.MouseEvent<HTMLElement, MouseEvent>, value: any): void => {
-        this.setState({picType: value})
-    }
-
     render():ReactElement {
         const { canvasConfig, braaFirst } = this.state
         const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } = this.state
 
-        const { picType } = this.state
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>} >
-                    <ParrotSourHeader comp={<InterceptQT/>} getAnswer={this.getAnswer} />
+                    <ParrotSourHeader comp={<ProceduralQT/>} getAnswer={this.getAnswer} />
                 </Suspense>
 
                 <hr />
 
-                <ToggleButtonGroup 
-                    value={picType}
-                    exclusive
-                    onChange={this.handlePicTypeChange}
-                    classes={{
-                        root: "buttongroup"
-                    }}>
-                    <ToggleButton value="easy"
-                        classes={{
-                            root: "muitoggle"
-                    }}>
-                        Easy
-                    </ToggleButton>
-                    <ToggleButton value="med"
-                        classes={{
-                            root: "muitoggle"
-                    }}>
-                        Med
-                    </ToggleButton>
-                    <ToggleButton value="hard"
-                        classes={{
-                            root: "muitoggle"
-                    }}>
-                        Hard
-                    </ToggleButton>
-                    {false && <ToggleButton value="insane">
-                        XHard
-                    </ToggleButton>}
-                </ToggleButtonGroup>
+                <DifficultySelector />
 
                 <Suspense fallback={<div/>} >    
                     <ParrotSourControls 
@@ -188,23 +155,27 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                 <br/>
 
                 <Suspense fallback={<div/>} >
-                    <PictureCanvas 
-                        height={canvasConfig.height}
-                        width={canvasConfig.width}
-                        braaFirst={braaFirst}
-                        picType="random"
-                        format="alsa"
-                        showMeasurements={showMeasurements}
-                        isHardMode={isHardMode}
-                        orientation={canvasConfig.orient}
-                        // eslint-disable-next-line react/jsx-no-bind
-                        setAnswer={()=>{ /* empty for now until removed */ }}
-                        newPic={newPic}
-                        animate={animate}
-                        sliderSpeed={speedSliderValue}
-                        resetCallback={this.pauseAnimate}
-                        animateCallback={this.startAnimate}
-                    />
+                    <div style={{display:"inline-flex", width:"100%"}}>
+                        <ProceduralCanvas 
+                            height={canvasConfig.height}
+                            width={canvasConfig.width}
+                            braaFirst={braaFirst}
+                            picType="random"
+                            showMeasurements={showMeasurements}
+                            isHardMode={isHardMode}
+                            orientation={canvasConfig.orient}
+                            // eslint-disable-next-line react/jsx-no-bind
+                            setAnswer={()=>{ /* empty for now until removed */ }}
+                            newPic={newPic}
+                            animate={animate}
+                            sliderSpeed={speedSliderValue}
+                            resetCallback={this.pauseAnimate}
+                            animateCallback={this.startAnimate}
+                        />
+
+                        <ChatBox />
+                        
+                    </div>
                 </Suspense>  
 
                 <Suspense fallback={<div>Loading...</div>}>

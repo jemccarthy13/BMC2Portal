@@ -2,12 +2,12 @@ import React, { ReactElement } from 'react'
 
 import Canvas from './canvas'
 
-import {randomNumber } from '../utils/mathutilities'
+import { randomNumber } from '../utils/mathutilities'
 import { drawArrow, drawBullseye } from './draw/drawutils'
 import { drawProcedural } from './draw/procedural/draw'
 import { Bullseye, DrawAnswer, Group } from '../utils/interfaces'
-//import { Bullseye, DrawAnswer, DrawFunction, Group } from '../utils/interfaces'
-import { animateGroups, pauseFight } from './draw/procedural/animate'
+//import { animateGroups, pauseFight } from './draw/procedural/animate'
+import { pauseFight } from './draw/procedural/animate'
 
 export type ProcCanvasProps = {
     height: number,
@@ -82,8 +82,11 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         }
     
         if (areEqualShallow(rest, newrest) && oldAnimate !== newAnimate){   
-            const { animate, showMeasurements, resetCallback } = this.props 
-            const { canvas, animateCanvas, answer } = this.state
+            // const { animate, showMeasurements, resetCallback } = this.props 
+            // const { canvas, animateCanvas, answer } = this.state
+            const { animate, showMeasurements } = this.props
+            const { canvas, animateCanvas } = this.state
+            
             if (animate){
                 if (canvas && animateCanvas){
                     // TODO - animate for procedural

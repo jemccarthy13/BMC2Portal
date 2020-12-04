@@ -19,7 +19,7 @@ function ChangeLog():JSX.Element {
             --------------------------------------- <br/>
             Features
             <li>Bullseye follows mouse on canvas</li>
-            <li>Threat now includes "THREAT GROUP" and correct ALSA formatting </li>
+            <li>Threat now includes &quot;THREAT GROUP&quot; and correct ALSA formatting </li>
             <li>Codebase migrated to React and Typescript </li>
             <li>Components to be easily included in other sites or mobile app </li>
             <li>Massive fixes to animation logic and arrow drawing </li>
