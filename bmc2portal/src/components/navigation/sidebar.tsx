@@ -106,7 +106,7 @@ const SideBar = (): ReactElement => {
   return (
     <div className={classes.root}>
       {/* Basic Style */}
-      <CssBaseline />
+      {/*<CssBaseline />*/}
 
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
