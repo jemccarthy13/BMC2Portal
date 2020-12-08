@@ -28,6 +28,14 @@ type FUState = {
  */
 export default class FileUploader extends React.PureComponent<FUProps, FUState> {
     
+    constructor(props:FUProps){
+        super(props)
+        this.state={
+            acceptedFiles:[],
+            rejectedFiles:[],
+            uploadedFiles:[]
+        }
+    }
     // Callback for when a file is dropped into the Dropzone
     handleDrop =(acceptedFiles:File[], rejectedFiles:FileRejection[]):void=>{
         // if theres a limit to the number of files

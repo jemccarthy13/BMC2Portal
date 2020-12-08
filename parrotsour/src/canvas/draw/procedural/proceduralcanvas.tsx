@@ -17,7 +17,7 @@ export type ProcCanvasProps = {
     braaFirst: boolean,
     showMeasurements:boolean,
     isHardMode: boolean,
-    setAnswer: {(answer:string):void},
+    setAnswer: {(answer:DrawAnswer):void},
     newPic: boolean,
     animate:boolean,
     sliderSpeed: number,
@@ -174,13 +174,15 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         
         //const bluePos = drawArrow(canvas, orientation, 1, xPos, yPos, heading, "blue");
         const bluePos = drawGroupCap(canvas, orientation, 1, xPos, yPos, "blue")
+        bluePos.callsign="VR01"
+        drawText(canvas, context, bluePos.callsign, bluePos.x, bluePos.y+35, 12);
         await this.setState({bluePos, bullseye})
         
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
         const answer: DrawAnswer = await this.drawPicture(canvas, context)
 
         const { setAnswer } = this.props
-        setAnswer(answer.pic)
+        setAnswer(answer)
         
         this.setState({canvas, answer, animateCanvas: imageData})
     }

@@ -790,8 +790,8 @@ export const drawPackage:DrawFunction = (
   const isRange = false
 
   let startX1:number, startX2:number, startY1:number, startY2:number
-  let lLbl = "EAST"
-  let tLbl = "WEST"
+  let lLbl = "WEST"
+  let tLbl = "EAST"
   
   if (props.orientation==="EW"){
     if (isRange){
@@ -863,9 +863,32 @@ export const drawPackage:DrawFunction = (
       drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS") ? 180 : 270, "blue");
       finalAnswer= drawPackage(canvas, context, props, state, start);
     } else {
-      realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
-          tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range + " "+
-          lLbl +" PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range;
+      const leadBR = getBR(bull1.x, bull1.y, {x:state.bluePos.x, y: state.bluePos.y}).range
+      const trailBR = getBR(bull2.x, bull2.y, {x: state.bluePos.x, y:state.bluePos.y}).range
+      let anchorLead = true
+      
+      if (trailBR < leadBR){
+        anchorLead = false
+      } else if (trailBR === leadBR) {
+        const maxAlt1 = Math.max(...groups1.map((grp)=>{return Math.max(...grp.z)}))
+        const maxAlt2 = Math.max(...groups2.map((grp)=>{return Math.max(...grp.z)}))
+        if (maxAlt2 > maxAlt1){
+          anchorLead = false
+        } else if (maxAlt2 === maxAlt1){
+          if (groups2.length>groups1.length){
+            anchorLead = false
+          }
+        }
+      }
+      if (anchorLead){
+        realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
+            lLbl + " PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range + " "+
+            tLbl +" PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range;
+      } else {
+        realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
+            tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + leadPackage.range + " "+
+            lLbl +" PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range;
+      }
       finalAnswer = realAnswer
     }
   }

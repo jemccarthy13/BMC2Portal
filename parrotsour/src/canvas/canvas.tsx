@@ -229,10 +229,10 @@ function Canvas(props: CanvasProps):ReactElement {
     }
 
     return (
-    <div style={{display:"block",textAlign:"center"}}>
-        <div style={{position:"relative", height:"600px"}}>
-            <canvas id="pscanvas" {...moveProps} style={{...style, left:"0px"}} ref={canvasRef} {...rest} />
-            <canvas id="mousecanvas" {...moveProps} style={{...style, position:"absolute", left:"0px",backgroundColor:"transparent"}} ref={mouseCanvasRef} {...rest} />
+    <div style={{display:"block",textAlign:"left"}}>
+        <div style={{display:"grid", position:"relative", height:"600px"}}>
+            <canvas id="pscanvas" {...moveProps} style={{...style, gridColumn:"2", gridRow:"1", left:"0px"}} ref={canvasRef} {...rest} />
+            <canvas id="mousecanvas" {...moveProps} style={{...style, gridColumn:"2", gridRow:"1", position:"absolute", left:"0px",backgroundColor:"transparent"}} ref={mouseCanvasRef} {...rest} />
         </div>
     </div>
     )

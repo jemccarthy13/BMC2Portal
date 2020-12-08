@@ -10,6 +10,7 @@ import '../css/togglebuttongroup.css'
 import { ProceduralQT } from '../quicktips/proceduralQT'
 import DifficultySelector from './difficultyselector'
 import ChatBox from './chatbox'
+import { DrawAnswer } from 'utils/interfaces'
 
 const ProceduralCanvas = lazy(()=>import('../canvas/draw/procedural/proceduralcanvas'))
 
@@ -31,7 +32,8 @@ interface PSPState {
     canvasConfig: CanvasConfig,
     braaFirst: boolean,
     animate:boolean,
-    newPic: boolean
+    newPic: boolean,
+    answer: DrawAnswer
     // picType: string // for easy/med/hard tracking
 }
 
@@ -53,7 +55,11 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
             },
             braaFirst: true,
             newPic: false,
-            animate: false
+            animate: false,
+            answer: {
+                pic: "",
+                groups: []
+            }
             // picType: "easy" // to be added later, to change simulation difficulty
         }
     }
@@ -128,8 +134,12 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
         return ""
     }
 
+    setAnswer = (answer: DrawAnswer): void => {
+        this.setState({answer})
+    }
+
     render():ReactElement {
-        const { canvasConfig, braaFirst } = this.state
+        const { canvasConfig, braaFirst, answer } = this.state
         const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } = this.state
 
         return (
@@ -165,7 +175,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                             isHardMode={isHardMode}
                             orientation={canvasConfig.orient}
                             // eslint-disable-next-line react/jsx-no-bind
-                            setAnswer={()=>{ /* empty for now until removed */ }}
+                            setAnswer={this.setAnswer}
                             newPic={newPic}
                             animate={animate}
                             sliderSpeed={speedSliderValue}
@@ -173,7 +183,9 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                             animateCallback={this.startAnimate}
                         />
 
-                        <ChatBox />
+                        <ChatBox 
+                            answer={answer}
+                        />
                         
                     </div>
                 </Suspense>  

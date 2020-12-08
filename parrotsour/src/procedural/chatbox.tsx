@@ -1,10 +1,12 @@
 import React from "react"
 import { ReactElement, KeyboardEvent } from "react"
+import { DrawAnswer } from "utils/interfaces"
 
 import { getTimeStamp } from '../utils/mathutilities'
+import { aiProcess } from "./prochelpers"
 
 type CBProps = {
-
+    answer: DrawAnswer
 }
  
 type CBState = {
@@ -58,7 +60,9 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
             success=true
         } else {
             const { text, sender } = this.state
+            const { answer } = this.props
             this.setState({text:text + getTimeStamp() + " <"+sender+"> " + msg + "\r\n"})
+            aiProcess(msg, answer)
             success = true
         }
         const current: HTMLTextAreaElement|null = this.inputRef.current

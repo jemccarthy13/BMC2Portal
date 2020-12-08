@@ -79,20 +79,6 @@ export default class LOAList extends React.PureComponent<Record<string,unknown>,
   rowSpan(text:string): JSX.Element {
       return <tr key={text}><td colSpan={2}>{text}</td></tr>
   }
-  
-  // Set the edit index (used to display file Dropzone)
-  setEditIdx(idx:number): (()=>void){
-    return () => {this.setState({
-      editIdx: idx
-    })}
-  }
-
-  // Get a button with appropriate styling ('Update' button)
-  getButton(text:string, 
-    clickHandler:((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void))
-    :JSX.Element{
-    return <button type="button" style={{padding:"5px",borderRadius:"5px"}} onClick={clickHandler}>{text}</button>
-  }
 
   // Create the elements for each row in the table
   getLOATableRows(): JSX.Element[] {
@@ -115,8 +101,8 @@ export default class LOAList extends React.PureComponent<Record<string,unknown>,
               </td>
               <td>
                 <LoaPdf
+                  update
                   loaLoc={loa.loaLoc}
-                  update={this.isEdit(index)}
                 />
               </td>
             </tr> )
