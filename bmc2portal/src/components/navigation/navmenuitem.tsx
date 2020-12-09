@@ -21,7 +21,7 @@ export default class NavMenuItem extends React.PureComponent<NMIProps, Record<st
 
   
   // If this menu item has a link, navigate to that link when it is clicked
-  handleNavigate = ():void => {
+  handleNavigate = () : void => {
     const {link} = this.props
     if (link){
       window.location.href = link;

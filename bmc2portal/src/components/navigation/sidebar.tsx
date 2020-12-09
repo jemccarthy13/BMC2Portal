@@ -3,7 +3,9 @@ import NavMenuItem from "./navmenuitem";
 
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
+
 import CssBaseline from '@material-ui/core/CssBaseline';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
@@ -18,7 +20,7 @@ import MailIcon from '@material-ui/icons/Mail';
 import "../../css/sidebar.css";
 import { Hyperlink } from "../utils/interfaces";
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -75,9 +77,7 @@ const categories = [
       { id: 'AR Tracks', icon: <InboxIcon /> },
       { id: 'E-3 Orbits', icon: <InboxIcon /> },
       { id: 'Debrief', icon: <InboxIcon /> },
-      {
-        id: 'ML Kit', icon: <InboxIcon />,
-      },
+      { id: 'ML Kit', icon: <InboxIcon /> },
     ],
   },
   {
@@ -108,16 +108,15 @@ const SideBar = (): ReactElement => {
       {/* Basic Style */}
       {/*<CssBaseline />*/}
 
-      <AppBar position="fixed" className={classes.appBar}>
+      {/* <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
             Training Portal
           </Typography>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
 
-      <Drawer
-        className={classes.drawer}
+      <Drawer 
         variant="permanent"
         classes={{
           paper: classes.drawerPaper,
@@ -125,16 +124,16 @@ const SideBar = (): ReactElement => {
         anchor="left"
       >
         <div className={classes.toolbar} />
-        <Divider />
+
         <List>
-          {['Test1', 'Test2', 'Test3', 'Test4'].map((text, index) => (
-            <ListItem button key={text}>
+          {categories.map((item, index) => (
+            <ListItem button key={item.id}>
               <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={item.id} />
             </ListItem>
           ))}
         </List>
-        <Divider />
+
         <List>
           {['Test5', 'Test6', 'Test7'].map((text, index) => (
             <ListItem button key={text}>
