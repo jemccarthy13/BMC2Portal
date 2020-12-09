@@ -1,161 +1,105 @@
-import React, { ReactElement } from "react";
-import NavMenuItem from "./navmenuitem";
+import React, {ReactElement} from "react";
 
-import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
+import {Accordion, AccordionDetails, AccordionSummary, Button, Drawer, Link, Typography} from '@material-ui/core';
 
-import CssBaseline from '@material-ui/core/CssBaseline';
+import {BusinessCenter, ExpandMore, FlightTakeoff, Help, Inbox} from '@material-ui/icons';
 
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import Category from "./Category";
 
-import "../../css/sidebar.css";
-import { Hyperlink } from "../utils/interfaces";
-
-const drawerWidth = 200;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-    },
-    appBar: {
-      width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: drawerWidth,
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-
-    // necessary for content to be below app bar
-    toolbar: theme.mixins.toolbar,
-    content: {
-      flexGrow: 1,
-      backgroundColor: theme.palette.background.default,
-      padding: theme.spacing(3),
-    },
-  }),
-);
-
-
-const fdMenuItems: Hyperlink[] = [
-  { text: "First Link", link: "/" },
-  { text: "Second Link", link: "/" },
-  { text: "AR Tracks", link: "/common/artracks.html" },
-  { text: "E-3 Orbits", link: "/common/orbits.html" },
-  { text: "Debrief", link: "/common/debrief.html" },
-];
-
-const mcMenuItems: Hyperlink[] = [
-  { text: "ParrotSour", link: "/msncrew/parrotsour.html" },
-  { text: "Airspaces", link: "/msncrew/airspacelist.html" },
-  { text: "Fighter Units", link: "/msncrew/unitlist.html" },
-  { text: "LOAs", link: "/msncrew/loalist.html" },
-  { text: "AR Tracks", link: "/common/artracks.html" },
-  { text: "E-3 Orbits", link: "/common/orbits.html" },
-  { text: "Debrief", link: "/common/debrief.html" },
-];
-
-const categories = [
-  {
-    id: 'Flight Deck',
-    children: [
-      { id: 'First Link', icon: <InboxIcon />, active: true },
-      { id: 'First Link', icon: <InboxIcon /> },
-      { id: 'AR Tracks', icon: <InboxIcon /> },
-      { id: 'E-3 Orbits', icon: <InboxIcon /> },
-      { id: 'Debrief', icon: <InboxIcon /> },
-      { id: 'ML Kit', icon: <InboxIcon /> },
-    ],
-  },
-  {
-    id: 'Quality',
-    children: [
-      { id: 'Analytics', icon: <InboxIcon /> },
-      { id: 'Performance', icon: <InboxIcon /> },
-      { id: 'Test Lab', icon: <InboxIcon /> },
-    ],
-  },
+const categories: Category[] = [
+	{
+		id: "Flight Deck",
+		icon: <FlightTakeoff/>,
+		children: [
+			{id: "First Link", icon: <Help/>},
+			{id: "Second Link", icon: <Help/>},
+			{id: "AR Tracks", icon: <Inbox/>, link: "/common/artracks.html"},
+			{id: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
+			{id: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
+		],
+	},
+	{
+		id: 'Mission Crew',
+		icon: <FlightTakeoff/>,
+		children: [
+			{id: "ParrotSour", icon: <Inbox/>, link: "/msncrew/parrotsour.html"},
+			{id: "Air Spaces", icon: <Inbox/>, link: "/msncrew/airspacelist.html"},
+			{id: "Fighter Units", icon: <Inbox/>, link: "/msncrew/unitlist.html"},
+			{id: "LOAs", icon: <Inbox/>, link: "/msncrew/loalist.html"},
+			{id: "AR Tracks", icon: <BusinessCenter/>, link: "/common/artracks.html"},
+			{id: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
+			{id: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
+		],
+	},
+	{
+		id: 'Lessons Learned',
+		icon: <FlightTakeoff/>,
+		link: "/common/lessons.html"
+	},
+	{
+		id: 'FAA Map',
+		icon: <FlightTakeoff/>,
+		link: "/common/faamap.html"
+	},
+	{
+		id: 'Links $ Resources',
+		icon: <FlightTakeoff/>,
+		link: "/resources.html"
+	},
+	{
+		id: 'Contact',
+		icon: <FlightTakeoff/>,
+		link: "/contact.html"
+	},
 ];
 
 /**
  * This React Component provides the left hand navigation menu for the website.
- * 
+ *
  * To add a navigation item, add a <NavMenuItem> in the appropriate spot in this list.
- * 
+ *
  * See <NavMenuItem> for options.
  */
 
 //Basic style guide
 
 const SideBar = (): ReactElement => {
-  const classes = useStyles();
+	return (
+		<div>
+			<Drawer variant="permanent" anchor="left">
+				{categories.filter(aCategory => aCategory.children != undefined)
+					.map((aCategory: Category) => (
+						<Accordion key={aCategory.id}>
+							<AccordionSummary expandIcon={<ExpandMore/>}>
+								<Typography>{aCategory.id}</Typography>
+							</AccordionSummary>
+							<AccordionDetails>
+								{aCategory.children?.map(aChild =>
+									(<Button key={aChild.id} variant="contained" startIcon={aChild.icon}>
+										<Link onClick={() => {
+											window.location.href = aChild.link as string;
+										}}>
+											{aChild.id}
+										</Link>
+									</Button>))
+								}
+							</AccordionDetails>
+						</Accordion>))
+				};
+				{categories.filter(aCategory => aCategory.children === undefined)
+					.map((aCategory: Category) => (
+						<Link
+							key={aCategory.id}
+							onClick={() => {
+								window.location.href = aCategory.link as string;
+							}}>
+							<Button variant="contained" startIcon={aCategory.icon}/>
+						</Link>))
+				};
+			</Drawer>
+		</div>
 
-  return (
-    <div className={classes.root}>
-      {/* Basic Style */}
-      {/*<CssBaseline />*/}
-
-      {/* <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Training Portal
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
-
-      <Drawer 
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        anchor="left"
-      >
-        <div className={classes.toolbar} />
-
-        <List>
-          {categories.map((item, index) => (
-            <ListItem button key={item.id}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={item.id} />
-            </ListItem>
-          ))}
-        </List>
-
-        <List>
-          {['Test5', 'Test6', 'Test7'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-    </div>
-
-
-
-    //<div className="navbar">
-    //  <NavMenuItem text="Flight Deck" menuItems={fdMenuItems} />
-    //  <NavMenuItem text="Mission Crew" menuItems={mcMenuItems} />
-    //  <NavMenuItem text="Lessons Learned" link = "/common/lessons.html" />
-    //  <NavMenuItem text="FAA Map" link="/common/faamap.html"/>
-    //  <NavMenuItem text="Links & Resources" link = "/resources.html" />
-    //  <NavMenuItem text="Contact" link = "/contact.html" />
-    //</div>
-  );
+	);
 }
 
 export default SideBar
