@@ -20,8 +20,8 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         super(props)
         this.state={
             text:
-                "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n" +
-                "*** Use /nick to set your callsign. ***\r\n",
+                "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n"+
+                "*** /help to display help information",
             sender:"UR_CALLSIGN"
         }
     }
@@ -56,6 +56,21 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
                 const newCs = msg.replace('/nick','').trim()
                 this.setState({sender: newCs})
                 this.sendSystemMsg("changed nick to " + newCs )
+            }
+            if (msg.indexOf("/help") === 0) {
+                this.sendSystemMsg(
+                    "*** Use /nick to set your callsign. ***\r\n"+
+                    "*** This chatroom simulates an airspace control room.\r\n" +
+                    "*** Here you can give transit instructions to assets.\n" +
+                    "*** Commands can be entered in plain english. \n" +
+                    "*** Assets will respond if they understand the tasking.\n"+
+                    "*** Assets will let you know if they don't understand.\n" +
+                    "*** Please use 'report a bug' to request command support.\n" +
+                    "*** Some common formats:\n" +
+                    "*** RPA01 proceed 89AG FL 240\n" +
+                    "*** RPA01 proceed dir 89AG at FL 240\n" +
+                    "*** RPA01 app 89AG FL 240\n" +
+                    "----------------------------------------\r\n")
             }
             success=true
         } else {

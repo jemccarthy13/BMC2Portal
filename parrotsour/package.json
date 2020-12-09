@@ -25,6 +25,7 @@
     "@types/react": "^16.14.0",
     "@types/react-dom": "^16.9.9",
     "babel-plugin-add-module-exports": "^1.0.4",
+    "compromise": "^13.7.0",
     "fibers": "3.1.0",
     "node-sass": "^4.0.0",
     "react": "^16.13.1",
@@ -62,7 +63,6 @@
     "clean": "rimraf dist",
     "compile": "npm run clean && cross-env NODE_ENV=production babel src --extensions \".ts,.js,.tsx,.jsx\" --out-dir dist --copy-files",
     "pub": "npm run compile && npm publish",
-    
     "clint": "eslint src/**/*.{ts,tsx}",
     "clint-fixdr": "eslint src/**/*.{ts,tsx} --fix-dry-run",
     "clint-fix": "eslint src/**/*.{ts,tsx} --fix"
