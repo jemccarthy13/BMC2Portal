@@ -209,13 +209,15 @@ export function headingToDeg(heading: number):
   }
 }
 
-function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, offsetX:number, offsetY:number){
+function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, prevX:number, prevY:number){
+  const deltX = startx - prevX
+  const deltY = starty - prevY
   if (id==="friend"){
     // draw friend symbology
     c.strokeStyle="blue"
     c.beginPath()
-    c.moveTo((startx+offsetX*4)-2.5, (starty+offsetY*4)-2.5)
-    c.arc(startx+offsetX*4-2.5,starty+offsetY*4-0.5, 2.5, toRadians(180), toRadians(360))
+    c.moveTo((startx+deltX)-2.5, (starty+deltY)-2.5)
+    c.arc(startx+deltX-2.5,starty+deltY-0.5, 2.5, toRadians(180), toRadians(360))
     c.stroke()
   } else if (id === "suspect") {
     c.strokeStyle = "#FA8072"
@@ -224,8 +226,8 @@ function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, sta
   }
   if (id==="suspect" || id==="hostile"){
     c.beginPath()
-    const headX = (startx+offsetX*4)-3
-    const headY = (starty+offsetY*4)-3
+    const headX = (startx+deltX)-3
+    const headY = (starty+deltY)-3
     
     const leftX = headX + 5*Math.cos(toRadians(240))
     const leftY = headY + 5-Math.sin(toRadians(240))
@@ -266,8 +268,9 @@ function drawRadarIff(
   if (!radarPts || radarPts.length === 0){
     for (let mult = 0; mult< 5; mult++){
       // add a bit of jitter with randomness
-      xPos = startx+ offsetX*mult + 5* Math.random()+Math.random()+Math.random()
-      yPos = starty+offsetY*mult + 5*Math.random()+Math.random()+Math.random()
+      const jit = color==="blue" ? 1 : 5
+      xPos = startx+ offsetX*mult + jit* Math.random()+Math.random()+Math.random()
+      yPos = starty+offsetY*mult + jit*Math.random()+Math.random()+Math.random()
       rdrPts.push({x:xPos, y:yPos})
       c.beginPath()
       c.moveTo(xPos, yPos)
@@ -307,13 +310,17 @@ function drawRadarIff(
     }
   } 
 
-  drawSymbology(c, color==="blue"? "friend": "hostile", startx,starty,offsetX,offsetY)
+  const cPt = rdrPts[rdrPts.length-1]
+  const pPt = rdrPts[rdrPts.length-2]
+  drawSymbology(c, color==="blue"? "friend": "hostile", cPt.x,cPt.y, pPt.x,pPt.y)
 
+  const deltX = cPt.x-pPt.x
+  const deltY = cPt.y-pPt.y
   // Draw vector stick
   c.strokeStyle="black"
   c.beginPath()
-  c.moveTo((startx+offsetX*4)-2.5, (starty+offsetY*4)-2.5)
-  c.lineTo((startx+offsetX*4.5)-2.5, (starty+offsetY*4.5)-2.5)
+  c.moveTo((cPt.x+deltX)-2.5, (cPt.y+deltY)-2.5)
+  c.lineTo((cPt.x+deltX*1.5)-2.5, (cPt.y+deltY*1.5)-2.5)
   c.stroke()
   c.stroke()
 
