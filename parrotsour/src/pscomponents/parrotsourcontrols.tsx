@@ -121,7 +121,8 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             <span className="slider round"><span className="on">N/S</span><span className="off">E/W</span></span>
                         </label>
                     </div>
-                    <div>
+                    <div style={{display:"inline-flex"}}>
+                        <div style={{display:"inline-flex"}}>
                         <label style={{float:"left", paddingLeft:"75px", paddingRight:"10px"}}> 
                             Display first: 
                         </label>
@@ -155,6 +156,8 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                                 </DialogContentText>
                             </DialogContent>
                         </Dialog>
+                        </div>
+                        <div>
                         <label style={{float:"left", paddingLeft:"75px", paddingRight:"10px"}}> 
                             Data Trail: 
                         </label>
@@ -162,6 +165,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             <input type="checkbox" id="cursordisp" defaultChecked onChange={this.dataStyleChanged} />
                             <span className="slider round"><span className="on"> Arrow </span><span className="off"> Radar </span></span>
                         </label>
+                        </div>
                     </div>
                 </div>    
             </div>        
