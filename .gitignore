@@ -20,3 +20,5 @@ parrotsour/src/procedural/proceduralanimation.js
 parrotsour/src/procedural/proceduralarrows.js
 parrotsour/src/procedural/proceduralcanvas.js
 parrotsour/src/procedural/proceduralchat.js
+parrotsour/src/procedural/ai.js
+parrotsour/.env.development

@@ -209,6 +209,118 @@ export function headingToDeg(heading: number):
   }
 }
 
+function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, offsetX:number, offsetY:number){
+  if (id==="friend"){
+    // draw friend symbology
+    c.beginPath()
+    c.moveTo((startx+offsetX*4)-2.5, (starty+offsetY*4)-2.5)
+    c.arc(startx+offsetX*4-2.5,starty+offsetY*4-0.5, 2.5, toRadians(180), toRadians(360))
+    c.stroke()
+  } else if (id === "suspect") {
+    c.strokeStyle = "#FA8072"
+  } else {
+    c.strokeStyle="red"
+  }
+  if (id==="suspect" || id==="hostile"){
+    c.beginPath()
+    const headX = (startx+offsetX*4)-3
+    const headY = (starty+offsetY*4)-3
+    
+    const leftX = headX + 5*Math.cos(toRadians(240))
+    const leftY = headY + 5-Math.sin(toRadians(240))
+    c.moveTo(headX, headY)
+    c.lineTo(leftX,leftY)
+    
+    const rightX = headX + 5*Math.cos(toRadians(300))
+    const rightY = headY + 5-Math.sin(toRadians(300))
+    c.moveTo(headX,headY)
+    c.lineTo(rightX,rightY)
+    c.stroke()
+    c.stroke()
+  }
+}
+
+function drawRadarIff(
+  c:CanvasRenderingContext2D,
+  color:string,
+  startx:number,
+  starty:number,
+  endx:number,
+  endy:number,
+  radarPts: Bullseye[], 
+  iffPts:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[]}
+{
+  // set initial point(s) and math calculations
+  c.strokeStyle = "#FF8C00"
+  c.beginPath()
+  let xPos = startx
+  let yPos = starty
+  const offsetX = (endx-startx)/4
+  const offsetY = (endy-starty)/4
+
+  let rdrPts:Bullseye[] = []
+  let iPts: Bullseye[] = []
+  // draw the radar trail
+  for (let mult = 0; mult< 4; mult++){
+    xPos = startx+ offsetX*mult
+    yPos = starty+offsetY*mult
+    rdrPts.push({x:xPos, y:yPos})
+    c.beginPath()
+    c.moveTo(xPos, yPos)
+    c.lineTo(xPos-3, yPos-3)
+    c.stroke()
+    c.stroke()
+  }
+  // else {
+  //   radarPts.forEach((ptArr) =>{
+  //     ptArr.forEach((pt)=>{
+  //       c.beginPath()
+  //       c.moveTo(pt.x, pt.y)
+  //       c.lineTo(pt.x-3, pt.y-3)
+  //       c.stroke()
+  //       c.stroke()
+  //     })
+  //   })
+  // }
+  
+  // Draw symbology
+  if (color ==="blue"){
+    xPos = startx
+    yPos = starty
+
+    // draw IFF
+    for (let mult = 0; mult< 4; mult++){
+      c.strokeStyle = "blue"
+      xPos = startx+ (offsetX*mult) + (offsetX*0.5)
+      yPos = starty+ (offsetY*mult) + (offsetY*0.5)
+      iPts.push({x:xPos,y:yPos})
+      c.beginPath()
+      c.moveTo(xPos, yPos)
+      c.lineTo(xPos-3, yPos)
+      c.lineTo(xPos-3, yPos-3)
+      c.lineTo(xPos, yPos-3)
+      c.lineTo(xPos, yPos)
+      c.stroke()      
+    }
+  } 
+
+  drawSymbology(c, color==="blue"? "friend": "hostile", startx,starty,offsetX,offsetY)
+
+  // Draw vector stick
+  c.strokeStyle="black"
+  c.beginPath()
+  c.moveTo((startx+offsetX*4)-2.5, (starty+offsetY*4)-2.5)
+  c.lineTo((startx+offsetX*4.5)-2.5, (starty+offsetY*4.5)-2.5)
+  c.stroke()
+  c.stroke()
+
+  
+  console.log('r',rdrPts)
+  console.log('i',iPts)
+
+  return {rdrPts, iPts}
+}
+
 /**
  * Draw arrows for a group
  * @param canvas Canvas to draw on
@@ -228,7 +340,9 @@ export function drawArrow(
     starty:number,
     heading: number,
     color = "red",
-    type="ftr" ): Group {
+    type="ftr",
+    rdrPts:Bullseye[]=[],
+    iffPts:Bullseye[]=[] ): Group {
 
     const c = canvas.getContext("2d");
 
@@ -265,23 +379,33 @@ export function drawArrow(
       startx = startx + 5*(Math.cos(offsetRads))
       starty = starty + 5*(-Math.sin(offsetRads))
 
-      const dist:number = canvas.width / (canvas.width / 20);
-  
-      endy = starty + dist * -Math.sin(rads);
-      endx = startx + dist * Math.cos(rads);
+      let type="radar"
+      if (type === "arrow"){
+        
+        const dist:number = canvas.width / (canvas.width / 20);
+    
+        endy = starty + dist * -Math.sin(rads);
+        endx = startx + dist * Math.cos(rads);
+        
+        c.beginPath()  
+        c.moveTo(startx, starty);
+        c.lineTo(endx, endy);
 
-      c.beginPath()  
-      c.moveTo(startx, starty);
-      c.lineTo(endx, endy);
-
-      const heady:number = endy + 7 * -Math.sin(headRads)
-      const headx:number = endx + 7 * Math.cos(headRads)
-  
-      c.lineTo(headx, heady);
-  
-      c.strokeStyle = color;
-      c.stroke();
-      c.stroke();
+        const heady:number = endy + 7 * -Math.sin(headRads)
+        const headx:number = endx + 7 * Math.cos(headRads)
+    
+        c.lineTo(headx, heady);
+    
+        c.strokeStyle = color;
+        c.stroke();
+        c.stroke();
+        c.stroke();
+      } else {
+        const dist:number = canvas.width / (canvas.width / 35);
+        endy = starty + dist * -Math.sin(rads);
+        endx = startx + dist * Math.cos(rads);
+        drawRadarIff(c, color, startx, starty, endx, endy, rdrPts, iffPts)
+      }
     }
   
     let low = 15;

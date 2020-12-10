@@ -49,7 +49,9 @@ export type Group = {
     maneuvers?: boolean,
     maneuvered?: boolean,
     trackDir?: string,
-    callsign?: string
+    callsign?: string,
+    radarPoints?: Bullseye[],
+    iffPoints?: Bullseye[]
 }
 
 export type DrawAnswer = {
