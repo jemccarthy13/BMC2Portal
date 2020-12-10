@@ -50,23 +50,11 @@ function doAnimation(
 
     let br: BRAA
     for (let x = 0; x < groups.length; x++) {
-      if (props.dataStyle==="radar"){
-      }
-      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle );
-  
+      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle,"red", "ftr", groups[x].radarPoints, groups[x].iffPoints );
       const xyDeg = headingToDeg(groups[x].heading).degrees
       const rads: number = toRadians(xyDeg);
       const offsetX: number = 7 * Math.cos(rads);
       const offsetY: number = -7 * Math.sin(rads);
-  
-      // TODO - better handling for running into walls
-      // should readjust heading to be towards blue air
-      // if (isNearBounds(canvas, groups[x])){
-      //   // offsetX = 0
-      //   // offsetY = 0
-        
-      //   groups[x].desiredHeading = parseInt(getBR(state.bluePos.x, state.bluePos.y, {x:groups[x].startX, y: groups[x].startY}).bearing)
-      // }
 
       groups[x].startX = groups[x].startX + offsetX;
       groups[x].startY = groups[x].startY + offsetY;
@@ -93,7 +81,32 @@ function doAnimation(
         divisor = 1
       }
       const newHeading = groups[x].heading + deltaA / divisor
-      groups[x].heading = newHeading 
+      groups[x].heading = newHeading
+
+      if (props.dataStyle==="radar"){
+        if (groups[x].radarPoints.length!==0){
+          const b4Pts = groups[x].radarPoints[0]
+          for (let z = 0; z < groups[x].radarPoints.length; z++){
+            groups[x].radarPoints[z] = groups[x].radarPoints[z].slice(1)
+            const endX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].x
+            const endY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].y
+            
+            const prevX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-2].x
+            const prevY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-2].y
+          
+            const deltX = endX-prevX
+            const deltY = endY-prevY
+            const rng = Math.sqrt(deltX * deltX + deltY * deltY)
+            let newX = endX + (rng*Math.cos(rads+Math.random()/5))
+            //newX += Math.random()
+            let newY = endY + (rng*-Math.sin(rads+Math.random()/5))
+            //newY += Math.random()
+            groups[x].startX = groups[x].radarPoints[z][0].x
+            groups[x].startY = groups[x].radarPoints[z][0].y
+            groups[x].radarPoints[z].push({x:newX, y:newY})
+          }
+        }
+      }
 
       if (groups[x].maneuvers) {
         br = getBR(state.bluePos.x, state.bluePos.y, { x: groups[x].startX, y: groups[x].startY});

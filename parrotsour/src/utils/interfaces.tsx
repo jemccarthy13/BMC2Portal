@@ -50,7 +50,7 @@ export type Group = {
     maneuvered?: boolean,
     trackDir?: string,
     callsign?: string,
-    radarPoints?: Bullseye[][],
+    radarPoints: Bullseye[][],
     iffPoints?: Bullseye[][]
 }
 

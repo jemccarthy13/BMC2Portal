@@ -248,8 +248,8 @@ function drawRadarIff(
   starty:number,
   endx:number,
   endy:number,
-  radarPts: Bullseye[][], 
-  iffPts:Bullseye[][]): { rdrPts: Bullseye[], iPts:Bullseye[]}
+  radarPts: Bullseye[], 
+  iffPts:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[]}
 {
   // set initial point(s) and math calculations
   c.strokeStyle = "#FF8C00"
@@ -261,29 +261,30 @@ function drawRadarIff(
 
   let rdrPts:Bullseye[] = []
   let iPts: Bullseye[] = []
+
   // draw the radar trail
-  for (let mult = 0; mult< 4; mult++){
-    // add a bit of jitter with randomness
-    xPos = startx+ offsetX*mult + 3* Math.random()+Math.random()+Math.random()
-    yPos = starty+offsetY*mult + 3*Math.random()+Math.random()+Math.random()
-    rdrPts.push({x:xPos, y:yPos})
-    c.beginPath()
-    c.moveTo(xPos, yPos)
-    c.lineTo(xPos-3, yPos-3)
-    c.stroke()
-    c.stroke()
+  if (!radarPts || radarPts.length === 0){
+    for (let mult = 0; mult< 5; mult++){
+      // add a bit of jitter with randomness
+      xPos = startx+ offsetX*mult + 5* Math.random()+Math.random()+Math.random()
+      yPos = starty+offsetY*mult + 5*Math.random()+Math.random()+Math.random()
+      rdrPts.push({x:xPos, y:yPos})
+      c.beginPath()
+      c.moveTo(xPos, yPos)
+      c.lineTo(xPos-3, yPos-3)
+      c.stroke()
+      c.stroke()
+    }
+  } else {
+    radarPts.forEach((pt) =>{
+      c.beginPath()
+      c.moveTo(pt.x, pt.y)
+      c.lineTo(pt.x-3, pt.y-3)
+      c.stroke()
+      c.stroke()
+      rdrPts.push(pt)
+    })
   }
-  // else {
-  //   radarPts.forEach((ptArr) =>{
-  //     ptArr.forEach((pt)=>{
-  //       c.beginPath()
-  //       c.moveTo(pt.x, pt.y)
-  //       c.lineTo(pt.x-3, pt.y-3)
-  //       c.stroke()
-  //       c.stroke()
-  //     })
-  //   })
-  // }
   
   // Draw symbology
   if (color ==="blue"){
@@ -354,7 +355,9 @@ export function drawArrow(
         desiredHeading: orientation==="EW" ? 360 : 90,
         z: [0],
         numContacts: 1,
-        type:type
+        type:type,
+        radarPoints:[],
+        iffPoints:[]
     }
 
     if (c === null) return group
@@ -406,7 +409,7 @@ export function drawArrow(
         const dist:number = canvas.width / (canvas.width / 35);
         endy = starty + dist * -Math.sin(rads);
         endx = startx + dist * Math.cos(rads);
-        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts, iffPts)
+        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts[x], iffPts[x])
         retRadarPts[x] = retVal.rdrPts
         retIffPts[x] = retVal.iPts
       }
@@ -436,8 +439,6 @@ export function drawArrow(
         iffPoints: retIffPts
     };
 
-    console.log(group.radarPoints)
-    console.log(group.iffPoints)
     return group;
 }
 
@@ -460,7 +461,7 @@ export function drawGroupCap(
   type="ftr"): Group{
 
   const c = canvas.getContext("2d");
-  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr"}}
+  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr", radarPoints:[], iffPoints:[]}}
 
   // eslint-disable-next-line
   let alts:number[] = [...Array(contacts)].map(_=>randomNumber(15,45));
@@ -515,7 +516,9 @@ export function drawGroupCap(
     desiredHeading: 90,
     z: alts,
     numContacts: contacts,
-    type
+    type,
+    radarPoints:[],
+    iffPoints:[]
   };
 
   return group;

@@ -729,7 +729,7 @@ export const drawLeadEdge:DrawFunction = (
   if (overlap || rngBack.range <=5 || rngBack.range >= 40){
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawBullseye(canvas, context, state.bullseye);
-    drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS" ? 180 : 270), "blue");
+    drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS" ? 180 : 270), props.dataStyle, "blue");
     finalAnswer = drawLeadEdge(canvas, context, props, state, start);
   }
   else {
@@ -847,7 +847,7 @@ export const drawPackage:DrawFunction = (
     if (rngBack.range < 40 ){
       context.clearRect(0, 0, canvas.width, canvas.height);
       drawBullseye(canvas, context, state.bullseye);
-      drawArrow(canvas, props.orientation, 4, state.bluePos.x, state.bluePos.y, (props.orientation==="NS"? 180 : 270), "blue");
+      drawArrow(canvas, props.orientation, 4, state.bluePos.x, state.bluePos.y, (props.orientation==="NS"? 180 : 270), props.dataStyle, "blue");
       finalAnswer = drawPackage(canvas, context, props, state, start);
     } else {
       realAnswer.pic = " 2 PACKAGES RANGE " + rngBack.range + " "+ 
@@ -861,7 +861,7 @@ export const drawPackage:DrawFunction = (
     if (rngBack.range < 40) { 
       context.clearRect(0, 0, canvas.width, canvas.height);
       drawBullseye(canvas, context, state.bullseye);
-      drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS") ? 180 : 270, "blue");
+      drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS") ? 180 : 270, props.dataStyle,"blue");
       finalAnswer= drawPackage(canvas, context, props, state, start);
     } else {
       const leadBR = getBR(bull1.x, bull1.y, {x:state.bluePos.x, y: state.bluePos.y}).range
