@@ -110,7 +110,7 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         return drawProcedural(canvas, context, this.props, this.state, start);
     }
 
-    drawCGRSGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
+    drawCGRSGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D):void => {
         for (let x = 0; x < canvas.width; x+=40){
             if (x % 120 === 0){
                 drawLine(context, x, 0, x, canvas.height)
@@ -168,8 +168,8 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
 
         this.drawCGRSGrid(canvas, context)
 
-        let xPos = randomNumber(canvas.width * 0.33, canvas.height * 0.66)
-        let yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
+        const xPos = randomNumber(canvas.width * 0.33, canvas.height * 0.66)
+        const yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
        
         const { orientation } = this.props 
         

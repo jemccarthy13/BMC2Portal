@@ -80,8 +80,9 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
     /**
      * Handle data trail toggle
      */
-    dataStyleChanged = ():void =>{
-        this.props.handleDataStyleChange()
+    handleDataStyleChange = ():void =>{
+        const { handleDataStyleChange } = this.props
+        handleDataStyleChange()
     }
 
     render(): ReactElement{
@@ -162,7 +163,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             Data Trail: 
                         </label>
                         <label className="switch">
-                            <input type="checkbox" id="cursordisp" defaultChecked onChange={this.dataStyleChanged} />
+                            <input type="checkbox" id="cursordisp" defaultChecked onChange={this.handleDataStyleChange} />
                             <span className="slider round"><span className="on"> Arrow </span><span className="off"> Radar </span></span>
                         </label>
                         </div>

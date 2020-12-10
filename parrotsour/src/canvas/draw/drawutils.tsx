@@ -261,8 +261,8 @@ function drawRadarIff(
   const offsetX = (endx-startx)/4
   const offsetY = (endy-starty)/4
 
-  let rdrPts:Bullseye[] = []
-  let iPts: Bullseye[] = []
+  const rdrPts:Bullseye[] = []
+  const iPts: Bullseye[] = []
 
   // draw the radar trail
   if (!radarPts || radarPts.length === 0){
@@ -272,22 +272,19 @@ function drawRadarIff(
       xPos = startx+ offsetX*mult + jit* Math.random()+Math.random()+Math.random()
       yPos = starty+offsetY*mult + jit*Math.random()+Math.random()+Math.random()
       rdrPts.push({x:xPos, y:yPos})
-      c.beginPath()
-      c.moveTo(xPos, yPos)
-      c.lineTo(xPos-3, yPos-3)
-      c.stroke()
-      c.stroke()
     }
   } else {
-    radarPts.forEach((pt) =>{
-      c.beginPath()
-      c.moveTo(pt.x, pt.y)
-      c.lineTo(pt.x-3, pt.y-3)
-      c.stroke()
-      c.stroke()
-      rdrPts.push(pt)
-    })
+    for (let idx = 0; idx < radarPts.length; idx++){
+      rdrPts.push(radarPts[idx])
+    } 
   }
+  rdrPts.forEach((pt) =>{
+    c.beginPath()
+    c.moveTo(pt.x, pt.y)
+    c.lineTo(pt.x-3, pt.y-3)
+    c.stroke()
+    c.stroke()
+  })
   
   // Draw symbology
   if (color ==="blue"){
@@ -295,18 +292,26 @@ function drawRadarIff(
     yPos = starty
 
     // draw IFF
-    for (let mult = 0; mult< 4; mult++){
+    if (!iffPts || iffPts.length === 0){
+      for (let mult = 0; mult< 4; mult++){
+        xPos = startx+ (offsetX*mult) + (offsetX*0.5)
+        yPos = starty+ (offsetY*mult) + (offsetY*0.5)
+        iPts.push({x:xPos,y:yPos})     
+      }
+    } else {
+      for (let k=0; k < iffPts.length; k++){
+        iPts.push(iffPts[k])
+      }
+    }
+    for (let l = 0; l < iPts.length; l++){
       c.strokeStyle = "blue"
-      xPos = startx+ (offsetX*mult) + (offsetX*0.5)
-      yPos = starty+ (offsetY*mult) + (offsetY*0.5)
-      iPts.push({x:xPos,y:yPos})
       c.beginPath()
       c.moveTo(xPos, yPos)
       c.lineTo(xPos-3, yPos)
       c.lineTo(xPos-3, yPos-3)
       c.lineTo(xPos, yPos-3)
       c.lineTo(xPos, yPos)
-      c.stroke()      
+      c.stroke()
     }
   } 
 
@@ -378,8 +383,8 @@ export function drawArrow(
     const iStartX = startx
     const iStartY = starty
 
-    let retRadarPts = rdrPts
-    let retIffPts = iffPts
+    const retRadarPts = rdrPts
+    const retIffPts = iffPts
     for (let x = 0; x < numContacts; x++){
 
       const vectors = headingToDeg(heading)

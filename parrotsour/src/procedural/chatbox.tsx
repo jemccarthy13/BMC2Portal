@@ -25,6 +25,12 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
             sender:"UR_CALLSIGN"
         }
     }
+    
+    componentDidUpdate():void{
+        const msgBox: HTMLTextAreaElement|null = this.chatroomRef.current
+        if (msgBox !== null)
+            msgBox.scrollTop = msgBox.scrollHeight
+    }
 
     inputRef: React.MutableRefObject<HTMLTextAreaElement|null> = React.createRef<HTMLTextAreaElement>()
     chatroomRef: React.MutableRefObject<HTMLTextAreaElement|null> = React.createRef<HTMLTextAreaElement>()
@@ -83,12 +89,6 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         const current: HTMLTextAreaElement|null = this.inputRef.current
             if (current !== null && success)
                 current.value = ""
-    }
-
-    componentDidUpdate(){
-        const msgBox: HTMLTextAreaElement|null = this.chatroomRef.current
-        if (msgBox !== null)
-            msgBox.scrollTop = msgBox.scrollHeight
     }
 
     render(): ReactElement {

@@ -141,7 +141,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
     /**
      * Do nothing if changing style for procedural
      */
-    handleDataStyleChange = ():void =>{
+    onDataStyleChange = ():void =>{
         // do nothing
     }
 
@@ -165,7 +165,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                         braaChanged={this.onToggleMeasurements}
                         startAnimate={this.startAnimate}
                         pauseAnimate={this.pauseAnimate}
-                        handleDataStyleChange={this.handleDataStyleChange}
+                        handleDataStyleChange={this.onDataStyleChange}
                     />
                 </Suspense>  
 

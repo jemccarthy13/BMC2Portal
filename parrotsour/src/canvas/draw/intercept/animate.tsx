@@ -85,22 +85,19 @@ function doAnimation(
 
       if (props.dataStyle==="radar"){
         if (groups[x].radarPoints.length!==0){
-          const b4Pts = groups[x].radarPoints[0]
           for (let z = 0; z < groups[x].radarPoints.length; z++){
             groups[x].radarPoints[z] = groups[x].radarPoints[z].slice(1)
             const endX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].x
             const endY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].y
             
-            const prevX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-2].x
-            const prevY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-2].y
+            const startX = groups[x].radarPoints[z][0].x
+            const startY = groups[x].radarPoints[z][0].y
           
-            const deltX = endX-prevX
-            const deltY = endY-prevY
-            const rng = Math.sqrt(deltX * deltX + deltY * deltY)
-            let newX = endX + (rng*Math.cos(rads+Math.random()/5))
-            //newX += Math.random()
-            let newY = endY + (rng*-Math.sin(rads+Math.random()/5))
-            //newY += Math.random()
+            const deltX = endX-startX
+            const deltY = endY-startY
+            const rng = Math.sqrt(deltX * deltX + deltY * deltY)/3
+            const newX = endX + (rng*Math.cos(rads+Math.random()/5))
+            const newY = endY + (rng*-Math.sin(rads+Math.random()/5))
             groups[x].startX = groups[x].radarPoints[z][0].x
             groups[x].startY = groups[x].radarPoints[z][0].y
             groups[x].radarPoints[z].push({x:newX, y:newY})

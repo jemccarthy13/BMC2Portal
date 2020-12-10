@@ -780,6 +780,24 @@ const getPicBull = (isRange:boolean, orientation:string, bluePos:Group, groups:G
   return retVal
 }
 
+const getAnchorPkg = (leadBR:number, trailBR:number, groups1:Group[], groups2:Group[]):boolean => {
+  let anchorLead = true
+  if (trailBR < leadBR){
+    anchorLead = false
+  } else if (trailBR === leadBR) {
+    const maxAlt1 = Math.max(...groups1.map((grp)=>{return Math.max(...grp.z)}))
+    const maxAlt2 = Math.max(...groups2.map((grp)=>{return Math.max(...grp.z)}))
+    if (maxAlt2 > maxAlt1){
+      anchorLead = false
+    } else if (maxAlt2 === maxAlt1){
+      if (groups2.length>groups1.length){
+        anchorLead = false
+      }
+    }
+  }
+  return anchorLead
+}
+
 export const drawPackage:DrawFunction = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
@@ -866,21 +884,8 @@ export const drawPackage:DrawFunction = (
     } else {
       const leadBR = getBR(bull1.x, bull1.y, {x:state.bluePos.x, y: state.bluePos.y}).range
       const trailBR = getBR(bull2.x, bull2.y, {x: state.bluePos.x, y:state.bluePos.y}).range
-      let anchorLead = true
+      const anchorLead = getAnchorPkg(leadBR, trailBR, groups1, groups2)
       
-      if (trailBR < leadBR){
-        anchorLead = false
-      } else if (trailBR === leadBR) {
-        const maxAlt1 = Math.max(...groups1.map((grp)=>{return Math.max(...grp.z)}))
-        const maxAlt2 = Math.max(...groups2.map((grp)=>{return Math.max(...grp.z)}))
-        if (maxAlt2 > maxAlt1){
-          anchorLead = false
-        } else if (maxAlt2 === maxAlt1){
-          if (groups2.length>groups1.length){
-            anchorLead = false
-          }
-        }
-      }
       if (anchorLead){
         realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
             lLbl + " PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range + " "+

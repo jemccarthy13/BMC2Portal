@@ -176,7 +176,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
         return this.state.answer
     }
 
-    handleDataStyleChange = ():void => {
+    onDataStyleChange = ():void => {
         const { dataStyle } = this.state
         if (dataStyle==="arrow") {
             this.setState({dataStyle:"radar" })
@@ -223,7 +223,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
                         braaChanged={this.braaChanged}
                         startAnimate={this.startAnimate}
                         pauseAnimate={this.pauseAnimate}
-                        handleDataStyleChange={this.handleDataStyleChange}
+                        handleDataStyleChange={this.onDataStyleChange}
                     />
                 </Suspense>  
 

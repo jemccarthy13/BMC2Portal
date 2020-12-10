@@ -1,6 +1,6 @@
 import { DrawAnswer, Group } from "utils/interfaces";
 
-export function getAsset(groups: Group[], callsign:string){
+export function getAsset(groups: Group[], callsign:string):Group|undefined{
     return groups.find(a => {
         if (a.callsign) { 
             return a.callsign.toUpperCase() === callsign.toUpperCase()
@@ -10,14 +10,14 @@ export function getAsset(groups: Group[], callsign:string){
     });
 }
 
-export function setDesiredFL(asset:Group, fl:string){
-    var fl2Dig = fl.substring(0,2);
+export function setDesiredFL(asset:Group, fl:string):void{
+    const fl2Dig = fl.substring(0,2);
     if (asset.z[0].toString() !== fl){
         asset.desiredAlt = parseInt(fl2Dig);
     }
 }
 
-export function aiProcess(msg:string, answer: DrawAnswer){
+export function aiProcess(msg:string, answer: DrawAnswer):void{
     // do some things to NLP the message
     console.log(answer.groups)
     console.log(msg)
