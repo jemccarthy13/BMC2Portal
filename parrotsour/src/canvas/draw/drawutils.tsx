@@ -291,6 +291,7 @@ function drawRadarIff(
     xPos = startx
     yPos = starty
 
+    // TODO -- fix blue IFF before pushing to awardspace / merging to proc branch
     // draw IFF
     if (!iffPts || iffPts.length === 0){
       for (let mult = 0; mult< 4; mult++){
