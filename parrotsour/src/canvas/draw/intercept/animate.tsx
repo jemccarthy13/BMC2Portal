@@ -50,8 +50,9 @@ function doAnimation(
 
     let br: BRAA
     for (let x = 0; x < groups.length; x++) {
-      
-      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading );
+      if (props.dataStyle==="radar"){
+      }
+      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle );
   
       const xyDeg = headingToDeg(groups[x].heading).degrees
       const rads: number = toRadians(xyDeg);

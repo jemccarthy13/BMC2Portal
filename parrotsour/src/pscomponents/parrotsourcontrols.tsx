@@ -7,7 +7,8 @@ interface PSCProps {
     startAnimate: {():void}
     pauseAnimate: {():void},
     braaChanged: {():void},
-    modifyCanvas: {():void}
+    modifyCanvas: {():void},
+    handleDataStyleChange:{():void}
 }
 
 interface PSCState {
@@ -76,6 +77,13 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
         this.setState({showHelpText: false})
     }
 
+    /**
+     * Handle data trail toggle
+     */
+    dataStyleChanged = ():void =>{
+        this.props.handleDataStyleChange()
+    }
+
     render(): ReactElement{
         const {speedSliderValue, showHelpText} = this.state
         const {modifyCanvas, braaChanged} = this.props
@@ -134,7 +142,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             onClose={this.handleHelpClose} >
                             <DialogContent>
                                 <DialogContentText>
-                                    This will change the order of the bullseye and braa measurements on screen.
+                                    The BULL/BRAA toggle will change the order of the bullseye and braa measurements on screen.
                                 </DialogContentText>
                                 <DialogContentText>
                                     BULL = ALT, BULL, BRAA
@@ -142,8 +150,18 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                                 <DialogContentText>
                                     BRAA = ALT, BRAA, BULL
                                 </DialogContentText>
+                                <DialogContentText>
+                                    The ARROW/RADAR toggle changes the picture from arrows to radar trails.
+                                </DialogContentText>
                             </DialogContent>
                         </Dialog>
+                        <label style={{float:"left", paddingLeft:"75px", paddingRight:"10px"}}> 
+                            Data Trail: 
+                        </label>
+                        <label className="switch">
+                            <input type="checkbox" id="cursordisp" defaultChecked onChange={this.dataStyleChanged} />
+                            <span className="slider round"><span className="on"> Arrow </span><span className="off"> Radar </span></span>
+                        </label>
                     </div>
                 </div>    
             </div>        

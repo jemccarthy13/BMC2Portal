@@ -19,7 +19,7 @@ export const drawProcedural = (
       wide: { lowX: 0, hiX: canvas.width, lowY: 0, hiY: canvas.height}
     }
     const startPos = getStartPos(canvas,props.orientation, bounds, start)
-    const grp = drawArrow(canvas, props.orientation, 1, startPos.x, startPos.y, randomHeading("alsa", state.bluePos.heading))
+    const grp = drawArrow(canvas, props.orientation, 1, startPos.x, startPos.y, randomHeading("alsa", state.bluePos.heading), props.dataStyle)
     return {
       pic: "",
       groups:[grp]

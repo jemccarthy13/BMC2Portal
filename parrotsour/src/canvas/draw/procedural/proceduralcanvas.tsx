@@ -21,6 +21,7 @@ export type ProcCanvasProps = {
     newPic: boolean,
     animate:boolean,
     sliderSpeed: number,
+    dataStyle: string,
     resetCallback: ()=>void,
     animateCallback: ()=>void
 }
@@ -190,7 +191,7 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
     render(): ReactElement{
         const { height, width, braaFirst, 
             picType, showMeasurements, isHardMode, 
-            newPic,resetCallback,animateCallback, animate  } = this.props
+            newPic,resetCallback,animateCallback, animate, dataStyle } = this.props
         const { bullseye } = this.state
         return (<Canvas 
             draw={this.draw} 
@@ -205,6 +206,7 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
             resetCallback={resetCallback}
             animate={animate}
             animateCallback={animateCallback}
+            dataStyle={dataStyle}
         />)
     }
 }

@@ -19,6 +19,7 @@ export type PicCanvasProps = {
     orientation: string,
     braaFirst: boolean,
     format:string,
+    dataStyle:string,
     showMeasurements:boolean,
     isHardMode: boolean,
     setAnswer: {(answer:string):void},
@@ -39,7 +40,7 @@ export type PicCanvasState = {
     reDraw: ReDrawFunction,
     answer:DrawAnswer,
     canvas?:HTMLCanvasElement,
-    animateCanvas?: ImageData,
+    animateCanvas?: ImageData
 }
 
 /**
@@ -167,7 +168,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
         let yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
         let heading = 270
 
-        const { orientation } = this.props 
+        const { orientation, dataStyle } = this.props 
 
         if (orientation === "NS"){
             xPos = randomNumber(canvas.width * 0.33, canvas.width * 0.66);
@@ -175,7 +176,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
             heading = 180;
         }
         
-        const bluePos = drawArrow(canvas, orientation, 4, xPos, yPos, heading, "blue");
+        const bluePos = drawArrow(canvas, orientation, 4, xPos, yPos, heading, dataStyle, "blue");
         await this.setState({bluePos, bullseye})
         
         const blueOnly = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -191,7 +192,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
     render(): ReactElement{
         const { height, width, braaFirst, 
             picType, showMeasurements, isHardMode, 
-            newPic,resetCallback,animateCallback, animate  } = this.props
+            newPic,resetCallback,animateCallback, animate, dataStyle  } = this.props
         const { bullseye } = this.state
         return (<Canvas 
             draw={this.draw} 
@@ -206,6 +207,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
             resetCallback={resetCallback}
             animate={animate}
             animateCallback={animateCallback}
+            dataStyle={dataStyle}
         />)
     }
 }

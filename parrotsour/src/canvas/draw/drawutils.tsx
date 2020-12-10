@@ -212,6 +212,7 @@ export function headingToDeg(heading: number):
 function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, offsetX:number, offsetY:number){
   if (id==="friend"){
     // draw friend symbology
+    c.strokeStyle="blue"
     c.beginPath()
     c.moveTo((startx+offsetX*4)-2.5, (starty+offsetY*4)-2.5)
     c.arc(startx+offsetX*4-2.5,starty+offsetY*4-0.5, 2.5, toRadians(180), toRadians(360))
@@ -247,8 +248,8 @@ function drawRadarIff(
   starty:number,
   endx:number,
   endy:number,
-  radarPts: Bullseye[], 
-  iffPts:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[]}
+  radarPts: Bullseye[][], 
+  iffPts:Bullseye[][]): { rdrPts: Bullseye[], iPts:Bullseye[]}
 {
   // set initial point(s) and math calculations
   c.strokeStyle = "#FF8C00"
@@ -262,8 +263,9 @@ function drawRadarIff(
   let iPts: Bullseye[] = []
   // draw the radar trail
   for (let mult = 0; mult< 4; mult++){
-    xPos = startx+ offsetX*mult
-    yPos = starty+offsetY*mult
+    // add a bit of jitter with randomness
+    xPos = startx+ offsetX*mult + 3* Math.random()+Math.random()+Math.random()
+    yPos = starty+offsetY*mult + 3*Math.random()+Math.random()+Math.random()
     rdrPts.push({x:xPos, y:yPos})
     c.beginPath()
     c.moveTo(xPos, yPos)
@@ -314,10 +316,6 @@ function drawRadarIff(
   c.stroke()
   c.stroke()
 
-  
-  console.log('r',rdrPts)
-  console.log('i',iPts)
-
   return {rdrPts, iPts}
 }
 
@@ -339,10 +337,11 @@ export function drawArrow(
     startx:number,
     starty:number,
     heading: number,
+    dataType:string,
     color = "red",
     type="ftr",
-    rdrPts:Bullseye[]=[],
-    iffPts:Bullseye[]=[] ): Group {
+    rdrPts:Bullseye[][]=[],
+    iffPts:Bullseye[][]=[] ): Group {
 
     const c = canvas.getContext("2d");
 
@@ -368,6 +367,9 @@ export function drawArrow(
 
     const iStartX = startx
     const iStartY = starty
+
+    let retRadarPts = rdrPts
+    let retIffPts = iffPts
     for (let x = 0; x < numContacts; x++){
 
       const vectors = headingToDeg(heading)
@@ -379,8 +381,8 @@ export function drawArrow(
       startx = startx + 5*(Math.cos(offsetRads))
       starty = starty + 5*(-Math.sin(offsetRads))
 
-      let type="radar"
-      if (type === "arrow"){
+      //let type="radar"
+      if (dataType === "arrow"){
         
         const dist:number = canvas.width / (canvas.width / 20);
     
@@ -404,7 +406,9 @@ export function drawArrow(
         const dist:number = canvas.width / (canvas.width / 35);
         endy = starty + dist * -Math.sin(rads);
         endx = startx + dist * Math.cos(rads);
-        drawRadarIff(c, color, startx, starty, endx, endy, rdrPts, iffPts)
+        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts, iffPts)
+        retRadarPts[x] = retVal.rdrPts
+        retIffPts[x] = retVal.iPts
       }
     }
   
@@ -427,9 +431,13 @@ export function drawArrow(
         desiredHeading: orientation==="EW" ? 360 : 90,
         z: alts,
         numContacts: numContacts,
-        type:type
+        type:type,
+        radarPoints: retRadarPts,
+        iffPoints: retIffPts
     };
 
+    console.log(group.radarPoints)
+    console.log(group.iffPoints)
     return group;
 }
 

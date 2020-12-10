@@ -50,8 +50,8 @@ export type Group = {
     maneuvered?: boolean,
     trackDir?: string,
     callsign?: string,
-    radarPoints?: Bullseye[],
-    iffPoints?: Bullseye[]
+    radarPoints?: Bullseye[][],
+    iffPoints?: Bullseye[][]
 }
 
 export type DrawAnswer = {

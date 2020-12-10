@@ -138,10 +138,16 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
         this.setState({answer})
     }
 
+    /**
+     * Do nothing if changing style for procedural
+     */
+    handleDataStyleChange = ():void =>{
+        // do nothing
+    }
+
     render():ReactElement {
         const { canvasConfig, braaFirst, answer } = this.state
         const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } = this.state
-
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>} >
@@ -159,6 +165,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                         braaChanged={this.onToggleMeasurements}
                         startAnimate={this.startAnimate}
                         pauseAnimate={this.pauseAnimate}
+                        handleDataStyleChange={this.handleDataStyleChange}
                     />
                 </Suspense>  
 
@@ -181,6 +188,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                             sliderSpeed={speedSliderValue}
                             resetCallback={this.pauseAnimate}
                             animateCallback={this.startAnimate}
+                            dataStyle="arrow"
                         />
 
                         <ChatBox 

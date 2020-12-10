@@ -73,14 +73,14 @@ export const drawCap:DrawFunction = (
         nOffset = 12
         ng = drawGroupCap (canvas, props.orientation, nNumContacts, startX, startY);
     } else {
-        ng = drawArrow(canvas, props.orientation, nNumContacts, startX, startY, heading1 + offsetDeg1);
+        ng = drawArrow(canvas, props.orientation, nNumContacts, startX, startY, heading1 + offsetDeg1, props.dataStyle);
     }
     if (sgCap){
         strackDir = "CAP";
         sOffset = 12
         sg = drawGroupCap (canvas, props.orientation, sNumContacts, startX + distanceX, startY + distanceY);
     } else {
-        sg = drawArrow(canvas, props.orientation, sNumContacts, startX + distanceX, startY + distanceY, heading2 + offsetDeg2);
+        sg = drawArrow(canvas, props.orientation, sNumContacts, startX + distanceX, startY + distanceY, heading2 + offsetDeg2, props.dataStyle);
     }
     
     let realWidth:number
