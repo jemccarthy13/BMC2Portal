@@ -251,7 +251,8 @@ function drawRadarIff(
   endx:number,
   endy:number,
   radarPts: Bullseye[], 
-  iffPts:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[]}
+  iffPts:Bullseye[],
+  drawnRadar:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[], drawnRdr:Bullseye[]}
 {
   // set initial point(s) and math calculations
   c.strokeStyle = "#FF8C00"
@@ -263,6 +264,7 @@ function drawRadarIff(
 
   const rdrPts:Bullseye[] = []
   const iPts: Bullseye[] = []
+  const drwPts: Bullseye[] = []
 
   // draw the radar trail
   if (!radarPts || radarPts.length === 0){
@@ -272,13 +274,18 @@ function drawRadarIff(
       xPos = startx+ offsetX*mult + jit* Math.random()+Math.random()+Math.random()
       yPos = starty+offsetY*mult + jit*Math.random()+Math.random()+Math.random()
       rdrPts.push({x:xPos, y:yPos})
+      drwPts.push({x:xPos,y:yPos})
     }
   } else {
-    for (let idx = 0; idx < radarPts.length; idx++){
-      rdrPts.push(radarPts[idx])
+    for (let i = 0; i < radarPts.length; i++){
+      rdrPts.push(radarPts[i])
+    }
+    for (let idx = 0; idx < drawnRadar.length; idx++){
+      drwPts.push(drawnRadar[idx])
     } 
   }
-  rdrPts.forEach((pt) =>{
+
+  drwPts.forEach((pt) =>{
     c.beginPath()
     c.moveTo(pt.x, pt.y)
     c.lineTo(pt.x-3, pt.y-3)
@@ -291,10 +298,9 @@ function drawRadarIff(
     xPos = startx
     yPos = starty
 
-    // TODO -- fix blue IFF before pushing to awardspace / merging to proc branch
     // draw IFF
     if (!iffPts || iffPts.length === 0){
-      for (let mult = 0; mult< 4; mult++){
+      for (let mult = 0; mult < 4; mult++){
         xPos = startx+ (offsetX*mult) + (offsetX*0.5)
         yPos = starty+ (offsetY*mult) + (offsetY*0.5)
         iPts.push({x:xPos,y:yPos})     
@@ -304,8 +310,12 @@ function drawRadarIff(
         iPts.push(iffPts[k])
       }
     }
+    
+    console.log(iPts)
     for (let l = 0; l < iPts.length; l++){
       c.strokeStyle = "blue"
+      xPos=iPts[l].x
+      yPos=iPts[l].y
       c.beginPath()
       c.moveTo(xPos, yPos)
       c.lineTo(xPos-3, yPos)
@@ -314,6 +324,7 @@ function drawRadarIff(
       c.lineTo(xPos, yPos)
       c.stroke()
     }
+    console.log(iPts)
   } 
 
   const cPt = rdrPts[rdrPts.length-1]
@@ -330,7 +341,7 @@ function drawRadarIff(
   c.stroke()
   c.stroke()
 
-  return {rdrPts, iPts}
+  return {rdrPts, iPts, drawnRdr: drwPts }
 }
 
 /**
@@ -355,7 +366,8 @@ export function drawArrow(
     color = "red",
     type="ftr",
     rdrPts:Bullseye[][]=[],
-    iffPts:Bullseye[][]=[] ): Group {
+    iffPts:Bullseye[][]=[],
+    drawnRadar:Bullseye[][]=[] ): Group {
 
     const c = canvas.getContext("2d");
 
@@ -370,6 +382,7 @@ export function drawArrow(
         numContacts: 1,
         type:type,
         radarPoints:[],
+        drawnRadar:[],
         iffPoints:[]
     }
 
@@ -386,6 +399,7 @@ export function drawArrow(
 
     const retRadarPts = rdrPts
     const retIffPts = iffPts
+    const retDrwPts = drawnRadar
     for (let x = 0; x < numContacts; x++){
 
       const vectors = headingToDeg(heading)
@@ -422,9 +436,11 @@ export function drawArrow(
         const dist:number = canvas.width / (canvas.width / 35);
         endy = starty + dist * -Math.sin(rads);
         endx = startx + dist * Math.cos(rads);
-        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts[x], iffPts[x])
+
+        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts[x], iffPts[x], drawnRadar[x])
         retRadarPts[x] = retVal.rdrPts
         retIffPts[x] = retVal.iPts
+        retDrwPts[x] = retVal.drawnRdr
       }
     }
   
@@ -449,7 +465,8 @@ export function drawArrow(
         numContacts: numContacts,
         type:type,
         radarPoints: retRadarPts,
-        iffPoints: retIffPts
+        iffPoints: retIffPts,
+        drawnRadar: retDrwPts
     };
 
     return group;
@@ -474,7 +491,7 @@ export function drawGroupCap(
   type="ftr"): Group{
 
   const c = canvas.getContext("2d");
-  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr", radarPoints:[], iffPoints:[]}}
+  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr", radarPoints:[], iffPoints:[], drawnRadar:[]}}
 
   // eslint-disable-next-line
   let alts:number[] = [...Array(contacts)].map(_=>randomNumber(15,45));
@@ -531,7 +548,8 @@ export function drawGroupCap(
     numContacts: contacts,
     type,
     radarPoints:[],
-    iffPoints:[]
+    iffPoints:[],
+    drawnRadar:[]
   };
 
   return group;

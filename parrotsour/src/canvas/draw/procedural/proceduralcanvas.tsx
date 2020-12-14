@@ -48,7 +48,7 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         super(props)
         this.state = {
             bullseye: {x:0, y:0},
-            bluePos: {x:0, y:0, startX:0, startY:0, heading:270, desiredHeading: 270, numContacts:4, z:[100], type:"ftr", radarPoints:[]},
+            bluePos: {x:0, y:0, startX:0, startY:0, heading:270, desiredHeading: 270, numContacts:4, z:[100], type:"ftr", radarPoints:[], drawnRadar:[]},
             reDraw: this.drawPicture,
             answer: {pic:"", groups:[]}
         }

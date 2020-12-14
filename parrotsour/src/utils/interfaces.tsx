@@ -51,6 +51,7 @@ export type Group = {
     trackDir?: string,
     callsign?: string,
     radarPoints: Bullseye[][],
+    drawnRadar: Bullseye[][],
     iffPoints?: Bullseye[][]
 }
 
