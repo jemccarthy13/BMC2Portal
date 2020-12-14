@@ -13,7 +13,8 @@ interface PSCProps {
 
 interface PSCState {
     speedSliderValue: number,
-    showHelpText: boolean
+    showHelpText: boolean,
+    showHelpArrowText: boolean
 }
 
 /**
@@ -32,6 +33,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
         this.state = {
             speedSliderValue: 50,
             showHelpText: false,
+            showHelpArrowText:false
         }
     }
 
@@ -77,6 +79,21 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
         this.setState({showHelpText: false})
     }
 
+    
+    /**
+     * Toggle display of help text
+     */
+    handleToggleArrowHelp = ():void => {
+        this.setState(prevState=>({showHelpArrowText: !prevState.showHelpArrowText}))
+    }
+
+    /**
+     * Close the help text dialog
+     */
+    handleHelpArrowClose = ():void =>{
+        this.setState({showHelpArrowText: false})
+    }
+
     /**
      * Handle data trail toggle
      */
@@ -86,7 +103,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
     }
 
     render(): ReactElement{
-        const {speedSliderValue, showHelpText} = this.state
+        const {speedSliderValue, showHelpText, showHelpArrowText} = this.state
         const {modifyCanvas, braaChanged} = this.props
         return(
             <div>
@@ -152,9 +169,6 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                                 <DialogContentText>
                                     BRAA = ALT, BRAA, BULL
                                 </DialogContentText>
-                                <DialogContentText>
-                                    The ARROW/RADAR toggle changes the picture from arrows to radar trails.
-                                </DialogContentText>
                             </DialogContent>
                         </Dialog>
                         </div>
@@ -166,6 +180,23 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             <input type="checkbox" id="cursordisp" defaultChecked onChange={this.handleDataStyleChange} />
                             <span className="slider round"><span className="on"> Arrow </span><span className="off"> Radar </span></span>
                         </label>
+                        <button 
+                            style={{padding:"0px", margin:"5px", float:"right"}}
+                            className="helpicon"
+                            id="btnDisplayAlert"
+                            type="button"
+                            onClick={this.handleToggleArrowHelp}>
+                                ?
+                        </button>                
+                        <Dialog
+                            open={showHelpArrowText}
+                            onClose={this.handleHelpArrowClose} >
+                            <DialogContent>
+                                <DialogContentText>
+                                    The ARROW/RADAR toggle changes the picture from arrows to radar trails.
+                                </DialogContentText>
+                            </DialogContent>
+                        </Dialog>
                         </div>
                     </div>
                 </div>    
