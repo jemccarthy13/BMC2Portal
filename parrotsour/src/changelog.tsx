@@ -14,7 +14,7 @@ function ChangeLog():JSX.Element {
             <li> Procedural simulation </li>
             --------------------------------------- <br/>
             --------------------------------------- <br/> 
-            Version 3.1.0 - 09 Dec 2020 <br/>
+            Version 3.1.0 - 14 Dec 2020 <br/>
             --------------------------------------- <br/>
             Features
             <li>Finished conversion to typescript - also React Component library for varied use(s)</li>
