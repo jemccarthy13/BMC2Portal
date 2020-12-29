@@ -1,8 +1,17 @@
-import {SvgIconComponent} from "@material-ui/icons";
+import React from "react";
 
-export default interface Category {
-	id: string,
-	icon: JSX.Element,
-	link?: string,
-	children?: Category[]
+class Category {
+	name: string;
+	icon?: JSX.Element;
+	link?: string;
+	children?: Category[];
+
+	constructor(name: string, icon?: JSX.Element, link?: string, children?: Category[]) {
+		this.name = name;
+		this.icon = icon;
+		this.link = link;
+		this.children = children;
+	}
 }
+
+export default Category;

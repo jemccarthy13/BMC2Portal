@@ -1,55 +1,73 @@
 import React, {ReactElement} from "react";
 
-import {Accordion, AccordionDetails, AccordionSummary, Button, Drawer, Link, Typography} from '@material-ui/core';
+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
-import {BusinessCenter, ExpandMore, FlightTakeoff, Help, Inbox} from '@material-ui/icons';
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Button,
+	Drawer,
+	List,
+	ListItem, ListItemIcon,
+	ListItemText,
+	ListSubheader,
+	Typography
+} from '@material-ui/core';
 
-import Category from "./Category";
+import {BusinessCenter, ExpandLess, ExpandMore, FlightTakeoff, Help, Inbox} from '@material-ui/icons';
+
+import Category from "./category";
+import NavMenuItem from "./navmenuitem";
 
 const categories: Category[] = [
 	{
-		id: "Flight Deck",
-		icon: <FlightTakeoff/>,
+		name: 'Flight Deck',
 		children: [
-			{id: "First Link", icon: <Help/>},
-			{id: "Second Link", icon: <Help/>},
-			{id: "AR Tracks", icon: <Inbox/>, link: "/common/artracks.html"},
-			{id: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
-			{id: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
+			{name: "First Link", icon: <Help/>},
+			{name: "Second Link", icon: <Help/>},
+			{name: "AR Tracks", icon: <Inbox/>, link: "/common/artracks.html"},
+			{name: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
+			{name: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
 		],
 	},
 	{
-		id: 'Mission Crew',
+		name: 'Mission Crew',
 		icon: <FlightTakeoff/>,
 		children: [
-			{id: "ParrotSour", icon: <Inbox/>, link: "/msncrew/parrotsour.html"},
-			{id: "Air Spaces", icon: <Inbox/>, link: "/msncrew/airspacelist.html"},
-			{id: "Fighter Units", icon: <Inbox/>, link: "/msncrew/unitlist.html"},
-			{id: "LOAs", icon: <Inbox/>, link: "/msncrew/loalist.html"},
-			{id: "AR Tracks", icon: <BusinessCenter/>, link: "/common/artracks.html"},
-			{id: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
-			{id: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
+			{name: "ParrotSour", icon: <Inbox/>, link: "/msncrew/parrotsour.html"},
+			{name: "Air Spaces", icon: <Inbox/>, link: "/msncrew/airspacelist.html"},
+			{name: "Fighter Units", icon: <Inbox/>, link: "/msncrew/unitlist.html"},
+			{name: "LOAs", icon: <Inbox/>, link: "/msncrew/loalist.html"},
+			{name: "AR Tracks", icon: <BusinessCenter/>, link: "/common/artracks.html"},
+			{name: "E-3 Orbits", icon: <Inbox/>, link: "/common/orbits.html"},
+			{name: "Debrief", icon: <BusinessCenter/>, link: "/common/debrief.html"}
 		],
 	},
 	{
-		id: 'Lessons Learned',
+		name: 'Lessons Learned',
 		icon: <FlightTakeoff/>,
-		link: "/common/lessons.html"
+		link: "/common/lessons.html",
+		children: undefined
 	},
 	{
-		id: 'FAA Map',
+		name: 'FAA Map',
 		icon: <FlightTakeoff/>,
-		link: "/common/faamap.html"
+		link: "/common/faamap.html",
+		children: undefined
+
 	},
 	{
-		id: 'Links $ Resources',
+		name: 'Links & Resources',
 		icon: <FlightTakeoff/>,
-		link: "/resources.html"
+		link: "/resources.html",
+		children: undefined
 	},
 	{
-		id: 'Contact',
+		name: 'Contact',
 		icon: <FlightTakeoff/>,
-		link: "/contact.html"
+		link: "/contact.html",
+		children: undefined
 	},
 ];
 
@@ -64,39 +82,55 @@ const categories: Category[] = [
 //Basic style guide
 
 const SideBar = (): ReactElement => {
+
+	// These are categories with links
+	const parentCategories = categories.filter((category: Category) => (
+		category.children !== undefined
+	));
+
+	// These are categories with no links
+	const orphanCategories = categories.filter((category: Category) => (
+		category.children === undefined
+	));
+
+	const handleNavigate = (): void => {
+		const {link} = this.props
+
+		if (link) {
+			window.location.href = link;
+		}
+	}
+	
 	return (
 		<div>
-			<Drawer variant="permanent" anchor="left">
-				{categories.filter(aCategory => aCategory.children != undefined)
-					.map((aCategory: Category) => (
-						<Accordion key={aCategory.id}>
-							<AccordionSummary expandIcon={<ExpandMore/>}>
-								<Typography>{aCategory.id}</Typography>
-							</AccordionSummary>
-							<AccordionDetails>
-								{aCategory.children?.map(aChild =>
-									(<Button key={aChild.id} variant="contained" startIcon={aChild.icon}>
-										<Link onClick={() => {
-											window.location.href = aChild.link as string;
-										}}>
-											{aChild.id}
-										</Link>
-									</Button>))
-								}
-							</AccordionDetails>
-						</Accordion>))
-				};
-				{categories.filter(aCategory => aCategory.children === undefined)
-					.map((aCategory: Category) => (
-						<Link
-							key={aCategory.id}
-							onClick={() => {
-								window.location.href = aCategory.link as string;
-							}}>
-							<Button variant="contained" startIcon={aCategory.icon}/>
-						</Link>))
-				};
-			</Drawer>
+			<List
+				component="nav"
+				subheader={
+					<ListSubheader>
+						Training Portal
+					</ListSubheader>
+				}
+			>
+				{parentCategories.map((aCategory: Category) => (
+					<ListItem button key={aCategory.name} onClick={}>
+						<ListItemIcon>
+							{aCategory.icon}
+						</ListItemIcon>
+						<ListItemText primary={aCategory.name} />
+						{true ? <ExpandLess/> : <ExpandMore/>}
+					</ListItem>
+				))}
+
+				{orphanCategories.map((aCategory: Category) => (
+					<ListItem button key={aCategory.name} onClick={handleNavigate}>
+						<ListItemIcon>
+							{aCategory.icon}
+						</ListItemIcon>
+						<ListItemText primary={aCategory.name} />
+					</ListItem>
+				))}
+			</List>
+
 		</div>
 
 	);
