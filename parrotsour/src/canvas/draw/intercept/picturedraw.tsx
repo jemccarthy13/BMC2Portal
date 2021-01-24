@@ -892,7 +892,7 @@ export const drawPackage:DrawFunction = (
             tLbl +" PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range;
       } else {
         realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
-            tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + leadPackage.range + " "+
+            tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range + " "+
             lLbl +" PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range;
       }
       finalAnswer = realAnswer

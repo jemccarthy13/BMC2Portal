@@ -8,8 +8,8 @@ import "./css/styles.css";
 import "./css/body.css";
 import "./css/fonts.css";
 
-const ParrotSour = lazy(()=>import("./pscomponents/parrotsour"))
-const ChangeLog = lazy(()=>import('./changelog'))
+import ParrotSour from "./pscomponents/parrotsour";
+import ChangeLog from "changelog";
 
 const browserHistory = createBrowserHistory();
 
