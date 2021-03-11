@@ -4,7 +4,7 @@ import React, {ReactElement} from 'react';
 
 import '../../css/sidebar.css';
 
-import Category from "./category";
+import Category from "./Category";
 
 /**
  * This Component contains the logic for Navigation Pane menus and menu items.

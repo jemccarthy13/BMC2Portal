@@ -17,7 +17,7 @@ import {
 
 import {BusinessCenter, ExpandLess, ExpandMore, FlightTakeoff, Help, Inbox} from '@material-ui/icons';
 
-import Category from "./category";
+import Category from "./Category";
 import NavMenuItem from "./navmenuitem";
 
 const categories: Category[] = [
@@ -112,7 +112,7 @@ const SideBar = (): ReactElement => {
 				}
 			>
 				{parentCategories.map((aCategory: Category) => (
-					<ListItem button key={aCategory.name} onClick={}>
+					<ListItem button key={aCategory.name}>
 						<ListItemIcon>
 							{aCategory.icon}
 						</ListItemIcon>
