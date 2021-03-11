@@ -8,8 +8,8 @@ import "./css/styles.css";
 import "./css/body.css";
 import "./css/fonts.css";
 
-const ParrotSour = lazy(()=>import("./pscomponents/parrotsour"))
-const ChangeLog = lazy(()=>import('./changelog'))
+import ParrotSour from "./pscomponents/parrotsour";
+import ChangeLog from "changelog";
 
 const browserHistory = createBrowserHistory();
 
@@ -57,7 +57,7 @@ const Home = ():ReactElement => {
     <div className="body-content" style={{width:"100%"}}>
       <Router history={browserHistory}>
         <Suspense fallback={<div>Loading...</div>} >
-        <Route exact path="/" component={getPSP} />
+        <Route exact path="/" component={getPSI} />
         <Route exact path="/changelog.html" component={ChangeLog} />
         <Route path="/msncrew/parrotsour.html" render={getPS} />
         <Route path="/msncrew/parrotsourintercept.html" render={getPSI} />

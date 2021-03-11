@@ -1,1 +1,1 @@
-declare module 'parrotsour-components'
+declare module "parrotsour-components"

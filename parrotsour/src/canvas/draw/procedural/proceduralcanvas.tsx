@@ -1,30 +1,27 @@
 import React, { ReactElement } from 'react'
 
-import Canvas from './canvas'
+import Canvas from '../../canvas'
 
-import {randomNumber } from '../utils/mathutilities'
-import { drawArrow, drawBullseye } from './draw/drawutils'
-import { Bullseye, DrawAnswer, DrawFunction, Group } from '../utils/interfaces'
-import { drawAzimuth, drawChampagne, drawLadder, drawLeadEdge, drawPackage, drawRange, drawVic, drawWall } from './draw/intercept/picturedraw'
-import { drawThreat } from './draw/intercept/threatdraw'
-import { drawCap } from './draw/intercept/capdraw'
-import { drawEA } from './draw/intercept/eadraw'
-import { drawPOD } from './draw/intercept/poddraw'
-import { animateGroups, pauseFight } from './draw/intercept/animate'
+import { randomNumber } from '../../../utils/mathutilities'
+import { drawBullseye, drawGroupCap, drawLine, drawText } from '../drawutils'
+import { drawProcedural } from './draw'
+import { Bullseye, DrawAnswer, Group } from '../../../utils/interfaces'
+//import { animateGroups, pauseFight } from './draw/procedural/animate'
+import { pauseFight } from './animate'
 
-export type PicCanvasProps = {
+export type ProcCanvasProps = {
     height: number,
     width: number,
     picType: string,
     orientation: string,
     braaFirst: boolean,
-    format:string,
     showMeasurements:boolean,
     isHardMode: boolean,
-    setAnswer: {(answer:string):void},
+    setAnswer: {(answer:DrawAnswer):void},
     newPic: boolean,
     animate:boolean,
     sliderSpeed: number,
+    dataStyle: string,
     resetCallback: ()=>void,
     animateCallback: ()=>void
 }
@@ -33,7 +30,7 @@ export interface ReDrawFunction {
     (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, forced?: boolean, start?: Bullseye):DrawAnswer
 }
 
-export type PicCanvasState = {
+export type ProcCanvasState = {
     bullseye: Bullseye
     bluePos: Group,
     reDraw: ReDrawFunction,
@@ -45,13 +42,13 @@ export type PicCanvasState = {
 /**
  * This component is the main control for drawing pictures for intercepts
  */
-export default class PictureCanvas extends React.PureComponent<PicCanvasProps, PicCanvasState> {
+export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProps, ProcCanvasState> {
 
-    constructor(props: PicCanvasProps){
+    constructor(props: ProcCanvasProps){
         super(props)
         this.state = {
             bullseye: {x:0, y:0},
-            bluePos: {x:0, y:0, startX:0, startY:0, heading:270, desiredHeading: 270, numContacts:4, z:[100], type:"ftr"},
+            bluePos: {x:0, y:0, startX:0, startY:0, heading:270, desiredHeading: 270, numContacts:4, z:[100], type:"ftr", radarPoints:[], drawnRadar:[]},
             reDraw: this.drawPicture,
             answer: {pic:"", groups:[]}
         }
@@ -63,7 +60,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
      * animation is not re-triggered when any other prop value changes 
      * @param prevProps - previous set of PicCanvasProps
      */
-    componentDidUpdate = (prevProps: PicCanvasProps):void => {
+    componentDidUpdate = (prevProps: ProcCanvasProps):void => {
         // eslint-disable-next-line
         var {animate, ...rest} = prevProps
         const oldAnimate = animate
@@ -86,27 +83,20 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
         }
     
         if (areEqualShallow(rest, newrest) && oldAnimate !== newAnimate){   
-            const { animate, showMeasurements, resetCallback } = this.props 
-            const { canvas, animateCanvas, answer } = this.state
+            // const { animate, showMeasurements, resetCallback } = this.props 
+            // const { canvas, animateCanvas, answer } = this.state
+            const { animate, showMeasurements } = this.props
+            const { canvas, animateCanvas } = this.state
+            
             if (animate){
                 if (canvas && animateCanvas){
-                  animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
+                    // TODO - animate for procedural
+                    // animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
                 }
             } else {
                 pauseFight(showMeasurements)
             }
         }
-    }
-
-    /**
-     * Pick a random picture type for drawing
-     * @param leadingEdge - true iff leading edge or packages. Set to true to avoid
-     * recursive redraw
-     */
-    getRandomPicType = (leadingEdge: boolean):string => {
-        const numType = randomNumber(0,(leadingEdge)? 7 : 9)
-        const types = ["azimuth", "range", "vic", "wall","ladder", "champagne", "cap","leading edge","package"];
-        return types[numType];
     }
     
     /**
@@ -117,39 +107,52 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
      * @param start (optional) start position for the picture
      */
     drawPicture = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, forced?: boolean, start?: Bullseye):DrawAnswer => {
-        const { picType } = this.props
-
-        const isLeadEdge = (picType === "leading edge" || picType === "package" || picType==="ea")
-
-        let type = "azimuth"
-        if (forced) {
-            type = this.getRandomPicType(true)
-        } else {
-            type = ((picType ==="random") ? this.getRandomPicType(isLeadEdge) : picType)
-        }
-      
-        let drawFunc:DrawFunction = this.functions[type];
-        if (drawFunc === undefined) drawFunc = drawAzimuth;
-      
-        const answer = drawFunc(canvas, context, this.props, this.state, start);
-
-        return answer
+        return drawProcedural(canvas, context, this.props, this.state, start);
     }
 
-    // A list of all avaiable functions
-    functions: { [key:string]: DrawFunction } = {
-        "azimuth": drawAzimuth,
-        "range": drawRange,
-        "ladder" : drawLadder,
-        "wall" : drawWall,
-        "vic": drawVic,
-        "champagne":drawChampagne,
-        "cap": drawCap,
-        "threat": drawThreat,
-        "ea": drawEA,
-        "pod": drawPOD,
-        "leading edge": drawLeadEdge,
-        "package": drawPackage,
+    drawCGRSGrid = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D):void => {
+        for (let x = 0; x < canvas.width; x+=40){
+            if (x % 120 === 0){
+                drawLine(context, x, 0, x, canvas.height)
+            } else {
+                drawLine(context, x, 0, x, canvas.height, "gray")
+            }
+        }
+        for (let y = 0; y < canvas.height; y += 40){
+            if (y % 120 === 0){
+                drawLine(context, 0, y, canvas.width, y)
+            } else {
+                drawLine(context, 0, y, canvas.width, y, "gray")
+            }
+        }
+
+        const startRow = randomNumber(5, 158)
+        const startCol1 = randomNumber(0,25)
+        const startCol2 = randomNumber(0,26)
+
+        const chr = (n:number):string => {
+            return String.fromCharCode (65+n)
+        }
+
+        let colC = 0
+        let off = 0
+        let rowC = startRow
+        let col2Chr = startCol2
+        for (let y = 10; y < canvas.height; y+=120){
+            for (let x = 10; x < canvas.width; x+=120){
+                if (col2Chr + colC > 25){
+                    col2Chr = 0
+                    off++
+                    colC = 0
+                }
+                drawText(canvas,context, rowC+chr(startCol1+off)+ chr(col2Chr+colC), x+33, y+60)
+                colC ++
+            }
+            col2Chr = startCol2
+            colC = 0;
+            off = 0;
+            rowC++
+        }
     }
 
     /**
@@ -163,35 +166,32 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
         if (context === null || context ===undefined) return
         const bullseye = drawBullseye(canvas, context)
 
-        let xPos = canvas.width-20
-        let yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
-        let heading = 270
+        this.drawCGRSGrid(canvas, context)
 
+        const xPos = randomNumber(canvas.width * 0.33, canvas.height * 0.66)
+        const yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
+       
         const { orientation } = this.props 
-
-        if (orientation === "NS"){
-            xPos = randomNumber(canvas.width * 0.33, canvas.width * 0.66);
-            yPos = 20;
-            heading = 180;
-        }
         
-        const bluePos = drawArrow(canvas, orientation, 4, xPos, yPos, heading, "blue");
+        //const bluePos = drawArrow(canvas, orientation, 1, xPos, yPos, heading, "blue");
+        const bluePos = drawGroupCap(canvas, orientation, 1, xPos, yPos, "blue")
+        bluePos.callsign="VR01"
+        drawText(canvas, context, bluePos.callsign, bluePos.x, bluePos.y+35, 12);
         await this.setState({bluePos, bullseye})
         
-        const blueOnly = context.getImageData(0, 0, canvas.width, canvas.height)
-
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
         const answer: DrawAnswer = await this.drawPicture(canvas, context)
 
         const { setAnswer } = this.props
-        setAnswer(answer.pic)
+        setAnswer(answer)
         
-        this.setState({canvas, answer, animateCanvas: blueOnly})
+        this.setState({canvas, answer, animateCanvas: imageData})
     }
 
     render(): ReactElement{
         const { height, width, braaFirst, 
             picType, showMeasurements, isHardMode, 
-            newPic,resetCallback,animateCallback, animate  } = this.props
+            newPic,resetCallback,animateCallback, animate, dataStyle } = this.props
         const { bullseye } = this.state
         return (<Canvas 
             draw={this.draw} 
@@ -206,6 +206,7 @@ export default class PictureCanvas extends React.PureComponent<PicCanvasProps, P
             resetCallback={resetCallback}
             animate={animate}
             animateCallback={animateCallback}
+            dataStyle={dataStyle}
         />)
     }
 }

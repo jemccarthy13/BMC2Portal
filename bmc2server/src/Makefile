@@ -10,3 +10,6 @@ bmc2server_start_smock:
 	@echo REACT_APP_SERVER_BASE_URL=MOCK > ./.env.development.local
 	go get . && go run main.go
 
+bmc2server_start_smock-ni:
+	@echo REACT_APP_SERVER_BASE_URL=MOCK > ./.env.development.local
+	go run main.go

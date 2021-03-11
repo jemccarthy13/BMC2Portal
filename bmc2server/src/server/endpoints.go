@@ -113,6 +113,11 @@ func (e *EP) UploadLOA(ctx echo.Context) error {
 		os.Mkdir(dir, os.ModeDir)
 	}
 
+	fName := file.Filename
+	fmt.Println(fName)
+
+	// TODO - regex whitelist of Filename pattern for .pdfs 
+
 	dst, err := os.Create(dir + "/" + file.Filename)
 	if err != nil {
 		fmt.Println(err)

@@ -7,12 +7,14 @@ interface PSCProps {
     startAnimate: {():void}
     pauseAnimate: {():void},
     braaChanged: {():void},
-    modifyCanvas: {():void}
+    modifyCanvas: {():void},
+    handleDataStyleChange:{():void}
 }
 
 interface PSCState {
     speedSliderValue: number,
-    showHelpText: boolean
+    showHelpText: boolean,
+    showHelpArrowText: boolean
 }
 
 /**
@@ -31,6 +33,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
         this.state = {
             speedSliderValue: 50,
             showHelpText: false,
+            showHelpArrowText:false
         }
     }
 
@@ -76,8 +79,31 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
         this.setState({showHelpText: false})
     }
 
+    
+    /**
+     * Toggle display of help text
+     */
+    handleToggleArrowHelp = ():void => {
+        this.setState(prevState=>({showHelpArrowText: !prevState.showHelpArrowText}))
+    }
+
+    /**
+     * Close the help text dialog
+     */
+    handleHelpArrowClose = ():void =>{
+        this.setState({showHelpArrowText: false})
+    }
+
+    /**
+     * Handle data trail toggle
+     */
+    handleDataStyleChange = ():void =>{
+        const { handleDataStyleChange } = this.props
+        handleDataStyleChange()
+    }
+
     render(): ReactElement{
-        const {speedSliderValue, showHelpText} = this.state
+        const {speedSliderValue, showHelpText, showHelpArrowText} = this.state
         const {modifyCanvas, braaChanged} = this.props
         return(
             <div>
@@ -113,7 +139,8 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             <span className="slider round"><span className="on">N/S</span><span className="off">E/W</span></span>
                         </label>
                     </div>
-                    <div>
+                    <div style={{display:"inline-flex"}}>
+                        <div style={{display:"inline-flex"}}>
                         <label style={{float:"left", paddingLeft:"75px", paddingRight:"10px"}}> 
                             Display first: 
                         </label>
@@ -134,7 +161,7 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                             onClose={this.handleHelpClose} >
                             <DialogContent>
                                 <DialogContentText>
-                                    This will change the order of the bullseye and braa measurements on screen.
+                                    The BULL/BRAA toggle will change the order of the bullseye and braa measurements on screen.
                                 </DialogContentText>
                                 <DialogContentText>
                                     BULL = ALT, BULL, BRAA
@@ -144,6 +171,33 @@ export default class ParrotSourControls extends React.PureComponent<PSCProps, PS
                                 </DialogContentText>
                             </DialogContent>
                         </Dialog>
+                        </div>
+                        <div>
+                        <label style={{float:"left", paddingLeft:"75px", paddingRight:"10px"}}> 
+                            Data Trail: 
+                        </label>
+                        <label className="switch">
+                            <input type="checkbox" id="cursordisp" defaultChecked onChange={this.handleDataStyleChange} />
+                            <span className="slider round"><span className="on"> Arrow </span><span className="off"> Radar </span></span>
+                        </label>
+                        <button 
+                            style={{padding:"0px", margin:"5px", float:"right"}}
+                            className="helpicon"
+                            id="btnDisplayAlert"
+                            type="button"
+                            onClick={this.handleToggleArrowHelp}>
+                                ?
+                        </button>                
+                        <Dialog
+                            open={showHelpArrowText}
+                            onClose={this.handleHelpArrowClose} >
+                            <DialogContent>
+                                <DialogContentText>
+                                    The ARROW/RADAR toggle changes the picture from arrows to radar trails.
+                                </DialogContentText>
+                            </DialogContent>
+                        </Dialog>
+                        </div>
                     </div>
                 </div>    
             </div>        

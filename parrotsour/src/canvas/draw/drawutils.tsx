@@ -209,6 +209,141 @@ export function headingToDeg(heading: number):
   }
 }
 
+function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, prevX:number, prevY:number){
+  const deltX = startx - prevX
+  const deltY = starty - prevY
+  if (id==="friend"){
+    // draw friend symbology
+    c.strokeStyle="blue"
+    c.beginPath()
+    c.moveTo((startx+deltX)-2.5, (starty+deltY)-2.5)
+    c.arc(startx+deltX-2.5,starty+deltY-0.5, 2.5, toRadians(180), toRadians(360))
+    c.stroke()
+  } else if (id === "suspect") {
+    c.strokeStyle = "#FA8072"
+  } else {
+    c.strokeStyle="red"
+  }
+  if (id==="suspect" || id==="hostile"){
+    c.beginPath()
+    const headX = (startx+deltX)-3
+    const headY = (starty+deltY)-3
+    
+    const leftX = headX + 5*Math.cos(toRadians(240))
+    const leftY = headY + 5-Math.sin(toRadians(240))
+    c.moveTo(headX, headY)
+    c.lineTo(leftX,leftY)
+    
+    const rightX = headX + 5*Math.cos(toRadians(300))
+    const rightY = headY + 5-Math.sin(toRadians(300))
+    c.moveTo(headX,headY)
+    c.lineTo(rightX,rightY)
+    c.stroke()
+    c.stroke()
+  }
+}
+
+function drawRadarIff(
+  c:CanvasRenderingContext2D,
+  color:string,
+  startx:number,
+  starty:number,
+  endx:number,
+  endy:number,
+  radarPts: Bullseye[], 
+  iffPts:Bullseye[],
+  drawnRadar:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[], drawnRdr:Bullseye[]}
+{
+  // set initial point(s) and math calculations
+  c.strokeStyle = "#FF8C00"
+  c.beginPath()
+  let xPos = startx
+  let yPos = starty
+  const offsetX = (endx-startx)/4
+  const offsetY = (endy-starty)/4
+
+  const rdrPts:Bullseye[] = []
+  const iPts: Bullseye[] = []
+  const drwPts: Bullseye[] = []
+
+  // draw the radar trail
+  if (!radarPts || radarPts.length === 0){
+    for (let mult = 0; mult< 5; mult++){
+      // add a bit of jitter with randomness
+      const jit = color==="blue" ? 1 : 5
+      xPos = startx+ offsetX*mult + jit* Math.random()+Math.random()+Math.random()
+      yPos = starty+offsetY*mult + jit*Math.random()+Math.random()+Math.random()
+      rdrPts.push({x:xPos, y:yPos})
+      drwPts.push({x:xPos,y:yPos})
+    }
+  } else {
+    for (let i = 0; i < radarPts.length; i++){
+      rdrPts.push(radarPts[i])
+    }
+    for (let idx = 0; idx < drawnRadar.length; idx++){
+      drwPts.push(drawnRadar[idx])
+    } 
+  }
+
+  drwPts.forEach((pt) =>{
+    c.beginPath()
+    c.moveTo(pt.x, pt.y)
+    c.lineTo(pt.x-3, pt.y-3)
+    c.stroke()
+    c.stroke()
+  })
+  
+  // Draw symbology
+  if (color ==="blue"){
+    xPos = startx
+    yPos = starty
+
+    // draw IFF
+    if (!iffPts || iffPts.length === 0){
+      for (let mult = 0; mult < 4; mult++){
+        xPos = startx+ (offsetX*mult) + (offsetX*0.5)
+        yPos = starty+ (offsetY*mult) + (offsetY*0.5)
+        iPts.push({x:xPos,y:yPos})     
+      }
+    } else {
+      for (let k=0; k < iffPts.length; k++){
+        iPts.push(iffPts[k])
+      }
+    }
+    
+    console.log(iPts)
+    for (let l = 0; l < iPts.length; l++){
+      c.strokeStyle = "blue"
+      xPos=iPts[l].x
+      yPos=iPts[l].y
+      c.beginPath()
+      c.moveTo(xPos, yPos)
+      c.lineTo(xPos-3, yPos)
+      c.lineTo(xPos-3, yPos-3)
+      c.lineTo(xPos, yPos-3)
+      c.lineTo(xPos, yPos)
+      c.stroke()
+    }
+    console.log(iPts)
+  } 
+
+  const cPt = rdrPts[rdrPts.length-1]
+  const pPt = rdrPts[rdrPts.length-2]
+  drawSymbology(c, color==="blue"? "friend": "hostile", cPt.x,cPt.y, pPt.x,pPt.y)
+
+  const deltX = cPt.x-pPt.x
+  const deltY = cPt.y-pPt.y
+  // Draw vector stick
+  c.strokeStyle="black"
+  c.beginPath()
+  c.moveTo((cPt.x+deltX)-2.5, (cPt.y+deltY)-2.5)
+  c.lineTo((cPt.x+deltX*1.5)-2.5, (cPt.y+deltY*1.5)-2.5)
+  c.stroke()
+  c.stroke()
+
+  return {rdrPts, iPts, drawnRdr: drwPts }
+}
+
 /**
  * Draw arrows for a group
  * @param canvas Canvas to draw on
@@ -227,8 +362,12 @@ export function drawArrow(
     startx:number,
     starty:number,
     heading: number,
+    dataType:string,
     color = "red",
-    type="ftr" ): Group {
+    type="ftr",
+    rdrPts:Bullseye[][]=[],
+    iffPts:Bullseye[][]=[],
+    drawnRadar:Bullseye[][]=[] ): Group {
 
     const c = canvas.getContext("2d");
 
@@ -241,7 +380,10 @@ export function drawArrow(
         desiredHeading: orientation==="EW" ? 360 : 90,
         z: [0],
         numContacts: 1,
-        type:type
+        type:type,
+        radarPoints:[],
+        drawnRadar:[],
+        iffPoints:[]
     }
 
     if (c === null) return group
@@ -254,6 +396,10 @@ export function drawArrow(
 
     const iStartX = startx
     const iStartY = starty
+
+    const retRadarPts = rdrPts
+    const retIffPts = iffPts
+    const retDrwPts = drawnRadar
     for (let x = 0; x < numContacts; x++){
 
       const vectors = headingToDeg(heading)
@@ -265,23 +411,37 @@ export function drawArrow(
       startx = startx + 5*(Math.cos(offsetRads))
       starty = starty + 5*(-Math.sin(offsetRads))
 
-      const dist:number = canvas.width / (canvas.width / 20);
-  
-      endy = starty + dist * -Math.sin(rads);
-      endx = startx + dist * Math.cos(rads);
+      //let type="radar"
+      if (dataType === "arrow"){
+        
+        const dist:number = canvas.width / (canvas.width / 20);
+    
+        endy = starty + dist * -Math.sin(rads);
+        endx = startx + dist * Math.cos(rads);
+        
+        c.beginPath()  
+        c.moveTo(startx, starty);
+        c.lineTo(endx, endy);
 
-      c.beginPath()  
-      c.moveTo(startx, starty);
-      c.lineTo(endx, endy);
+        const heady:number = endy + 7 * -Math.sin(headRads)
+        const headx:number = endx + 7 * Math.cos(headRads)
+    
+        c.lineTo(headx, heady);
+    
+        c.strokeStyle = color;
+        c.stroke();
+        c.stroke();
+        c.stroke();
+      } else {
+        const dist:number = canvas.width / (canvas.width / 35);
+        endy = starty + dist * -Math.sin(rads);
+        endx = startx + dist * Math.cos(rads);
 
-      const heady:number = endy + 7 * -Math.sin(headRads)
-      const headx:number = endx + 7 * Math.cos(headRads)
-  
-      c.lineTo(headx, heady);
-  
-      c.strokeStyle = color;
-      c.stroke();
-      c.stroke();
+        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts[x], iffPts[x], drawnRadar[x])
+        retRadarPts[x] = retVal.rdrPts
+        retIffPts[x] = retVal.iPts
+        retDrwPts[x] = retVal.drawnRdr
+      }
     }
   
     let low = 15;
@@ -303,7 +463,10 @@ export function drawArrow(
         desiredHeading: orientation==="EW" ? 360 : 90,
         z: alts,
         numContacts: numContacts,
-        type:type
+        type:type,
+        radarPoints: retRadarPts,
+        iffPoints: retIffPts,
+        drawnRadar: retDrwPts
     };
 
     return group;
@@ -324,10 +487,11 @@ export function drawGroupCap(
   contacts: number,
   startX:number,
   startY:number, 
-  color = "red"): Group{
+  color = "red",
+  type="ftr"): Group{
 
   const c = canvas.getContext("2d");
-  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr"}}
+  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr", radarPoints:[], iffPoints:[], drawnRadar:[]}}
 
   // eslint-disable-next-line
   let alts:number[] = [...Array(contacts)].map(_=>randomNumber(15,45));
@@ -342,7 +506,7 @@ export function drawGroupCap(
   if (contacts === 1 ){
     c.arc(startX, startY, 10, 1.0*Math.PI, 0.8*Math.PI);
     c.stroke();
-    drawLine(c, startX-8, startY+6, startX-6, startY+12, "red");
+    drawLine(c, startX-8, startY+6, startX-6, startY+12, color);
   } else{
     const ratio = 2/contacts - 0.1; 
     let startPI = 0;
@@ -382,7 +546,10 @@ export function drawGroupCap(
     desiredHeading: 90,
     z: alts,
     numContacts: contacts,
-    type:"ftr"
+    type,
+    radarPoints:[],
+    iffPoints:[],
+    drawnRadar:[]
   };
 
   return group;

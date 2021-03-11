@@ -9,17 +9,24 @@ function ChangeLog():JSX.Element {
             --------------------------------------- <br/>
             Scheduled Features: <br/>
             <li> Verify anchoring P&quot;s in WALL, CHAMP TRAIL gps, CAP </li>
-            <li> Verify typescript conversion went well (i.e. no bugs in animation or answers)</li>
             <li> Finish opening/closing comm (particularly for range pics) </li>
             <li> CAP for more picture types </li>
             <li> Procedural simulation </li>
             --------------------------------------- <br/>
             --------------------------------------- <br/> 
+            Version 3.1.0 - 14 Dec 2020 <br/>
+            --------------------------------------- <br/>
+            Features
+            <li>Finished conversion to typescript - also React Component library for varied use(s)</li>
+            <li>Fixed small issue in package comm (labeling/anchoring)</li>
+            <li>Implemented radar/arrow toggle (make it look like radar returns instead of arrows)</li>
+            <li>Migrated procedural implementation -- working on further development</li>
+            --------------------------------------- <br/> 
             Version 3.0.5 - 21 Nov 2020 <br/>
             --------------------------------------- <br/>
             Features
             <li>Bullseye follows mouse on canvas</li>
-            <li>Threat now includes "THREAT GROUP" and correct ALSA formatting </li>
+            <li>Threat now includes &quot;THREAT GROUP&quot; and correct ALSA formatting </li>
             <li>Codebase migrated to React and Typescript </li>
             <li>Components to be easily included in other sites or mobile app </li>
             <li>Massive fixes to animation logic and arrow drawing </li>

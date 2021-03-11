@@ -1,6 +1,6 @@
 import { getAltStack, getAspect, getBR, getTrackDir, randomHeading, randomNumber } from "../../../utils/mathutilities";
 import { AltStack, BRAA, Bullseye, DrawAnswer, DrawFunction, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../../picturecanvas";
+import { PicCanvasProps, PicCanvasState } from "./picturecanvas";
 import { drawAltitudes, drawArrow, drawBraaseye } from "../drawutils";
 
 
@@ -30,7 +30,7 @@ export const drawThreat:DrawFunction = (
 
     const heading:number = randomHeading(props.format, state.bluePos.heading);
 
-    const sg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), start.x, start.y, heading + offsetDeg1);
+    const sg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), start.x, start.y, heading + offsetDeg1, props.dataStyle);
 
     drawAltitudes(canvas, context, sg.x + 10, sg.y - 11, sg.z);
 

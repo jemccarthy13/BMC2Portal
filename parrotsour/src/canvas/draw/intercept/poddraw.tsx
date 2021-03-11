@@ -1,6 +1,6 @@
 import { getAltStack, getTrackDir, randomHeading, randomNumber } from "../../../utils/mathutilities";
 import { DrawAnswer, DrawFunction, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../../picturecanvas";
+import { PicCanvasProps, PicCanvasState } from "./picturecanvas";
 import { drawAltitudes, drawArrow, drawBraaseye, drawText } from "../drawutils";
 import { formatGroup } from "../formatutils";
 
@@ -23,7 +23,8 @@ export const drawPOD:DrawFunction = (
         randomNumber(1, 5),
         randomNumber(canvas.width *0.2, canvas.width*0.75),
         randomNumber(canvas.height * 0.2, canvas.height*0.8),
-        randomHeading(props.isHardMode?"alsa":"ipe", state.bluePos.heading) + randomNumber(-10,10)
+        randomHeading(props.isHardMode?"alsa":"ipe", state.bluePos.heading) + randomNumber(-10,10),
+        props.dataStyle
       ));
   
       drawAltitudes(

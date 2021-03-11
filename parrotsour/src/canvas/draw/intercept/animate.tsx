@@ -1,6 +1,6 @@
 import { getBR, randomNumber, toRadians } from "../../../utils/mathutilities";
 import { BRAA, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../../picturecanvas";
+import { PicCanvasProps, PicCanvasState } from "./picturecanvas";
 import { drawAltitudes, drawArrow, drawBraaseye, headingToDeg } from "../drawutils";
 
 let continueAnimation = false;
@@ -50,22 +50,11 @@ function doAnimation(
 
     let br: BRAA
     for (let x = 0; x < groups.length; x++) {
-      
-      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading );
-  
+      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle,"red", "ftr", groups[x].radarPoints, groups[x].iffPoints, groups[x].drawnRadar );
       const xyDeg = headingToDeg(groups[x].heading).degrees
       const rads: number = toRadians(xyDeg);
       const offsetX: number = 7 * Math.cos(rads);
       const offsetY: number = -7 * Math.sin(rads);
-  
-      // TODO - better handling for running into walls
-      // should readjust heading to be towards blue air
-      // if (isNearBounds(canvas, groups[x])){
-      //   // offsetX = 0
-      //   // offsetY = 0
-        
-      //   groups[x].desiredHeading = parseInt(getBR(state.bluePos.x, state.bluePos.y, {x:groups[x].startX, y: groups[x].startY}).bearing)
-      // }
 
       groups[x].startX = groups[x].startX + offsetX;
       groups[x].startY = groups[x].startY + offsetY;
@@ -92,7 +81,37 @@ function doAnimation(
         divisor = 1
       }
       const newHeading = groups[x].heading + deltaA / divisor
-      groups[x].heading = newHeading 
+      groups[x].heading = newHeading
+
+      if (props.dataStyle==="radar"){
+        if (groups[x].radarPoints.length!==0){
+          for (let z = 0; z < groups[x].radarPoints.length; z++){
+            groups[x].radarPoints[z] = groups[x].radarPoints[z].slice(1)
+            groups[x].drawnRadar[z] = groups[x].drawnRadar[z].slice(1)
+            const endX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].x
+            const endY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].y
+            
+            const startX = groups[x].radarPoints[z][0].x
+            const startY = groups[x].radarPoints[z][0].y
+          
+            const deltX = endX-startX
+            const deltY = endY-startY
+            const rng = Math.sqrt(deltX * deltX + deltY * deltY)/3
+
+            const newX = endX + (rng*Math.cos(rads+Math.random()/5))
+            const newY = endY + (rng*-Math.sin(rads+Math.random()/5))
+            groups[x].startX = groups[x].radarPoints[z][0].x
+            groups[x].startY = groups[x].radarPoints[z][0].y
+
+            const jit = 5
+            const drawnX = newX + jit* Math.random()+Math.random()+Math.random()
+            const drawnY = newY + jit*Math.random()+Math.random()+Math.random()
+
+            groups[x].radarPoints[z].push({x:newX, y:newY})
+            groups[x].drawnRadar[z].push({x:drawnX, y: drawnY})
+          }
+        }
+      }
 
       if (groups[x].maneuvers) {
         br = getBR(state.bluePos.x, state.bluePos.y, { x: groups[x].startX, y: groups[x].startY});

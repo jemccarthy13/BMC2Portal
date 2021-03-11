@@ -13,7 +13,7 @@ const StandardSelector = lazy(()=>import('./standardselector'))
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))
 
-const PictureCanvas = lazy(()=>import('../canvas/picturecanvas'))
+const PictureCanvas = lazy(()=>import('../canvas/draw/intercept/picturecanvas'))
 const VersionInfo = lazy(()=>import('../versioninfo'))
 
 interface CanvasConfig {
@@ -33,7 +33,8 @@ interface PSIState {
     picType: string,
     answer: string,
     animate:boolean,
-    newPic: boolean
+    newPic: boolean,
+    dataStyle: string
 }
 
 /**
@@ -59,6 +60,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
             answer: "",
             newPic: false,
             animate: false,
+            dataStyle: "arrow"
         }
     }
 
@@ -174,10 +176,20 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
         return this.state.answer
     }
 
+    onDataStyleChange = ():void => {
+        const { dataStyle } = this.state
+        if (dataStyle==="arrow") {
+            this.setState({dataStyle:"radar" })
+        } else {
+            this.setState({dataStyle:"arrow"})
+        }
+    }
+
     render():ReactElement {
         const { showAnswer, answer, picType } = this.state
         const { canvasConfig, braaFirst, format } = this.state
         const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } = this.state
+        const { dataStyle } = this.state
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>} >
@@ -211,6 +223,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
                         braaChanged={this.braaChanged}
                         startAnimate={this.startAnimate}
                         pauseAnimate={this.pauseAnimate}
+                        handleDataStyleChange={this.onDataStyleChange}
                     />
                 </Suspense>  
 
@@ -240,6 +253,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
                         sliderSpeed={speedSliderValue}
                         resetCallback={this.pauseAnimate}
                         animateCallback={this.startAnimate}
+                        dataStyle={dataStyle}
                     />
                 </Suspense>  
 

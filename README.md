@@ -16,7 +16,7 @@ This is the frontend website that a user will see. It is constructed using
 React (Javascript) Components and CSS styling. External communication is
 handled via a REST API to the server in 'components/utils/backend.js'.
 
-NOTE: If the NODE_ENV environment variable is set to "development", 
+NOTE: If the REACT_APP_SERVER_BASE_URL environment variable is set to "development", 
 the backend will mock all of the data returns for rapid testing and 
 frontend only development.
 
@@ -37,15 +37,18 @@ TODO - Setup and configuration files for the database (under construction).
 
 ## Frontend-Only Development
 
-- See [bmc2portal README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2portal).
+- Primary: Run `make frontend-dev` (first time), subsequently `make frontend-dev-ni` to skip npm install.
 
-## Integrated Development
+- See [bmc2portal README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2portal) for 
+additional react scripts and details on the frontend.
 
-1) You will need to clone this repository.
-2) Choose a hosting platform for bmc2db and bmc2server.
-3) Create the database on your server following the [bmc2db README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2db).
-4) Start the bmc2server (modify the .env according to  your database setup), by following 
-the [bmc2server README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2server)
-5) Serve the frontend of the application by following the [bmc2portal README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2portal).
-6) Navigate to the frontend IP address / served URL.
+## Partial Integration Development
 
+- Primary: Run `make server-mock` (first time), subsequently `make server-mock-ni` to skip npm install. This will also skip go get.
+
+- See [bmc2portal README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2portal) for
+additional react scripts and details on the frontend, and [bmc2server README](https://github.com/jemccarthy13/BMC2Portal/tree/master/bmc2server) for API references.
+
+## Fully Integrated Development -- Not Available
+
+1. TBD - establish a DBMS solution and write instructions to integrate full stack.

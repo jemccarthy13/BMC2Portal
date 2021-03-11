@@ -1,5 +1,5 @@
 import Canvas from './canvas/canvas'
-import PictureCanvas from './canvas/picturecanvas'
+import PictureCanvas from './canvas/draw/intercept/picturecanvas'
 import {ParrotSourChooser} from './pscomponents/parrotsourchooser'
 import ParrotSourHeader from './pscomponents/parrotsourheader'
 import ParrotSourControls from './pscomponents/parrotsourcontrols'

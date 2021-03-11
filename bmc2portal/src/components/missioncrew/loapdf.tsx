@@ -8,7 +8,6 @@ type LPProps = {
 }
 
 type LPState = {
-    update: boolean,
     isEdit: string|undefined
 }
 
@@ -17,7 +16,6 @@ export default class LoaPdf extends React.PureComponent<LPProps, LPState> {
     constructor(props:LPProps){
         super(props)
         this.state={
-            update: props.update!==undefined ? props.update : true,
             isEdit: undefined
         }
     }
@@ -43,8 +41,7 @@ export default class LoaPdf extends React.PureComponent<LPProps, LPState> {
     }
 
     render():ReactElement{
-        const {loaLoc} = this.props
-        const {update} = this.state
+        const {loaLoc,update} = this.props
         return (<div>
             {loaLoc.map((loa) => {
             return (<div style={{marginBottom:"15px"}} key={loa}>
@@ -57,7 +54,7 @@ export default class LoaPdf extends React.PureComponent<LPProps, LPState> {
                     }
                     
                 </div>}
-                {!this.isEdit(loa) && update && // we're not editing, so render the update button
+                {!this.isEdit(loa) && update && 
                     <div style={{float:"right"}}>
                         {this.getButton("Update", this.setEdit(loa))}
                     </div>}

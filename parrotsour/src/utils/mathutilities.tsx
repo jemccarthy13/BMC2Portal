@@ -6,6 +6,26 @@
 import { AltStack, BRAA, Bullseye, Group } from './interfaces'
 
 /**
+ * Format a portion of a timestamp to 2 digits 
+ * @param time number to format to 2 digits if less than 10
+ */
+function formatT(time:number){
+  let retVal:string = time.toString();
+  if (time <= 9){
+      retVal = "0" + time;
+  }
+  return retVal;
+}
+
+/**
+ * Get a HH:mm:ss timestamp (for messages)
+ */
+export function getTimeStamp():string {
+  const date = new Date();
+  return formatT(date.getHours()) + ":" + formatT(date.getMinutes()) + ":" + formatT(date.getSeconds());
+}
+
+/**
  * Converts a math angle to Radians (180 is EW line)
  * @param angleDeg - the cartesian angle to convert to radians
  */
@@ -130,7 +150,7 @@ export function randomNumber(min: number, max: number): number {
  * Return a random heading (0-360 for ALSA, HOT/FLANK blue for !ALSA) 
  * @param format 
  */
-export function randomHeading(format: string, blueHeading:number): number {
+export function randomHeading(format: string, blueHeading = -1): number {
   const bound = (format==="ipe" ? 45: 360)
   const offset = randomNumber(-bound, bound)
 

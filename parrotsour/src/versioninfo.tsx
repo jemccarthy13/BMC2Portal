@@ -14,9 +14,9 @@ export default class VersionInfo extends React.PureComponent {
             <div style={this.vStyle}>
                  <br /><br /><br /><br /><br /><br /><br />
                 Developed by John McCarthy <br />
-                Version: 3.0.5 --
+                Version: 3.1.0 --
                 <a style={this.vStyle} href="/changelog.html"> Change Log </a> <br />
-                21 Nov 2020 <br />
+                14 Dec 2020 <br />
             </div>
         )
     }

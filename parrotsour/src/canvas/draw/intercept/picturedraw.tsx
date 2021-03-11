@@ -3,7 +3,7 @@ import { AltStack, Braaseye, Bullseye, DrawAnswer } from '../../../utils/interfa
 import { randomNumber, randomHeading, getBR, getAltStack, getTrackDir } from '../../../utils/mathutilities'
 import { Bounds, drawAltitudes, drawArrow, drawBraaseye, drawBullseye, drawMeasurement, getStartPos } from '../drawutils'
 import { DrawFunction, Group } from '../../../utils/interfaces'
-import { PicCanvasProps, PicCanvasState } from '../../picturecanvas';
+import { PicCanvasProps, PicCanvasState } from './picturecanvas';
 import { formatGroup, getGroupOpenClose } from '../formatutils';
 
 const isAnchorNorth = ( ngBraaseye: Braaseye, sgBraaseye: Braaseye, ng:Group, sg:Group) =>
@@ -78,7 +78,7 @@ export const drawAzimuth:DrawFunction = (
     const drawDistance:number = randomNumber(3.5 * incr, 10 * incr);
 
     let heading:number = randomHeading(props.format, state.bluePos.heading);
-    const ng:Group = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10,10));
+    const ng:Group = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10,10), props.dataStyle);
     
     // if hard mode, we randomize the 2nd groups heading
     if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
@@ -91,7 +91,7 @@ export const drawAzimuth:DrawFunction = (
     let m2: Bullseye
 
     if (props.orientation==="NS") {
-      sg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX + drawDistance, startY, heading + randomNumber(-10,10));
+      sg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX + drawDistance, startY, heading + randomNumber(-10,10), props.dataStyle);
       m2 = { x: sg.x, y: ng.y}
       offsetX = -60;
       offsetY = 40;
@@ -101,7 +101,7 @@ export const drawAzimuth:DrawFunction = (
       ng.label = "WEST GROUP";
       sg.label = "EAST GROUP";
     } else {
-      sg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY + drawDistance, heading + randomNumber(-10,10));
+      sg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY + drawDistance, heading + randomNumber(-10,10), props.dataStyle);
       m2 = { x: ng.x, y: sg.y}
       
       ng.label = "NORTH GROUP";
@@ -184,7 +184,8 @@ export const drawRange:DrawFunction = (
         randomNumber(1, 4), 
         startX, 
         startY, 
-        heading + randomNumber(-10, 10));
+        heading + randomNumber(-10, 10),
+        props.dataStyle);
   
     if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
   
@@ -195,10 +196,10 @@ export const drawRange:DrawFunction = (
     let offsetX2 = 0;
     let offsetY2 = 0;
     if (props.orientation === "NS") {
-      lg =  drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY + drawDistance, heading + randomNumber(-10,10));
+      lg =  drawArrow( canvas, props.orientation, randomNumber(1, 4), startX, startY + drawDistance, heading + randomNumber(-10,10), props.dataStyle);
       m2 = { x: tg.x, y: lg.y}
     } else {
-      lg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX + drawDistance, startY, heading + randomNumber(-10,10));
+      lg = drawArrow( canvas, props.orientation, randomNumber(1, 4), startX + drawDistance, startY, heading + randomNumber(-10,10), props.dataStyle);
       m2 = { x: lg.x, y: tg.y}
       offsetX = -10;
       offsetY = 40;
@@ -285,11 +286,11 @@ export const drawWall: DrawFunction = (
       if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
 
       if (props.orientation==="NS"){ 
-        groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX + totalArrowOffset, startY, heading + offsetHeading) );
+        groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX + totalArrowOffset, startY, heading + offsetHeading,props.dataStyle) );
         altOffsetX = (-15*(numGroups-x));
         altOffsetY = 40 + 11*(numGroups-(numGroups-x));
       } else {
-        groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX, startY + totalArrowOffset, heading + offsetHeading) );
+        groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX, startY + totalArrowOffset, heading + offsetHeading, props.dataStyle) );
       }
   
       drawAltitudes( canvas, context, groups[x].x + 20 + altOffsetX, groups[x].y - 11 + altOffsetY, groups[x].z);
@@ -386,9 +387,9 @@ export const drawLadder: DrawFunction =  (
     let offsetX = 0;
     let offsetY = 0;
     if (props.orientation==="NS"){ 
-      groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX, startY - totalArrowOffset, heading + offsetHeading) );
+      groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX, startY - totalArrowOffset, heading + offsetHeading, props.dataStyle) );
     } else {
-      groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX + totalArrowOffset, startY, heading + offsetHeading) );
+      groups.push( drawArrow(canvas, props.orientation, randomNumber(1, 5), startX + totalArrowOffset, startY, heading + offsetHeading, props.dataStyle) );
       offsetX = -40 + -5*(numGroups-x);
       offsetY = -20 + -11 * (numGroups-x);
     }
@@ -474,15 +475,15 @@ export const drawChampagne:DrawFunction =  (
   const champDepth:number = randomNumber(3.5 * incr, 10 * incr);
 
   let heading:number = randomHeading(props.format, state.bluePos.heading);
-  const tg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10, 10));
+  const tg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10, 10), props.dataStyle);
 
   if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
   
   let nlg:Group
   if (props.orientation === "NS"){
-    nlg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - champWidth/2, startY - champDepth,  heading + randomNumber(-10, 10));
+    nlg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - champWidth/2, startY - champDepth,  heading + randomNumber(-10, 10),props.dataStyle);
   } else {
-    nlg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champDepth, startY - champWidth / 2,  heading + randomNumber(-10, 10));
+    nlg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champDepth, startY - champWidth / 2,  heading + randomNumber(-10, 10), props.dataStyle);
   }
   
   if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
@@ -494,12 +495,12 @@ export const drawChampagne:DrawFunction =  (
   let nLbl = "NORTH";
 
   if (props.orientation === "NS"){
-    slg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champWidth/2, startY - champDepth, heading + randomNumber(-10, 10));
+    slg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champWidth/2, startY - champDepth, heading + randomNumber(-10, 10), props.dataStyle);
     offsetX2 = -70;    
     sLbl = "EAST";
     nLbl = "WEST";
   } else {
-    slg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champDepth, startY + champWidth / 2, heading + randomNumber(-10, 10)); 
+    slg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + champDepth, startY + champWidth / 2, heading + randomNumber(-10, 10), props.dataStyle); 
     offsetX = -70;
   }
   
@@ -582,14 +583,14 @@ export const drawVic:DrawFunction =  (
   const vicDepth: number = randomNumber(3.5 * incr, 10 * incr);
 
   let heading:number = randomHeading(props.format, state.bluePos.heading);
-  const lg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10, 10));
+  const lg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX, startY, heading + randomNumber(-10, 10), props.dataStyle);
 
   if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
   let stg:Group
   if (props.orientation==="NS"){
-    stg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + vicWidth/2, startY + vicDepth, heading + randomNumber(-10, 10));
+    stg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX + vicWidth/2, startY + vicDepth, heading + randomNumber(-10, 10), props.dataStyle);
   } else {
-    stg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicDepth, startY + vicWidth / 2, heading + randomNumber(-10, 10));
+    stg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicDepth, startY + vicWidth / 2, heading + randomNumber(-10, 10), props.dataStyle);
   }
 
   if (props.isHardMode) heading = randomHeading(props.format, state.bluePos.heading);
@@ -598,12 +599,12 @@ export const drawVic:DrawFunction =  (
   let nLbl = "NORTH";
   let sLbl = "SOUTH";
   if (props.orientation==="NS"){
-    ntg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicWidth/2, startY +vicDepth, heading + randomNumber(-10, 10));
+    ntg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicWidth/2, startY +vicDepth, heading + randomNumber(-10, 10), props.dataStyle);
     offsetX = -70;
     nLbl = "WEST";
     sLbl = "EAST";
   } else {
-    ntg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicDepth, startY - vicWidth / 2, heading + randomNumber(-10, 10));
+    ntg = drawArrow(canvas, props.orientation, randomNumber(1, 4), startX - vicDepth, startY - vicWidth / 2, heading + randomNumber(-10, 10), props.dataStyle);
   }
 
   let realDepth, realWidth
@@ -728,7 +729,7 @@ export const drawLeadEdge:DrawFunction = (
   if (overlap || rngBack.range <=5 || rngBack.range >= 40){
     context.clearRect(0, 0, canvas.width, canvas.height);
     drawBullseye(canvas, context, state.bullseye);
-    drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS" ? 180 : 270), "blue");
+    drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS" ? 180 : 270), props.dataStyle, "blue");
     finalAnswer = drawLeadEdge(canvas, context, props, state, start);
   }
   else {
@@ -779,6 +780,24 @@ const getPicBull = (isRange:boolean, orientation:string, bluePos:Group, groups:G
   return retVal
 }
 
+const getAnchorPkg = (leadBR:number, trailBR:number, groups1:Group[], groups2:Group[]):boolean => {
+  let anchorLead = true
+  if (trailBR < leadBR){
+    anchorLead = false
+  } else if (trailBR === leadBR) {
+    const maxAlt1 = Math.max(...groups1.map((grp)=>{return Math.max(...grp.z)}))
+    const maxAlt2 = Math.max(...groups2.map((grp)=>{return Math.max(...grp.z)}))
+    if (maxAlt2 > maxAlt1){
+      anchorLead = false
+    } else if (maxAlt2 === maxAlt1){
+      if (groups2.length>groups1.length){
+        anchorLead = false
+      }
+    }
+  }
+  return anchorLead
+}
+
 export const drawPackage:DrawFunction = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
@@ -790,8 +809,8 @@ export const drawPackage:DrawFunction = (
   const isRange = false
 
   let startX1:number, startX2:number, startY1:number, startY2:number
-  let lLbl = "EAST"
-  let tLbl = "WEST"
+  let lLbl = "WEST"
+  let tLbl = "EAST"
   
   if (props.orientation==="EW"){
     if (isRange){
@@ -846,7 +865,7 @@ export const drawPackage:DrawFunction = (
     if (rngBack.range < 40 ){
       context.clearRect(0, 0, canvas.width, canvas.height);
       drawBullseye(canvas, context, state.bullseye);
-      drawArrow(canvas, props.orientation, 4, state.bluePos.x, state.bluePos.y, (props.orientation==="NS"? 180 : 270), "blue");
+      drawArrow(canvas, props.orientation, 4, state.bluePos.x, state.bluePos.y, (props.orientation==="NS"? 180 : 270), props.dataStyle, "blue");
       finalAnswer = drawPackage(canvas, context, props, state, start);
     } else {
       realAnswer.pic = " 2 PACKAGES RANGE " + rngBack.range + " "+ 
@@ -860,12 +879,22 @@ export const drawPackage:DrawFunction = (
     if (rngBack.range < 40) { 
       context.clearRect(0, 0, canvas.width, canvas.height);
       drawBullseye(canvas, context, state.bullseye);
-      drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS") ? 180 : 270, "blue");
+      drawArrow(canvas, props.orientation, 4, state.bluePos.startX, state.bluePos.startY, (props.orientation==="NS") ? 180 : 270, props.dataStyle,"blue");
       finalAnswer= drawPackage(canvas, context, props, state, start);
     } else {
-      realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
-          tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range + " "+
-          lLbl +" PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range;
+      const leadBR = getBR(bull1.x, bull1.y, {x:state.bluePos.x, y: state.bluePos.y}).range
+      const trailBR = getBR(bull2.x, bull2.y, {x: state.bluePos.x, y:state.bluePos.y}).range
+      const anchorLead = getAnchorPkg(leadBR, trailBR, groups1, groups2)
+      
+      if (anchorLead){
+        realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
+            lLbl + " PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range + " "+
+            tLbl +" PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range;
+      } else {
+        realAnswer.pic = " 2 PACKAGES AZIMUTH " + rngBack.range + " " +
+            tLbl + " PACKAGE BULLSEYE " + trailPackage.bearing + "/" + trailPackage.range + " "+
+            lLbl +" PACKAGE BULLSEYE " + leadPackage.bearing + "/" + leadPackage.range;
+      }
       finalAnswer = realAnswer
     }
   }

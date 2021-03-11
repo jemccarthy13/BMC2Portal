@@ -1,6 +1,6 @@
 import { getBR, randomNumber, toRadians } from "../../../utils/mathutilities";
 import { BRAA, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../../picturecanvas";
+import { PicCanvasProps, PicCanvasState } from "../intercept/picturecanvas";
 import { drawAltitudes, drawArrow, drawBraaseye, headingToDeg } from "../drawutils";
 
 let continueAnimation = false;
@@ -51,7 +51,7 @@ function doAnimation(
     let br: BRAA
     for (let x = 0; x < groups.length; x++) {
       
-      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading );
+      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle);
   
       const xyDeg = headingToDeg(groups[x].heading).degrees
       const rads: number = toRadians(xyDeg);

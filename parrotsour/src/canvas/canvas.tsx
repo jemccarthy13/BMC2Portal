@@ -25,7 +25,8 @@ interface CanvasProps {
     newPic: boolean,
     animate: boolean,
     resetCallback: () => void,
-    animateCallback: () => void
+    animateCallback: () => void,
+    dataStyle: string
 }
 
 /**
@@ -47,7 +48,7 @@ function Canvas(props: CanvasProps):ReactElement {
     // These values are used by useEffect to trigger a 'draw'
     const { draw, height, width, braaFirst, bullseye, picType, 
         showMeasurements, isHardMode, newPic, 
-        resetCallback, animateCallback, animate, ...rest } =  props
+        resetCallback, animateCallback, animate, dataStyle, ...rest } =  props
 
     // useEffect is a React hook called when any of the trigger props changes
     useEffect(()=>{
@@ -87,7 +88,7 @@ function Canvas(props: CanvasProps):ReactElement {
                 // do nothing
             }
         }
-    }, [draw, height, width, braaFirst, picType, showMeasurements, newPic, isHardMode])
+    }, [draw, height, width, braaFirst, picType, showMeasurements, newPic, isHardMode, dataStyle])
 
     /**
      * Get the mouse position given the event relative to canvas
@@ -229,10 +230,10 @@ function Canvas(props: CanvasProps):ReactElement {
     }
 
     return (
-    <div style={{display:"block",textAlign:"center"}}>
-        <div style={{position:"relative", height:"600px"}}>
-            <canvas id="pscanvas" {...moveProps} style={{...style, position:"absolute", left:"0px"}} ref={canvasRef} {...rest} />
-            <canvas id="mousecanvas" {...moveProps} style={{...style, position:"absolute", left:"0px",backgroundColor:"transparent"}} ref={mouseCanvasRef} {...rest} />
+    <div style={{display:"block",textAlign:"left"}}>
+        <div style={{display:"grid", position:"relative", height:"600px"}}>
+            <canvas id="pscanvas" {...moveProps} style={{...style, gridColumn:"2", gridRow:"1", left:"0px"}} ref={canvasRef} {...rest} />
+            <canvas id="mousecanvas" {...moveProps} style={{...style, gridColumn:"2", gridRow:"1", position:"absolute", left:"0px",backgroundColor:"transparent"}} ref={mouseCanvasRef} {...rest} />
         </div>
     </div>
     )
