@@ -44,8 +44,8 @@ export function convertToXY(cgrs:string|undefined): Bullseye{
         }
 
         /// TODO - fix logic here to translate to x,y coordinates
-        console.log(kp, yOff)
-        console.log(row, localStorage.startRow)
+        //console.log(kp, yOff)
+        //console.log(row, localStorage.startRow)
         y = ((localStorage.startRow - parseInt(row)) * 100) + yOff;
         x = ((col2 - localStorage.startCol2) * 100) + xOff;
     }
@@ -61,17 +61,17 @@ export function convertToCGRS(x:number, y:number): string{
 }
 
 // eslint-disable-next-line
-export function aiProcess(nlp:any, msgText:string, answer: DrawAnswer, sendResponse:(sender:string, msg:string)=>void):void{
+export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: DrawAnswer, sendResponse:(sender:string, msg:string, voice?:boolean)=>void):void{
     // do some things to NLP the message
-    console.log(answer.groups)
-    console.log(msgText)
+
+    let msgText = msg.text
 
     msgText = msgText.toUpperCase();
     const re = new RegExp("([0-9]+[A-Z]+[0-9]*)");
     const matches = msgText.match(re);
     let cgrs = "";
     if (matches){
-        console.log("loop replace cgrs");
+        //console.log("loop replace cgrs");
         matches.forEach((elem) => {
             const xy = convertToXY(elem);
             msgText = msgText.replace(elem, xy.x + " " + xy.y);
@@ -84,76 +84,123 @@ export function aiProcess(nlp:any, msgText:string, answer: DrawAnswer, sendRespo
     const nl = nlp(msgText);
 
     const assetMsg = nl.match("[<cs>#Noun] *");
+    const radiocheck = nl.match("[<cs>#Noun]");
     const cmd = nl.match("[<cs>#Noun] [<act>#Verb] #Unit [<fl>#Cardinal]");
     const move = nl.match("[<cs>#Noun] [<cmd>#Verb?] * [<x>#Cardinal] [<y>#Cardinal]");
     const move3d = nl.match("[<cs>#Noun] [#Verb?] * [<x>#Cardinal] [<y>#Cardinal] app? [#Verb?] [#Preposition?] #Unit [<fl>#Cardinal]")
     const desert3d = nl.match("[<cs>#Noun] [#Verb?] * [<x>#Cardinal] [<y>#Cardinal] * app? * [#Verb?] [#Preposition?] #Unit [<fl>#Cardinal]")
     const desert3d2 = nl.match("[<cs>#Noun] [#Verb?] * [<x>#Cardinal] [<y>#Cardinal] * [#Verb?] [#Preposition?] #Unit [<fl>#Cardinal] * app?")
     const question = nl.match('[<cs>#Noun] * [<thing>#Noun] *');
+    const question2 = nl.match('[<cs>#Noun] interrogative [<thing>#Noun] *');
 
     const cs = assetMsg.groups().cs
     const callsign = cs ? cs.text().toUpperCase() : "SYSTEM"
     const asset = getAsset(answer.groups, callsign);
 
-    console.log(nl)
+    //console.log(nl)
 
     const isCommand = cmd.found;
     const isMove = move.found;
     const isMove3d = move3d.found || desert3d.found || desert3d2.found;
     const isQuestion = nl.sentences().isQuestion().length > 0;
+    const interrogative = question2.found
+    const isRadCheck = radiocheck.found
+    
+    function convertToJargon(msg:string):string{
+        const m = new Map()
+        m.set("A", "alpha")
+        m.set("B", "bravo")
+        m.set("C", "charlie")
+        m.set("D", "delta")
+        m.set("E", "echo")
+        m.set("F", "fox")
+        m.set("G", "gulf")
+        m.set("H", "hotel")
+        m.set("I", "india")
+        m.set("J", "juliet")
+        m.set("K", "kilo")
+        m.set("L", "lima")
+        m.set("M", "mike")
+        m.set("N", "november")
+        m.set("O", "oscar")
+        m.set("P", "pa pa")
+        m.set("Q", "quebec")
+        m.set("R", "romeo")
+        m.set("S", "sierra")
+        m.set("T", "tango")
+        m.set("U", "uniform")
+        m.set("V", "victor")
+        m.set("W", "whiskey")
+        m.set("X", "x-ray")
+        m.set("Y", "yankee")
+        m.set("Z", "zulu")
+        return [...msg.toUpperCase()].map(x => m.get(x) ? m.get(x) : x).join(' ')
+    }
 
-    if (isMove){
-        if (asset){       
-            const command = move.groups().cmd
-            const cmdText = command ? command.text() : undefined;
-            if (!cmdText || (cmdText ==="transit" || cmdText ==="proceed" || cmdText==="move")){
-                const locX = move.groups().x.text();
-                const locY = move.groups().y.text();
-                let fl
-                if (isMove3d){
-                    fl = move3d.groups().fl.text();
-                    console.log(fl)
-                    setDesiredFL(asset,fl);
-                }
+    if (!asset){
+        sendResponse("SYSTEM", "No such callsign.")
+        return
+    }
 
-                sendResponse(callsign, "c, " + (command ? command.verbs().toGerund().text() : "moving") + " to " + ((cgrs!=="") ? cgrs:
-                (locX +"," + locY)) + 
-                (isMove3d ? (" at FL " + fl) : ""));
+    if (isMove){      
+        const command = move.groups().cmd
+        const cmdText = command ? command.text() : undefined;
+        if (!cmdText || (cmdText ==="transit" || cmdText ==="proceed" || cmdText==="move")){
+            const locX = move.groups().x.text();
+            const locY = move.groups().y.text();
+            let fl
+            if (isMove3d){
+                fl = move3d.groups().fl.text();
+                setDesiredFL(asset,fl);
+            }
 
-                asset.desiredLoc = [{x:locX, y:locY}];
-                asset.isCapping = false;
-            } else {
-                sendResponse(callsign, "I don't understand " + cmd.text());
-            }   
+            let cpy = "c"
+            let FL = "FL"
+
             
+            if (msg.voice){
+                cpy = "copy"
+                FL = "flight level"
+                fl = fl?.split('').join(' ')
+                cgrs = convertToJargon(cgrs)
+            }
+            sendResponse(callsign, cpy+", " + (command ? command.verbs().toGerund().text() : "moving") + " to " + ((cgrs!=="") ? cgrs:
+            (locX +"," + locY)) + 
+            (isMove3d ? (" at "+ FL + " " + fl) : ""), msg.voice);
+
+            asset.desiredLoc = [{x:locX, y:locY}];
+            asset.isCapping = false;
         } else {
-            sendResponse("SYSTEM", "Asset unknown.");
+            sendResponse(callsign, "I don't understand " + cmd.text(), msg.voice);
         }
     }
     else if (isCommand){
-        if (asset){
-            const newfl = cmd.groups().fl.text();
-            sendResponse(callsign, "c, " + cmd.groups().act.verbs().toGerund().text() + " " + newfl)
-            console.log("UPDATE TRACK");
-            // console.log(asset);
-            setDesiredFL(asset,newfl);
-        } else {
-            sendResponse("SYSTEM", "Asset unknown.");
+        const newflActual = cmd.groups().fl.text();
+        let newfl = newflActual
+        let cpy = "c, "
+        if (msg.voice){
+            cpy = "copy, "
+            newfl = newflActual.replace("FL", " flight level ")
+            newfl = newflActual?.split('').join(' ')
         }
-    } else if (isQuestion){
-        const thing = question.groups().thing.text();
-        
-        if (!asset){
-            sendResponse("SYSTEM", "Asset unknown.");
-        } else if ((thing ==="status" || thing==="location" || thing ==="posit" || thing ==="cwas")){
+        sendResponse(callsign, cpy + cmd.groups().act.verbs().toGerund().text() + " " + newfl, msg.voice)
+        setDesiredFL(asset,newflActual);
+    } else if (isQuestion || interrogative){
+        const q = interrogative ? question2 : question
+        const thing = q.groups().thing.text();
+        if ((thing ==="status" || thing==="location" || thing ==="posit" || thing === "positive" || thing ==="cwas")){
             if (asset.isCapping){
-                sendResponse(callsign, "working " + convertToCGRS(asset.startX, asset.startY));
+                sendResponse(callsign, "working " + convertToCGRS(asset.startX, asset.startY), msg.voice);
             } else if (asset.desiredLoc) {
                 const current = convertToCGRS(asset.startX, asset.startY).replace("+", "");
                 const desired = convertToCGRS(asset.desiredLoc[0].x, asset.desiredLoc[0].y);
-                sendResponse(callsign, "passing " + current + ", enroute to " + desired);
+                sendResponse(callsign, "passing " + current + ", enroute to " + desired, msg.voice);
             } else {
-                sendResponse(callsign, "stby")
+                if (msg.voice){
+                    sendResponse(callsign, "standby")
+                } else {
+                    sendResponse(callsign, "stby")
+                }
             }
         } else if (thing ==="tasking" ){
             if (asset.tasking){
@@ -174,7 +221,11 @@ export function aiProcess(nlp:any, msgText:string, answer: DrawAnswer, sendRespo
         } else {
             sendResponse(callsign, "I don't understand the question");
         }
-    } else{
+    } else if (isRadCheck) {
+        let fullCs = callsign
+        if (msg.voice) fullCs = callsign.replace("VR", "viper")
+        sendResponse(callsign, "go for " + fullCs, msg.voice)
+    } else {
         sendResponse(callsign, "I don't understand.")
     }
     

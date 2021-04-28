@@ -5,6 +5,8 @@ import { DrawAnswer } from "utils/interfaces"
 import { getTimeStamp } from '../utils/mathutilities'
 import { aiProcess } from "./prochelpers"
 
+import SpeechTextControls from './speechtext'
+
 import nlp from 'compromise'
 import sentences from 'compromise-sentences'
 nlp.extend(sentences)
@@ -33,7 +35,7 @@ type CBState = {
 }
 
 export default class ChatBox extends React.PureComponent<CBProps, CBState>{
-    
+
     constructor(props:CBProps){
         super(props)
         this.state={
@@ -73,9 +75,15 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         this.setState({text:text + getTimeStamp() + " *** " + msg + "\r\n"})
     }
     
-    sendMessage = (sender:string, message:string):void => {
+    sendMessage = (sender:string, message:string, voice?:boolean):void => {
         const { text } = this.state
-        this.setState({text:text + getTimeStamp() + " <"+sender+"> " + message + "\n"});
+        if (!voice) {
+            this.setState({text:text + getTimeStamp() + " <"+sender+"> " + message + "\n"});
+        } else {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = message;
+            window.speechSynthesis.speak(msg);
+        }
     }
 
     sendChatMessage = async (msg:string):Promise<void> => {
@@ -106,7 +114,7 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
             const { sender } = this.state
             const { answer } = this.props
             await this.sendMessage(sender, msg)
-            aiProcess(nlp, msg, answer, this.sendMessage)
+            aiProcess(nlp, {text:msg, voice:false}, answer, this.sendMessage)
             success = true
         }
         const current: HTMLTextAreaElement|null = this.inputRef.current
@@ -114,7 +122,13 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
                 current.value = ""
     }
 
+    handleMessage = (text:string):void => {
+        const { answer } = this.props
+        aiProcess(nlp, {text, voice:true}, answer, this.sendMessage)
+    }
+
     render(): ReactElement {
+        const handler = this.handleMessage
         const { text } = this.state
         return(
             <div id="chat" style={{width:"33%", marginLeft:"auto", marginRight:"auto", minHeight:"100%"}}>
@@ -123,6 +137,7 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
                     <textarea ref={this.inputRef} id="chatInput" style={{width:"80%", height:"10%"}} onKeyPress={this.handleInputKeypress} />
                     <button type="button" style={{marginLeft:"5px", width:"20%"}} onClick={this.handleSendBtnClick}>Send</button>
                 </div>
+                <SpeechTextControls handler={handler} />
             </div>
         )
     }
