@@ -52,7 +52,9 @@ export type Group = {
     callsign?: string,
     radarPoints: Bullseye[][],
     drawnRadar: Bullseye[][],
-    iffPoints?: Bullseye[][]
+    iffPoints?: Bullseye[][],
+    tasking?: string,
+    desiredLoc?: Bullseye[]
 }
 
 export type DrawAnswer = {

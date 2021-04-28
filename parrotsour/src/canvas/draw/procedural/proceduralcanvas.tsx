@@ -130,6 +130,10 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         const startCol1 = randomNumber(0,25)
         const startCol2 = randomNumber(0,26)
 
+        localStorage.startRow = startRow
+        localStorage.startCol1 = startCol1
+        localStorage.startCol2 = startCol2
+
         const chr = (n:number):string => {
             return String.fromCharCode (65+n)
         }
@@ -181,10 +185,10 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
         
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
         const answer: DrawAnswer = await this.drawPicture(canvas, context)
-
+        answer.groups[0].callsign = bluePos.callsign
+        
         const { setAnswer } = this.props
         setAnswer(answer)
-        
         this.setState({canvas, answer, animateCanvas: imageData})
     }
 

@@ -5,6 +5,24 @@ import { DrawAnswer } from "utils/interfaces"
 import { getTimeStamp } from '../utils/mathutilities'
 import { aiProcess } from "./prochelpers"
 
+import nlp from 'compromise'
+import sentences from 'compromise-sentences'
+nlp.extend(sentences)
+// eslint-disable-next-line
+nlp.extend((Doc:any, world:any) => {
+    world.addWords({
+        transit: 'Verb',
+        climb: 'Verb',
+        elev: "Verb",
+        elevator: 'Verb',
+        posit:'Noun',
+        proceed: 'Verb',
+        FL: 'Unit',
+        tasking:'Noun',
+        state:'Noun'
+    })
+});
+
 type CBProps = {
     answer: DrawAnswer
 }
@@ -21,7 +39,7 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         this.state={
             text:
                 "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n"+
-                "*** /help to display help information",
+                "*** /help to display help information\r\n",
             sender:"UR_CALLSIGN"
         }
     }
@@ -54,8 +72,13 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
         const { text } = this.state
         this.setState({text:text + getTimeStamp() + " *** " + msg + "\r\n"})
     }
+    
+    sendMessage = (sender:string, message:string):void => {
+        const { text } = this.state
+        this.setState({text:text + getTimeStamp() + " <"+sender+"> " + message + "\n"});
+    }
 
-    sendChatMessage = (msg:string):void => {
+    sendChatMessage = async (msg:string):Promise<void> => {
         let success= false
         if (msg.indexOf('/') === 0){
             if (msg.indexOf('/nick') === 0){
@@ -80,10 +103,10 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState>{
             }
             success=true
         } else {
-            const { text, sender } = this.state
+            const { sender } = this.state
             const { answer } = this.props
-            this.setState({text:text + getTimeStamp() + " <"+sender+"> " + msg + "\r\n"})
-            aiProcess(msg, answer)
+            await this.sendMessage(sender, msg)
+            aiProcess(nlp, msg, answer, this.sendMessage)
             success = true
         }
         const current: HTMLTextAreaElement|null = this.inputRef.current
