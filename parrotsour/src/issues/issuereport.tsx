@@ -110,7 +110,7 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
                 onClose={this.handleIssueClose} >
                 <DialogContent>
                     {/* TODO - change this to /issues.html and use php to read from reported issues */}
-                    See a list of <a href="/changelog.html">known issues</a>.
+                    See a list of <a href="/#/changelog.html">known issues</a>.
                 </DialogContent>
                 
                 <form onSubmit={this.handleSubmit}>

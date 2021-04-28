@@ -1,7 +1,7 @@
-import React, { Suspense, lazy, ReactElement } from "react";
+import React, { Suspense, ReactElement } from "react";
 
-import { Router, Route } from "react-router";
-import { createBrowserHistory } from "history";
+import { Route } from "react-router";
+import { HashRouter } from "react-router-dom";
 
 import "./css/snackbar.css";
 import "./css/styles.css";
@@ -10,8 +10,6 @@ import "./css/fonts.css";
 
 import ParrotSour from "./pscomponents/parrotsour";
 import ChangeLog from "changelog";
-
-const browserHistory = createBrowserHistory();
 
 /**
  * This is the main application. 
@@ -41,7 +39,7 @@ const Home = ():ReactElement => {
 
   
   function getPS() : JSX.Element {
-    return <ParrotSour type="chooser" interceptLink="/msncrew/parrotsourintercept.html" proceduralLink="/msncrew/parrotsourprocedural.html"/>
+    return <ParrotSour type="chooser" interceptLink="/#/msncrew/parrotsourintercept.html" proceduralLink="/#/msncrew/parrotsourprocedural.html"/>
   }
 
   function getPSP(): JSX.Element {
@@ -55,15 +53,15 @@ const Home = ():ReactElement => {
   return (
     <div className="app">
     <div className="body-content" style={{width:"100%"}}>
-      <Router history={browserHistory}>
+      <HashRouter>
         <Suspense fallback={<div>Loading...</div>} >
         <Route exact path="/" component={getPSI} />
-        <Route exact path="/changelog.html" component={ChangeLog} />
+        <Route path="/changelog.html" component={ChangeLog} />
         <Route path="/msncrew/parrotsour.html" render={getPS} />
         <Route path="/msncrew/parrotsourintercept.html" render={getPSI} />
         <Route path="/msncrew/parrotsourprocedural.html" render={getPSP} />
         </Suspense>
-      </Router>
+      </HashRouter>
     </div>
     <div id="snackbar" />
   </div>
