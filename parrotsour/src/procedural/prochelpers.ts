@@ -1,4 +1,4 @@
-import { DrawAnswer, Group } from "utils/interfaces";
+import { Bullseye, DrawAnswer, Group } from "utils/interfaces";
 
 export function getAsset(groups: Group[], callsign:string):Group|undefined{
     return groups.find(a => {
@@ -17,7 +17,12 @@ export function setDesiredFL(asset:Group, fl:string):void{
     }
 }
 
-function convertToXY(cgrs:string){
+export function convertToXY(cgrs:string|undefined): Bullseye{
+    if (cgrs === undefined){
+        return {
+            x:50, y:50
+        }
+    }
     const re = new RegExp("([0-9]+)([A-Z])([A-Z])([0-9]*).*");
     const match = cgrs.match(re);
     let x = 50;
@@ -37,13 +42,17 @@ function convertToXY(cgrs:string){
         } else if (kp < 7){
             yOff = 48;
         }
+
+        /// TODO - fix logic here to translate to x,y coordinates
+        console.log(kp, yOff)
+        console.log(row, localStorage.startRow)
         y = ((localStorage.startRow - parseInt(row)) * 100) + yOff;
         x = ((col2 - localStorage.startCol2) * 100) + xOff;
     }
     return {x: x, y:y};
 }
 
-function convertToCGRS(x:number, y:number){
+export function convertToCGRS(x:number, y:number): string{
     const keypads = [[1,2,3],[4,5,6],[7,8,9]];
     const row = (localStorage.startRow - Math.floor(y/100));
     const col = String.fromCharCode(localStorage.startCol1) + String.fromCharCode(localStorage.startCol2 + Math.floor(x/100));

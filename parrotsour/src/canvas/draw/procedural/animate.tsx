@@ -1,10 +1,11 @@
 import { getBR, randomNumber, toRadians } from "../../../utils/mathutilities";
-import { BRAA, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "../intercept/picturecanvas";
-import { drawAltitudes, drawArrow, drawBraaseye, headingToDeg } from "../drawutils";
+import { Group } from "../../../utils/interfaces";
+import { drawAltitudes, drawArrow, drawGroupCap, drawText } from "../drawutils";
+import snackbar from "utils/alert";
+import { convertToXY } from "procedural/prochelpers";
+import { ProcCanvasProps, ProcCanvasState } from "canvas/draw/procedural/proceduralcanvas";
 
 let continueAnimation = false;
-let pauseShowMeasure = true
   
 function sleep(milliseconds: number):void {
     const start = new Date().getTime();
@@ -23,21 +24,14 @@ function setContinueAnimate(val: boolean) {
     continueAnimation = val;
 }
   
-export function pauseFight(showMeasure: boolean): void {
-    pauseShowMeasure = showMeasure;
+export function pauseFight(): void {
     setContinueAnimate(false);
 }
-  
-function isNearBounds(canvas:HTMLCanvasElement, group:Group){
-  const buffer = 40
-  return group.startX < buffer || group.startX > canvas.width-buffer || group.startY < buffer || group.startY > canvas.height-buffer
-}
 
-// eslint-disable-next-line complexity
 function doAnimation(
     canvas: HTMLCanvasElement,
-    props: PicCanvasProps,
-    state: PicCanvasState,
+    props: ProcCanvasProps,
+    state: ProcCanvasState,
     groups:Group[],
     animateCanvas: ImageData,
     resetCallback: (showMeasure:boolean)=>void):void {
@@ -48,76 +42,116 @@ function doAnimation(
     
     context.putImageData(animateCanvas, 0, 0);
 
-    let br: BRAA
     for (let x = 0; x < groups.length; x++) {
+
+      for (let y =0; y< groups.length; y++){
+        if (groups[x].callsign !== groups[y].callsign && groups[x].z[0] === groups[y].z[0] && getBR(groups[x].startX, groups[x].startY, {x:groups[y].startX, y:groups[y].startY}).range <= 20){
+          snackbar.alert(groups[x].callsign + " is co-alt with " + groups[y].callsign + "!", undefined, "#FA5D5D")
+        }
+      }
+      let atFinalDest = false;
+      if ( groups[x].desiredLoc !== undefined){
+        atFinalDest = groups[x].desiredLoc?.length ===0;
+        if (!atFinalDest){
+          const firstLoc = groups[x].desiredLoc?.slice(0,1)[0]
+          if (firstLoc){
+            const reachedDestX = Math.abs(firstLoc.x - groups[x].startX) < 10;
+            const reachedDestY = Math.abs(firstLoc.y - groups[x].startY) < 10;
+          
+            const atDest = reachedDestX && reachedDestY;
+            if (atDest) {groups[x].desiredLoc = groups[x].desiredLoc?.slice(1)}
+            atFinalDest = groups[x].desiredLoc?.length ===0;
+            if (!atFinalDest) {
+              groups[x].desiredHeading = parseInt(getBR(firstLoc.x, firstLoc.y, {x:groups[x].startX, y:groups[x].startY}).bearing);
+            } else {
+              groups[x].isCapping = true;
+              atFinalDest = true;
+            }
+          }
+        }
+      }
+  
+      if (groups[x].request !== undefined){
+        groups[x].successAsReq = false;
+        groups[x].successAltReq = false;
+        if (groups[x].request && groups[x].request?.airspace){
+          const desiredLoc = convertToXY(groups[x].request?.airspace)
+          const rngToDes = getBR(groups[x].startX, groups[x].startY, desiredLoc).range
+          if (atFinalDest && rngToDes < 10){
+            groups[x].successAsReq = true;
+          }
+        } else {
+          groups[x].successAsReq = true;
+        }
+
+        if(groups[x].request?.alt){
+          if(groups[x].z[0] === groups[x].request?.alt || groups[x].z[0] === groups[x].request?.alt){
+            groups[x].successAltReq = true;
+          }
+        } else {
+          groups[x].successAltReq = true;
+        }
+
+        if (groups[x].successAsReq && groups[x].successAltReq) {
+          snackbar.alert("Processed request for " + groups[x].callsign, 3000);
+          groups[x].request= undefined;
+        }
+      }
       
-      drawArrow(canvas,props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle);
+      const atDesiredAlt = groups[x].desiredAlt===undefined || (groups[x].z[0] === groups[x].desiredAlt);
+      if (!atDesiredAlt){
+        if ((groups[x].desiredAlt||groups[x].z) > groups[x].z[0]){
+          groups[x].z[0] += 0.5;
+        } else{
+          groups[x].z[0] -= 0.5;
+        }
+      }
   
-      const xyDeg = headingToDeg(groups[x].heading).degrees
-      const rads: number = toRadians(xyDeg);
-      const offsetX: number = 7 * Math.cos(rads);
-      const offsetY: number = -7 * Math.sin(rads);
-  
-      // TODO - better handling for running into walls
-      // should readjust heading to be towards blue air
-      // if (isNearBounds(canvas, groups[x])){
-      //   // offsetX = 0
-      //   // offsetY = 0
+      if (!groups[x].isCapping && !atFinalDest){
+        drawArrow(canvas, props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, groups[x].heading, props.dataStyle, "blue", groups[x].type, groups[x].radarPoints, groups[x].iffPoints)
         
-      //   groups[x].desiredHeading = parseInt(getBR(state.bluePos.x, state.bluePos.y, {x:groups[x].startX, y: groups[x].startY}).bearing)
-      // }
+        let xyDeg = groups[x].heading - 90;
+        if (xyDeg < 0) xyDeg += 360;
+    
+        const rads = toRadians(xyDeg);
+    
+        const offsetX = 7 * Math.cos(rads);
+        const offsetY = 7 * Math.sin(rads);
+    
+        groups[x].startX = groups[x].startX + offsetX;
+        groups[x].startY = groups[x].startY + offsetY;
 
-      groups[x].startX = groups[x].startX + offsetX;
-      groups[x].startY = groups[x].startY + offsetY;
 
-      if (!groups[x].maneuvers || isNearBounds(canvas, groups[x]))
-        groups[x].desiredHeading = parseInt(getBR(state.bluePos.x, state.bluePos.y, {x:groups[x].startX, y: groups[x].startY}).bearing)
-      
-      let deltaA: number
+        const firstLoc = groups[x].desiredLoc?.slice(0,1)[0]
 
-      const LH = (groups[x].heading - groups[x].desiredHeading + 360) % 360
-      const RH = (groups[x].desiredHeading - groups[x].heading + 360) % 360
-      
-      if (LH < RH) {
-        deltaA = -LH
+        let newHeading = groups[x].heading
+        if( firstLoc){
+          newHeading = parseInt(getBR(firstLoc.x, firstLoc.y, {x:groups[x].startX, y:groups[x].startY}).bearing);
+        }
+        
+        let leftDir = groups[x].heading - newHeading;
+        let rightDir = newHeading -groups[x].heading;
+        if (leftDir < 0) leftDir += 360;
+        if (rightDir < 0) rightDir += 360;
+        
+        const deltaA = (leftDir < rightDir) ? -leftDir : rightDir;
+        
+        groups[x].desiredHeading= newHeading;
+    
+        let offset = 0;
+        if (Math.abs(deltaA) > 10) {
+          offset = deltaA / 5;
+          newHeading = groups[x].heading + offset;
+        } else {
+          newHeading = groups[x].desiredHeading;
+        }
+    
+        groups[x].heading = newHeading;
       } else {
-        deltaA = RH
-      }
-
-      let divisor = 7
-      const absDelt = Math.abs(deltaA)
-      if (absDelt > 90 ){
-        divisor = 15
-      } else if (absDelt < 7 ) {
-        divisor = 1
-      }
-      const newHeading = groups[x].heading + deltaA / divisor
-      groups[x].heading = newHeading 
-
-      if (groups[x].maneuvers) {
-        br = getBR(state.bluePos.x, state.bluePos.y, { x: groups[x].startX, y: groups[x].startY});
-  
-        if (br.range < 70 && !groups[x].maneuvered) {
-          console.log("maneuver")
-          groups[x].desiredHeading = randomNumber(45,330)
-          groups[x].maneuvered = true
-          // TODO - set maneuver comm in answer DIV (initial detect)
-        } 
-
-        // TODO - once established on heading, 
-        // var aspectH = ;
-        // var mxUpdate = groups[x].label + " MANEUVER, " + 
-        //                getAspect(state.bluePos, groups[x]) + " " +
-        //                getTrackDir(groups[x].heading);
-      }
+        drawGroupCap(canvas, props.orientation, groups[x].numContacts, groups[x].startX, groups[x].startY, "blue", groups[x].type)
+      }  
+      drawText(canvas, context, groups[x].callsign||"", groups[x].startX-10, groups[x].startY+20, 12)
     }
-
-    groups.forEach((grp) => {
-      if (getBR(state.bluePos.x, state.bluePos.y, {x:grp.startX, y:grp.startY}).range < 30 ){
-        continueAnimation = false
-        resetCallback(true)
-      }
-    })
   
     if (continueAnimation) {
       const slider:HTMLInputElement = document.getElementById("speedSlider") as HTMLInputElement
@@ -135,57 +169,13 @@ function doAnimation(
       for (let y =0 ; y < groups.length; y++){
         drawAltitudes(canvas, context, groups[y].startX + 20, groups[y].startY - 11, groups[y].z);
       }
-    } else {
-    //   var mxCommDiv = document.getElementById("maneuverComm");
-  
-      let closest: BRAA = { bearing: "90", range: 1000 };
-    //   var closestGrp: Group = groups[0];
-  
-      for (let y = 0; y < groups.length; y++) {
-        if (pauseShowMeasure) {
-          drawBraaseye(
-            canvas,
-            context,
-            state.bluePos,
-            { x: groups[y].startX, y: groups[y].startY },
-            state.bullseye,
-            true,
-            props.braaFirst
-          );
-        }
-  
-        drawAltitudes(canvas, context, groups[y].startX + 20, groups[y].startY - 11, groups[y].z);
-  
-        br = getBR(groups[y].startX, groups[y].startY, {
-          x: state.bluePos.x,
-          y: state.bluePos.y
-        });
-        if (br.range < closest.range) {
-          closest = br;
-        //   closestGrp = groups[y];
-        }
-      }
-  
-      if (closest.range < 40) {
-        // var altStack: AltStack = getAltStack(closestGrp.z, props.format);
-        // mxCommDiv.innerHTML =
-        //   mxCommDiv.innerHTML +
-        //   "<br/> THREAT BRAA " +
-        //   closest.bearing +
-        //   "/" +
-        //   closest.range +
-        //   " " +
-        //   altStack.stack +
-        //   " HOT, HOSTILE " +
-        //   altStack.fillIns;
-      }
     }
 }
 
 export function animateGroups(
   canvas: HTMLCanvasElement,
-  props: PicCanvasProps, 
-  state: PicCanvasState,
+  props: ProcCanvasProps, 
+  state: ProcCanvasState,
   groups: Group[],
   animateCanvas: ImageData,
   resetCallback: (showMeasure:boolean)=>void):void {
@@ -199,5 +189,4 @@ export function animateGroups(
   continueAnimation = true;
   doAnimation(canvas, props, state, groups, animateCanvas, resetCallback);
 }
-  
   

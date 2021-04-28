@@ -1,12 +1,6 @@
-import { randomHeading } from 'utils/mathutilities';
 import { Bullseye, DrawAnswer } from '../../../utils/interfaces'
-
-// import { randomNumber, randomHeading, getBR, getAltStack, getTrackDir } from '../../../utils/mathutilities'
-// import { drawAltitudes, drawArrow, drawBraaseye, drawMeasurement } from '../drawutils'
-// import { DrawFunction, Group } from '../../../utils/interfaces'
 import { ProcCanvasProps, ProcCanvasState } from './proceduralcanvas';
-import { Bounds, drawArrow, getStartPos } from '../drawutils';
-// import { formatGroup, getGroupOpenClose } from '../formatutils';
+import { Bounds, drawGroupCap, drawText, getStartPos } from '../drawutils';
 
 export const drawProcedural = (
   canvas: HTMLCanvasElement,
@@ -15,11 +9,17 @@ export const drawProcedural = (
   state: ProcCanvasState,
   start?: Bullseye):DrawAnswer => {
     const bounds: Bounds = {
-      tall: { lowX: 0, hiX: canvas.width, lowY: 0, hiY: canvas.height},
-      wide: { lowX: 0, hiX: canvas.width, lowY: 0, hiY: canvas.height}
+      tall: { lowX: 0.1, hiX: 0.9, lowY: 0.1, hiY: 0.9},
+      wide: { lowX: 0.1, hiX: 0.9, lowY: 0.1, hiY: 0.9}
     }
     const startPos = getStartPos(canvas,props.orientation, bounds, start)
-    const grp = drawArrow(canvas, props.orientation, 1, startPos.x, startPos.y, randomHeading("alsa", state.bluePos.heading), props.dataStyle)
+    
+    const grp = drawGroupCap(canvas, props.orientation, 1, startPos.x, startPos.y, "blue")
+    grp.desiredLoc=[{x:startPos.x, y:startPos.y}]
+    grp.callsign = "VR01"
+    
+    drawText(canvas, ctx, grp.callsign, grp.x, grp.y+35, 12);
+    console.log("blue group:",grp)
     return {
       pic: "",
       groups:[grp]

@@ -54,7 +54,10 @@ export type Group = {
     drawnRadar: Bullseye[][],
     iffPoints?: Bullseye[][],
     tasking?: string,
-    desiredLoc?: Bullseye[]
+    desiredLoc?: Bullseye[],
+    request?: { airspace: string, alt: number},
+    successAsReq?: boolean,
+    successAltReq?: boolean,
 }
 
 export type DrawAnswer = {

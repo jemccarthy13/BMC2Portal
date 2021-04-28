@@ -3,11 +3,10 @@ import React, { ReactElement } from 'react'
 import Canvas from '../../canvas'
 
 import { randomNumber } from '../../../utils/mathutilities'
-import { drawBullseye, drawGroupCap, drawLine, drawText } from '../drawutils'
+import { drawLine, drawText } from '../drawutils'
 import { drawProcedural } from './draw'
 import { Bullseye, DrawAnswer, Group } from '../../../utils/interfaces'
-//import { animateGroups, pauseFight } from './draw/procedural/animate'
-import { pauseFight } from './animate'
+import { animateGroups, pauseFight } from './animate'
 
 export type ProcCanvasProps = {
     height: number,
@@ -82,19 +81,16 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
             return true;
         }
     
-        if (areEqualShallow(rest, newrest) && oldAnimate !== newAnimate){   
-            // const { animate, showMeasurements, resetCallback } = this.props 
-            // const { canvas, animateCanvas, answer } = this.state
-            const { animate, showMeasurements } = this.props
-            const { canvas, animateCanvas } = this.state
+        if (areEqualShallow(rest, newrest) && oldAnimate !== newAnimate){
+            const { animate, resetCallback } = this.props
+            const { canvas, animateCanvas, answer } = this.state
             
             if (animate){
                 if (canvas && animateCanvas){
-                    // TODO - animate for procedural
-                    // animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
+                    animateGroups(canvas, this.props, this.state, answer.groups, animateCanvas, resetCallback);
                 }
             } else {
-                pauseFight(showMeasurements)
+                pauseFight()
             }
         }
     }
@@ -168,24 +164,12 @@ export default class ProceduralCanvas extends React.PureComponent<ProcCanvasProp
      */
     draw = async (context: CanvasRenderingContext2D|null|undefined, frameCount: number, canvas: HTMLCanvasElement):Promise<void> => {
         if (context === null || context ===undefined) return
-        const bullseye = drawBullseye(canvas, context)
 
         this.drawCGRSGrid(canvas, context)
-
-        const xPos = randomNumber(canvas.width * 0.33, canvas.height * 0.66)
-        const yPos = randomNumber(canvas.height * 0.33, canvas.height *0.66)
-       
-        const { orientation } = this.props 
         
-        //const bluePos = drawArrow(canvas, orientation, 1, xPos, yPos, heading, "blue");
-        const bluePos = drawGroupCap(canvas, orientation, 1, xPos, yPos, "blue")
-        bluePos.callsign="VR01"
-        drawText(canvas, context, bluePos.callsign, bluePos.x, bluePos.y+35, 12);
-        await this.setState({bluePos, bullseye})
         
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
         const answer: DrawAnswer = await this.drawPicture(canvas, context)
-        answer.groups[0].callsign = bluePos.callsign
         
         const { setAnswer } = this.props
         setAnswer(answer)
