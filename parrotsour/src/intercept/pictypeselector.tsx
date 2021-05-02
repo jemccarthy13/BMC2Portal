@@ -16,10 +16,9 @@ const PicTypeSelector = (props: PTSelProps):ReactElement => {
     return (<div style={{display:"flex"}}>
         <div className="custom-sel-div">
             <Select 
-                // eslint-disable-next-line 
+                // eslint-disable-next-line react/forbid-component-props
                 className = "parrotsoursel"
                 autoWidth
-                disableUnderline 
                 labelId="picSelLabel" 
                 id="pictureType" 
                 value={picType}

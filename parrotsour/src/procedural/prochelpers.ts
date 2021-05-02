@@ -1,27 +1,21 @@
-import { Bullseye, DrawAnswer, Group } from "utils/interfaces";
+import { ACType } from "classes/groups/aircraft";
+import { PictureAnswer } from "canvas/canvastypes";
+import { AircraftGroup } from "classes/groups/group";
+import { Point } from "classes/point";
 
-export function getAsset(groups: Group[], callsign:string):Group|undefined{
+export function getAsset(groups: AircraftGroup[], callsign:string):AircraftGroup|undefined{
     return groups.find(a => {
-        if (a.callsign) { 
-            return a.callsign.toUpperCase() === callsign.toUpperCase()
+        if (a.getLabel()) { 
+            return a.getLabel().toUpperCase() === callsign.toUpperCase()
         } else {
             return false
         }
     });
 }
 
-export function setDesiredFL(asset:Group, fl:string):void{
-    const fl2Dig = fl.substring(0,2);
-    if (asset.z[0].toString() !== fl){
-        asset.desiredAlt = parseInt(fl2Dig);
-    }
-}
-
-export function convertToXY(cgrs:string|undefined): Bullseye{
+export function convertToXY(cgrs:string|undefined): Point{
     if (cgrs === undefined){
-        return {
-            x:50, y:50
-        }
+        return new Point(50,50)
     }
     const re = new RegExp("([0-9]+)([A-Z])([A-Z])([0-9]*).*");
     const match = cgrs.match(re);
@@ -44,12 +38,12 @@ export function convertToXY(cgrs:string|undefined): Bullseye{
         }
 
         /// TODO - fix logic here to translate to x,y coordinates
-        //console.log(kp, yOff)
-        //console.log(row, localStorage.startRow)
+        //log(kp, yOff)
+        //log(row, localStorage.startRow)
         y = ((localStorage.startRow - parseInt(row)) * 100) + yOff;
         x = ((col2 - localStorage.startCol2) * 100) + xOff;
     }
-    return {x: x, y:y};
+    return new Point(x,y)
 }
 
 export function convertToCGRS(x:number, y:number): string{
@@ -61,7 +55,7 @@ export function convertToCGRS(x:number, y:number): string{
 }
 
 // eslint-disable-next-line
-export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: DrawAnswer, sendResponse:(sender:string, msg:string, voice?:boolean)=>void):void{
+export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: PictureAnswer, sendResponse:(sender:string, msg:string, voice?:boolean)=>void):void{
     // do some things to NLP the message
 
     let msgText = msg.text
@@ -71,7 +65,6 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
     const matches = msgText.match(re);
     let cgrs = "";
     if (matches){
-        //console.log("loop replace cgrs");
         matches.forEach((elem) => {
             const xy = convertToXY(elem);
             msgText = msgText.replace(elem, xy.x + " " + xy.y);
@@ -96,8 +89,6 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
     const cs = assetMsg.groups().cs
     const callsign = cs ? cs.text().toUpperCase() : "SYSTEM"
     const asset = getAsset(answer.groups, callsign);
-
-    //console.log(nl)
 
     const isCommand = cmd.found;
     const isMove = move.found;
@@ -151,7 +142,9 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
             let fl
             if (isMove3d){
                 fl = move3d.groups().fl.text();
-                setDesiredFL(asset,fl);
+                asset.updateIntent({
+                    desiredAlt: fl
+                })
             }
 
             let cpy = "c"
@@ -168,8 +161,8 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
             (locX +"," + locY)) + 
             (isMove3d ? (" at "+ FL + " " + fl) : ""), msg.voice);
 
-            asset.desiredLoc = [{x:locX, y:locY}];
-            asset.isCapping = false;
+            asset.addRoutingPoint(new Point(locX, locY))
+            // asset.setCapping(false)
         } else {
             sendResponse(callsign, "I don't understand " + cmd.text(), msg.voice);
         }
@@ -184,16 +177,20 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
             newfl = newflActual?.split('').join(' ')
         }
         sendResponse(callsign, cpy + cmd.groups().act.verbs().toGerund().text() + " " + newfl, msg.voice)
-        setDesiredFL(asset,newflActual);
+        asset.updateIntent({
+            desiredAlt: newflActual
+        })
     } else if (isQuestion || interrogative){
         const q = interrogative ? question2 : question
         const thing = q.groups().thing.text();
         if ((thing ==="status" || thing==="location" || thing ==="posit" || thing === "positive" || thing ==="cwas")){
-            if (asset.isCapping){
-                sendResponse(callsign, "working " + convertToCGRS(asset.startX, asset.startY), msg.voice);
-            } else if (asset.desiredLoc) {
-                const current = convertToCGRS(asset.startX, asset.startY).replace("+", "");
-                const desired = convertToCGRS(asset.desiredLoc[0].x, asset.desiredLoc[0].y);
+            const assetSPos = asset.getCenterOfMass()
+            if (asset.isCapping()){
+                sendResponse(callsign, "working " + convertToCGRS(assetSPos.x, assetSPos.y), msg.voice);
+            } else if (asset.getNextRoutingPoint()) {
+                const rPoint = asset.getNextRoutingPoint()
+                const current = convertToCGRS(assetSPos.x, assetSPos.y).replace("+", "");
+                const desired = convertToCGRS(rPoint.x, rPoint.y);
                 sendResponse(callsign, "passing " + current + ", enroute to " + desired, msg.voice);
             } else {
                 if (msg.voice){
@@ -203,17 +200,17 @@ export function aiProcess(nlp:any, msg:{text:string, voice:boolean}, answer: Dra
                 }
             }
         } else if (thing ==="tasking" ){
-            if (asset.tasking){
+            if (asset.isOnTask()){
                 console.log("TODO -- read back tasking when assigned")
             } else {
-                if (asset.type==="rpa"){
+                if (asset.getType() === ACType.RPA){
                     sendResponse(callsign,"performing ISR iwas");
                 } else {
                     sendResponse(callsign, "no tasking att, XCAS ufn");
                 }
             }
         } else if (thing.toLowerCase() ==="eta"){
-            if (asset.isCapping){
+            if (asset.isCapping()){
                 sendResponse(callsign, "I'm already on loc");
             } else{
                 sendResponse(callsign, "ETA 5m");

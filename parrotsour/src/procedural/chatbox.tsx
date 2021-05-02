@@ -1,14 +1,14 @@
-import React from "react"
-import { ReactElement, KeyboardEvent } from "react"
-import { DrawAnswer } from "utils/interfaces"
+import React, { ReactElement, KeyboardEvent } from "react"
 
-import { getTimeStamp } from '../utils/mathutilities'
 import { aiProcess } from "./prochelpers"
-
 import SpeechTextControls from './speechtext'
+
+import { getTimeStamp } from "utils/pstime"
 
 import nlp from 'compromise'
 import sentences from 'compromise-sentences'
+import { PictureAnswer } from "canvas/canvastypes"
+
 nlp.extend(sentences)
 // eslint-disable-next-line
 nlp.extend((Doc:any, world:any) => {
@@ -24,14 +24,14 @@ nlp.extend((Doc:any, world:any) => {
         state:'Noun'
     })
 });
-
-type CBProps = {
-    answer: DrawAnswer
-}
  
 type CBState = {
     text: string,
     sender: string
+}
+
+type CBProps = {
+    answer: PictureAnswer
 }
 
 export default class ChatBox extends React.PureComponent<CBProps, CBState>{

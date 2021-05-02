@@ -1,6 +1,6 @@
-const snackbar = {
+export class Snackbar {
     // Displays a snackbar notification in the lower portion of the screen
-    async alert(text:string, timeout: number|undefined, color = "#4caf50"): Promise<void> {
+    public static async alert(text:string, timeout: number|undefined, color = "#4caf50"): Promise<void> {
       const x: HTMLElement|null = document.getElementById("snackbar");
       if (x){
         x.innerText = text;
@@ -13,5 +13,3 @@ const snackbar = {
       }
   }
 }
-
-export default snackbar;

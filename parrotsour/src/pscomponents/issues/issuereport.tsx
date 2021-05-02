@@ -1,10 +1,12 @@
 import React, { ReactElement } from 'react'
 
 import {Button, Dialog, DialogActions, DialogContent, TextField} from '@material-ui/core'
-import IssueSelector from 'issues/issueselector'
+import IssueSelector from 'pscomponents/issues/issueselector'
 
-import '../css/collapsible.css'
-import snackbar from '../utils/alert'
+import { Snackbar } from 'classes/alert'
+import { PictureAnswer } from 'canvas/canvastypes'
+
+import '../../css/collapsible.css'
 
 type IRState = {
     showIssueForm: boolean,
@@ -15,7 +17,7 @@ type IRState = {
 }
 
 type IRProps = {
-    getAnswer: () => string
+    answer: PictureAnswer
 }
 
 export default class IssueReport extends React.PureComponent<IRProps, IRState> {
@@ -63,7 +65,7 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
 
         this.setState({submitEnabled:false})
         if (goodForm) {   
-            const {getAnswer} = this.props   
+            const {answer} = this.props   
             const {selection} = this.state  
             const canvas:HTMLCanvasElement= document.getElementById("pscanvas") as HTMLCanvasElement
 
@@ -71,7 +73,6 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
             if (email && email.indexOf("@") === -1) realEmail += "@gmail.com"; 
  
             const realText = (text) ? text : "unknown"
-            const answer = getAnswer()
 
             const formData = new FormData()
             formData.append("email", realEmail)
@@ -84,10 +85,10 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
             });
             
             if (response.ok){
-                snackbar.alert("Submitted!", 5000, "green")
+                Snackbar.alert("Submitted!", 5000, "green")
                 this.setState({showIssueForm:false})
             } else {
-                snackbar.alert("Issue report failed.\nTry again later.", 5000, "red")
+                Snackbar.alert("Issue report failed.\nTry again later.", 5000, "red")
             }
         }
         

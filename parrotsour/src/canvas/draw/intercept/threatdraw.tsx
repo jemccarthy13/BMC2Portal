@@ -1,71 +1,73 @@
-import { getAltStack, getAspect, getBR, getTrackDir, randomHeading, randomNumber } from "../../../utils/mathutilities";
-import { AltStack, BRAA, Bullseye, DrawAnswer, DrawFunction, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "./picturecanvas";
-import { drawAltitudes, drawArrow, drawBraaseye } from "../drawutils";
+// Interfaces
+import { AltStack } from "../../../classes/interfaces";
+import { PictureAnswer, PictureDrawFunction, PictureCanvasProps, PictureCanvasState } from "canvas/canvastypes";
+import { AircraftGroup } from "classes/groups/group";
 
+// Functions
+import { drawAltitudes } from "../drawutils";
+import { getAspect } from "../../../utils/mathutilities";
+import { Braaseye } from "classes/braaseye";
+import { randomHeading, randomNumber } from "utils/psmath";
+import { Point } from "classes/point";
 
-export const drawThreat:DrawFunction = (
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
-    props: PicCanvasProps,
-    state: PicCanvasState,
-    start?: Bullseye|undefined ): DrawAnswer => {
+export const drawThreat:PictureDrawFunction = (
+    ctx: CanvasRenderingContext2D,
+    props: PictureCanvasProps,
+    state: PictureCanvasState,
+    start?: Point|undefined ): PictureAnswer => {
     
     if (!state.bluePos) { return { pic: "", groups: []} }
 
     const offsetDeg1:number = randomNumber(-10, 10);
 
+    const bPos = state.bluePos.getCenterOfMass()
+
     if (start === undefined){
-        start = {
-            x: randomNumber(state.bluePos.x-100, state.bluePos.x-40),
-            y: randomNumber(state.bluePos.y-100, state.bluePos.y+40)
-        }
+        start = new Point(
+            randomNumber(bPos.x-100, bPos.x-40),
+            randomNumber(bPos.y-100, bPos.y+40))
     }
     if (start && start.y === undefined){
-        start.y = randomNumber(state.bluePos.y-100, state.bluePos.y+40);
+        start.y = randomNumber(bPos.y-100, bPos.y+40);
     }
     if (start && start.x === undefined) {
-        start.x = randomNumber(state.bluePos.x-100, state.bluePos.x-40);
+        start.x = randomNumber(bPos.x-100, bPos.x-40);
     }
 
-    const heading:number = randomHeading(props.format, state.bluePos.heading);
+    const heading:number = randomHeading(props.format, state.bluePos.getHeading());
 
-    const sg:Group = drawArrow(canvas, props.orientation, randomNumber(1, 4), start.x, start.y, heading + offsetDeg1, props.dataStyle);
+    const sg = new AircraftGroup({
+        ctx, 
+        sx: start.x, 
+        sy: start.y,
+        hdg: heading + offsetDeg1
+    })
+    sg.draw(ctx, props.dataStyle)
+    const sgPos = sg.getCenterOfMass()
 
-    drawAltitudes(canvas, context, sg.x + 10, sg.y - 11, sg.z);
+    drawAltitudes( ctx, sgPos, sg.getAltitudes());
 
-    const sgAlts: AltStack = getAltStack(sg.z, props.format);
+    const sgAlts: AltStack = sg.getAltStack( props.format );
 
-    drawBraaseye(
-        canvas, 
-        context,
-        state.bluePos,
-        { x: sg.x, y: sg.y },
-        state.bullseye,
-        props.showMeasurements,
-        props.braaFirst
-    );
 
-    const br:BRAA = getBR(sg.x, sg.y, {
-          x: state.bluePos.x,
-          y: state.bluePos.y
-        });
-    const closest:BRAA = br;
-    const closestGrp:Group = sg;
+    const closestBraaseye = new Braaseye(sgPos, state.bluePos.getCenterOfMass(), state.bullseye)
+    closestBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
+
+    const closestGrp:AircraftGroup = sg;
 
     const aspectH = getAspect(state.bluePos, sg);
-    const trackDir = getTrackDir(sg.heading);
+    const trackDir = sg.getTrackDir();
 
-    let answer:string = "[FTR C/S], THREAT GROUP BRAA " + closest.bearing + "/" + closest.range + " " + sgAlts.stack + " " + aspectH + " " + (aspectH !== "HOT" ? trackDir : "") + " HOSTILE "
+    let answer:string = "[FTR C/S], THREAT GROUP BRAA " + closestBraaseye.braa.bearing + "/" + closestBraaseye.braa.range + " " + sgAlts.stack + " " + aspectH + " " + (aspectH !== "HOT" ? trackDir : "") + " HOSTILE "
 
-    if (closestGrp.numContacts > 1) {
-        answer += (closestGrp.numContacts >= 3 ? "HEAVY " : "") + closestGrp.numContacts + " CONTACTS ";
+    if (closestGrp.getStrength() > 1) {
+        answer += (closestGrp.getStrength() >= 3 ? "HEAVY " : "") + closestGrp.getStrength() + " CONTACTS ";
     }
 
     answer += sgAlts.fillIns;
   
     const groups = [];
-    sg.label = "SINGLE GROUP";
+    sg.setLabel("SINGLE GROUP");
     groups.push(sg);
 
     return {

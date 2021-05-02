@@ -7,33 +7,28 @@ import '../css/parrotsour.css'
 import '../css/toggle.css'
 import '../css/togglebuttongroup.css'
 
-import { ProceduralQT } from '../quicktips/proceduralQT'
+import { ProceduralQT } from '../pscomponents/quicktips/proceduralQT'
 import DifficultySelector from './difficultyselector'
 import ChatBox from './chatbox'
-import { DrawAnswer } from 'utils/interfaces'
+import { FightAxis, PictureAnswer, CanvasOrient } from 'canvas/canvastypes'
+import { SensorType } from 'classes/groups/datatrail'
 
-const ProceduralCanvas = lazy(()=>import('../canvas/draw/procedural/proceduralcanvas'))
+const ProceduralCanvas = lazy(()=>import('../canvas/draw/intercept/procedural/proceduralcanvas'))
 
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))
 
 const VersionInfo = lazy(()=>import('../versioninfo'))
 
-interface CanvasConfig {
-    height: number,
-    width: number,
-    orient: string
-}
-
 interface PSPState {
     showMeasurements: boolean,
     isHardMode: boolean,
     speedSliderValue: number,
-    canvasConfig: CanvasConfig,
+    canvasConfig: CanvasOrient,
     braaFirst: boolean,
     animate:boolean,
     newPic: boolean,
-    answer: DrawAnswer
+    answer: PictureAnswer
     // picType: string // for easy/med/hard tracking
 }
 
@@ -51,7 +46,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
             canvasConfig: {
                 height: 500,
                 width:800,
-                orient:"EW"
+                orient:FightAxis.EW
             },
             braaFirst: true,
             newPic: false,
@@ -117,24 +112,19 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
         let newConfig = {
             height:700,
             width:600,
-            orient:"NS"
+            orient:FightAxis.NS
         }
-        if (orient==="NS"){
+        if (orient===FightAxis.NS){
             newConfig = {
                 height:500,
                 width:800,
-                orient:"EW"
+                orient:FightAxis.EW
             }
         }
         this.setState({canvasConfig:newConfig})
     }
 
-    getAnswer = ():string => {
-        // TODO - return some helpful information about commands?
-        return ""
-    }
-
-    setAnswer = (answer: DrawAnswer): void => {
+    setAnswer = (answer: PictureAnswer): void => {
         this.setState({answer})
     }
 
@@ -151,7 +141,7 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>} >
-                    <ParrotSourHeader comp={<ProceduralQT/>} getAnswer={this.getAnswer} />
+                    <ParrotSourHeader comp={<ProceduralQT/>} answer={answer} />
                 </Suspense>
 
                 <hr />
@@ -174,21 +164,19 @@ export default class ParrotSourProcedural extends React.PureComponent<Record<str
                 <Suspense fallback={<div/>} >
                     <div style={{display:"inline-flex", width:"100%"}}>
                         <ProceduralCanvas 
-                            height={canvasConfig.height}
-                            width={canvasConfig.width}
+                            orientation={canvasConfig}
                             braaFirst={braaFirst}
                             picType="random"
+                            format="alsa"
                             showMeasurements={showMeasurements}
                             isHardMode={isHardMode}
-                            orientation={canvasConfig.orient}
-                            // eslint-disable-next-line react/jsx-no-bind
                             setAnswer={this.setAnswer}
                             newPic={newPic}
                             animate={animate}
                             sliderSpeed={speedSliderValue}
                             resetCallback={this.pauseAnimate}
                             animateCallback={this.startAnimate}
-                            dataStyle="arrow"
+                            dataStyle={SensorType.ARROW}
                         />
 
                         <ChatBox 

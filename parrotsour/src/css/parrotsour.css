@@ -18,9 +18,9 @@
   
 .custom-sel-div {
     border-radius:10px;
-    padding: 5px 10px 0px 10px;
     background-color:#eee;
     margin-right:10px;
     margin-bottom:20px;
     width:25%;
+    height:40px;
 }

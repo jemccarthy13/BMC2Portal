@@ -1,11 +1,12 @@
 import React, { CSSProperties, ReactElement } from 'react'
 
-import IssueReport from '../issues/issuereport'
+import IssueReport from './issues/issuereport'
 import {Dialog} from '@material-ui/core'
+import { PictureAnswer } from 'canvas/canvastypes'
 
 interface PSHeaderProps{
     comp?:ReactElement,
-    getAnswer: ()=>string
+    answer: PictureAnswer
 }
 
 interface PSHeaderState{
@@ -51,7 +52,7 @@ export default class ParrotSourHeader extends React.PureComponent<PSHeaderProps,
     
     render():ReactElement{
         const { showQT } = this.state
-        const { comp, getAnswer } = this.props
+        const { comp, answer } = this.props
         return (
             <div>
                 <img src="/icon/552trans.png" style={{...this.imgStyle, right:"5%"}} id="acwlogo" alt="552Logo" />
@@ -66,7 +67,7 @@ export default class ParrotSourHeader extends React.PureComponent<PSHeaderProps,
                             {comp}
                         </Dialog>
                     }
-                    <IssueReport getAnswer={getAnswer}/>
+                    <IssueReport answer={answer}/>
                 </div>
             </div>
         )

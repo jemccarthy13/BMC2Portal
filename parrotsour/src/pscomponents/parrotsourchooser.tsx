@@ -1,6 +1,6 @@
 import React, { lazy, ReactElement } from 'react'
 
-import { PsQT } from '../quicktips/psQT'
+import { PsQT } from './quicktips/psQT'
 
 const ParrotSourHeader = lazy(()=>import('./parrotsourheader'))
 
@@ -20,16 +20,12 @@ export const ParrotSourChooser = (props:PSCProps):ReactElement => {
         return ()=>{
             window.location.href = (link) ? link : "#"
         }
-    }   
-
-    function emptyFunc():string {
-        return ""
     }
 
     const { interceptLink, proceduralLink } = props
     return (
         <div>
-            <ParrotSourHeader comp={<PsQT/>} getAnswer={emptyFunc}/>
+            <ParrotSourHeader comp={<PsQT/>} answer={{pic:"", groups:[]}}/>
             <br/>
             <hr/>
             <div style={{textAlign:"center"}}>

@@ -2,9 +2,9 @@
  * This file contains utilities for group and answer formatting
  */
 
-import { Braaseye, AltStack, Group, BRAA } from '../../utils/interfaces'
-
-import { getBR, getTrackDir } from '../../utils/mathutilities'
+import { Braaseye } from 'classes/braaseye';
+import { AircraftGroup } from 'classes/groups/group';
+import { AltStack } from '../../classes/interfaces'
 
 type RangeBack = {
   label: string,
@@ -19,63 +19,6 @@ export function formatAlt(alt: number): string{
     const altF = (alt*10).toString().substring(0,3);
     return altF.length < 3 ? "0" + altF : altF;
 }
-
-/**
- * Return a group formatted for BRAA response
- * @param label group label
- * @param braa bearing/range from blue
- * @param altitudes altitude of group
- * @param numContacts num contacts in the group
- * @param heading heading of group
- * @param aspect Aspect between blue and red
- */
-export function formatBRAA(
-  label:string,
-  braa:BRAA,
-  altStack:AltStack,
-  numContacts:number,
-  heading:number,
-  aspect: string): string{
-    let response:string = label + " BRAA " + braa.bearing + "/" + braa.range + " "
-    response +=  altStack.stack + ", " + aspect+ " " + (aspect !== "HOT" ? getTrackDir(heading): "") +" HOSTILE ";
-    if (numContacts > 1) {
-      response += (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS ";
-    }
-    response += altStack.fillIns;
-    return response
-}
-
-/**
- * Format a strobe response
- * @param strBR BR from blue to red
- * @param altStack Alt stack of red group
- * @param heading Heading of red group
- * @param aspect Aspect between blue and red
- * @param label Red group label
- */
-export function formatStrobe(
-  strBR: BRAA,
-  altStack:AltStack,
-  heading:number,
-  aspect:string,
-  label:string): string {
-  return "EAGLE01 STROBE RANGE " + strBR.range + ", " + altStack.stack
-   + (aspect !=="HOT" ? aspect + " "+ getTrackDir(heading) : aspect) + ", HOSTILE, " + label;
-}
-
-/**
- * Format a music response to a given group
- * @param grp Group for music call
- * @param bull Bullseye of the picture
- * @param altStack Altitude stack information for red group
- * @param format Format of the picture
- */
-export function formatMusic(grp:Group, bull:BRAA, altStack:AltStack, format:string):string{
-  return grp.label + " BULLSEYE " + bull.bearing +"/" + bull.range + ", " + altStack.stack
-    + (format==="ALSA" ? (grp.isCapping ? " CAP " : ", TRACK " + getTrackDir(grp.heading)) :"")
-    + ", HOSTILE, "
-    + ( altStack.fillIns ? altStack.fillIns: grp.numContacts+ " CONTACT(S)") + (grp.numContacts > 1 ? " LINE ABREAST THREE " : "") + altStack.fillIns
-} 
 
 /**
  * Return the string formatted answer for this group based on properties of the group
@@ -133,18 +76,35 @@ export function formatGroup(
  * @param fg First group of picture
  * @param sg Second group of picture
  */
-export function getGroupOpenClose( fg: Group, sg: Group ): string{  
-    const b1 = getBR(fg.x, fg.y, {x:sg.x, y:sg.y}).range
-    const b2 = getBR(fg.startX, fg.startY, {x:sg.x, y:sg.y}).range
+export function getGroupOpenClose( fg: AircraftGroup, sg: AircraftGroup ): string{  
+  const fgPos = fg.getCenterOfMass()
+  const sgPos = sg.getCenterOfMass()
+  const fgStartPos = fg.getStartPos()
+  const sgStartPos = sg.getStartPos()
+
+  // if the head of the arrow is closer, it's pointing towards the other fighter
+  const b1 = sgPos.getBR(fgPos).range
+  const b2 = sgPos.getBR(fgStartPos).range
+  const mina = Math.min(b1, b2)
   
-    const b3 = getBR(sg.x, sg.y, {x:fg.x, y: fg.y}).range
-    const b4 = getBR(sg.startX, sg.startY, {x:fg.x, y:fg.y}).range
+  const b3 = sgStartPos.getBR(fgPos).range
+  const b4 = sgStartPos.getBR(fgStartPos).range
+  const minb = Math.min(b3,b4)
+
+  const b5 = fgPos.getBR(sgPos).range
+  const b6 = fgPos.getBR(sgStartPos).range
+  const minc = Math.min(b5, b6)
   
-    if (b1 <= b2 && b3 <= b4){
-      return "CLOSING";
-    } 
-    if (b2 <= b1 && b4 <= b3){
-      return "OPENING";
-    }
-    return "";
+  const b7 = fgStartPos.getBR(sgPos).range
+  const b8 = fgStartPos.getBR(sgStartPos).range
+  const mind = Math.min(b7,b8)
+
+  if (mina+2 < minb && minc+2 < mind ){ 
+    return "CLOSING"
+  }
+  if (mina-2 > minb && minc-2 > mind){
+    return "OPENING"
+  }
+
+  return "";
 }

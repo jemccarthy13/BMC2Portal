@@ -63,7 +63,6 @@ export function SpeechTextControls(props: SpeechTextProps):ReactElement {
             let tmpAnswer = transcript
 
             tmpAnswer = preProcess(transcript)
-            console.log(tmpAnswer)
             props.handler(tmpAnswer)
         })
     }

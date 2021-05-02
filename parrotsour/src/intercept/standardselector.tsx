@@ -1,6 +1,6 @@
 import { Dialog } from "@material-ui/core";
 import React, { ReactElement } from "react";
-import { AlsaHelp } from "../quicktips/alsahelp";
+import { AlsaHelp } from "../pscomponents/quicktips/alsahelp";
 
 type StdSelectorProps = {
     selectionChanged: (val:string)=>()=>void

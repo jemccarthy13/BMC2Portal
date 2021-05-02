@@ -1,5 +1,5 @@
-import Canvas from './canvas/canvas'
-import PictureCanvas from './canvas/draw/intercept/picturecanvas'
+import DrawingCanvas from './canvas/drawingcanvas'
+import PictureCanvas from './canvas/picturecanvas'
 import {ParrotSourChooser} from './pscomponents/parrotsourchooser'
 import ParrotSourHeader from './pscomponents/parrotsourheader'
 import ParrotSourControls from './pscomponents/parrotsourcontrols'
@@ -10,15 +10,15 @@ import StandardSelector from './intercept/standardselector'
 
 import ParrotSourProcedural from './procedural/parrotsourprocedural'
 
-import { AlsaHelp } from './quicktips/alsahelp'
-import { InterceptQT } from './quicktips/interceptQT'
-import { PsQT } from './quicktips/psQT'
+import { AlsaHelp } from './pscomponents/quicktips/alsahelp'
+import { InterceptQT } from './pscomponents/quicktips/interceptQT'
+import { PsQT } from './pscomponents/quicktips/psQT'
 import ReactDOM from 'react-dom'
 import React, { Suspense } from 'react'
 import Home from 'Home'
 
 export {
-    Canvas,
+    DrawingCanvas as Canvas,
     PictureCanvas,
     ParrotSourIntercept,
     PicTypeSelector,

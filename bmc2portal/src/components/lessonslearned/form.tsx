@@ -69,7 +69,6 @@ export default class Form extends React.PureComponent<FormProps, FormState> {
         const goodForm = e.currentTarget.form.reportValidity()
         e.preventDefault();
         if (goodForm) {
-            console.log("submit to server", title, author, content)
             const res = await backend.postLessonLearned(title, author, content)
             if (res === "OK"){
                 snackbar.alert("Submitted!", 5000, "green")

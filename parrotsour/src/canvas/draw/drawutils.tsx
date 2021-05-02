@@ -3,29 +3,38 @@
  * to build groups and pictures.
  */
 
-import { toRadians, randomNumber, getBR } from '../../utils/mathutilities'
+// Interfaces
+import { AircraftGroup } from 'classes/groups/group';
+import { FightAxis, PictureCanvasState } from 'canvas/canvastypes';
+import { Point } from 'classes/point';
+import { Braaseye } from 'classes/braaseye';
 
-import { BRAA, Braaseye, Bullseye, Group } from '../../utils/interfaces'
+// Utility functions
 import { formatAlt } from './formatutils';
+import { PIXELS_TO_NM, randomNumber, toRadians } from 'utils/psmath';
 
 /**
- * 'Clamp' the location to the confines of the Canvas
- * @param canvas The canvas to constrict it to
+ * 'Clamp' the location to the confines of the drawing context
+ * @param ctx The context to constrict it to
  * @param pos the current position
  */
-function clamp(canvas: HTMLCanvasElement, pos: Bullseye): Bullseye {
-  if (pos === null){
-      return {
-          x:0, y:0
-      }
+export function clampInContext(ctx: CanvasRenderingContext2D, x:number|Point, y?:number): Point {
+  let retPoint = Point.DEFAULT
+  if (x instanceof Point){
+    retPoint = new Point(
+      Math.min(Math.max(x.x, 0), ctx.canvas.width),
+      Math.min(Math.max(x.y, 0), ctx.canvas.height))
+  } else {
+    if (y === undefined) y = 0
+    retPoint = new Point(
+      Math.min(Math.max(x, 0), ctx.canvas.width),
+      Math.min(Math.max(y, 0), ctx.canvas.height))
   }
-  return {
-      x: Math.min(Math.max(pos.x, 0), canvas.width),
-      y: Math.min(Math.max(pos.y, 0), canvas.height)}
+  return retPoint
 }
 
 /**
- * Draw a line on the canvas, given the properties
+ * Draw a line on the drawing context, given the properties
  * @param ctx Context to draw on
  * @param startX start x of the line
  * @param startY start y of the line
@@ -39,7 +48,8 @@ export function drawLine (
   startY: number,
   endX: number,
   endY: number, 
-  color="black"): void {
+  color="black"): void 
+{
   ctx.lineWidth = 1;
   ctx.strokeStyle = color;
   ctx.beginPath();
@@ -50,8 +60,7 @@ export function drawLine (
 }
 
 /**
- * Draw text to the canvas at the given position
- * @param canvas The canvas to draw on
+ * Draw text to the drawing context at the given position
  * @param ctx The context to draw on
  * @param text Text to draw
  * @param x X Position to draw at
@@ -60,104 +69,45 @@ export function drawLine (
  * @param color (optional) Color of the text, defaults to black
  */
 export function drawText(
-  canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
   y: number,
   size = 12,
-  color = "black"): void {
+  color = "black"): void 
+{
   ctx.lineWidth = 1;
   ctx.fillStyle = color;
   ctx.font = size + "px Arial";
-  const pos = clamp(canvas, {x,y})
+  const pos = clampInContext(ctx, x,y)
   
   ctx.fillText(text, pos.x, pos.y);
 }
 
 /**
- * Draw group altitudes on the canvas
- * @param canvas The canvas to draw on
- * @param ctx The context to draw on
- * @param startX x position to draw at
- * @param startY y position to draw at
- * @param alts the altitudes to draw
+ * Draw altitudes next to a group with optional offset
+ * 
+ * @param ctx Current drawing context
+ * @param grpPos group's current position
+ * @param alts altitudes to draw
+ * @param offX (optional) x-axis offset from group
+ * @param offY (optional) y-axis offset from group
  */
 export function drawAltitudes(
-    canvas: HTMLCanvasElement,
-    ctx:CanvasRenderingContext2D,
-    startX: number,
-    startY: number,
-    alts: number[]): void {
-    const formattedAlts: string[] = alts.map((a:number) => {return formatAlt(a)})
-    drawText(canvas, ctx, formattedAlts.join(","), startX, startY, 11, "#ff8c00");
-}
-  
-/**
- * Draw a bearing and range to the canvas
- * @param canvas Canvas to draw on
- * @param ctx Context to draw on
- * @param startX X position to draw at
- * @param startY Y position to draw at
- * @param bull the braa to draw
- * @param color color of the BRAA text
- * @param showMeasurements boolean to toggle if BRAA is shown
- */
-export function drawBR(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D, 
-    startX: number,
-    startY: number,
-    bull: BRAA,
-    color: string,
-    showMeasurements: boolean): void {
-    if (showMeasurements) {
-      drawText(canvas, ctx, bull.bearing + "/" + bull.range, startX, startY, 11, color);
-    }
-}
-
-/**
- * Draw BRAASEYE between red and blue
- * @param canvas Canvas to draw on
- * @param ctx Context to draw on
- * @param bluePos Position of blue air
- * @param redPos Position of red air
- * @param bullseye The picture's bullseye
- * @param showMeasurements true iff braaseye should be drawn on canvas
- * @param braaFirst true iff BRAA is displayed first, false to draw bullseye first
- * @param offsetX X position to draw at
- * @param offsetY Y position to draw at
- */
-export function drawBraaseye(
-    canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    bluePos: Group,
-    redPos: Bullseye,
-    bullseye: Bullseye,
-    showMeasurements: boolean,
-    braaFirst: boolean,
-    offsetX = 0, offsetY = 0): Braaseye{
-    
-    const bulls: BRAA = getBR(redPos.x, redPos.y, bullseye);
-    const braa: BRAA = getBR(redPos.x, redPos.y, {x:bluePos.x, y:bluePos.y});
-
-    if (braaFirst){
-      drawBR(canvas, ctx, redPos.x + 20 + offsetX, redPos.y + offsetY, braa, "blue", showMeasurements);
-      drawBR(canvas, ctx, redPos.x + 20 + offsetX, redPos.y + 11 + offsetY, bulls, "black", showMeasurements);
-    } else {
-      drawBR(canvas, ctx, redPos.x + 20 + offsetX, redPos.y + offsetY, bulls, "black", showMeasurements);
-      drawBR(canvas, ctx, redPos.x + 20 + offsetX, redPos.y + 11 + offsetY, braa, "blue", showMeasurements);
-    }
-  
-    return {
-      bull: bulls,
-      braa: braa
-    };
+  ctx: CanvasRenderingContext2D,
+  grpPos: Point,
+  alts: number[],
+  offX?:number,
+  offY?:number): void
+{
+  const offsetX = offX || 0
+  const offsetY = offY || 0
+  const formattedAlts: string[] = alts.map((a:number) => {return formatAlt(a)})
+  drawText(ctx, formattedAlts.join(","), grpPos.x + 25 + offsetX, grpPos.y - 11 + offsetY, 11, "#ff8c00");
 }
 
 /**
  * Draw a measurement (distance with a length number)
- * @param canvas Canvas to draw on
  * @param ctx Context to draw on
  * @param startX X position to start for line
  * @param startY Y position to start for line
@@ -167,7 +117,6 @@ export function drawBraaseye(
  * @param showMeasurements true iff measurement should be drawn/shown
  */
 export function drawMeasurement(
-    canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D, 
     startX: number,
     startY: number,
@@ -177,321 +126,27 @@ export function drawMeasurement(
     showMeasurements:boolean): void {
     if (showMeasurements) {
       drawLine(ctx, startX, startY, endX, endY);
-      drawText(canvas, ctx, Math.floor(distance).toString(), (startX + endX) / 2, (startY + endY) / 2 - 3);
+      drawText(ctx, Math.floor(distance).toString(), (startX + endX) / 2, (startY + endY) / 2 - 3);
     }
-}
-
-/**
- * Convert a aeronautical heading to Cartesian degrees
- * @param heading Heading to convert to degrees
- */
-export function headingToDeg(heading: number):
- {degrees:number, offset:number, headAngle:number}
-{
-  let deg: number = 360 - (heading - 90);
-  if (heading < 90) {
-    deg = 90 - heading;
-  }
-
-  let offsetVector = deg-90
-  if (offsetVector < 0){
-    offsetVector = 360 + offsetVector
-  }
-
-  let arrowHead = deg - 150
-  if (arrowHead < 0)
-    arrowHead = 360 + arrowHead
-
-  return {
-    degrees: deg,
-    offset: offsetVector,
-    headAngle: arrowHead
-  }
-}
-
-function drawSymbology(c:CanvasRenderingContext2D, id:string, startx:number, starty:number, prevX:number, prevY:number){
-  const deltX = startx - prevX
-  const deltY = starty - prevY
-  if (id==="friend"){
-    // draw friend symbology
-    c.strokeStyle="blue"
-    c.beginPath()
-    c.moveTo((startx+deltX)-2.5, (starty+deltY)-2.5)
-    c.arc(startx+deltX-2.5,starty+deltY-0.5, 2.5, toRadians(180), toRadians(360))
-    c.stroke()
-  } else if (id === "suspect") {
-    c.strokeStyle = "#FA8072"
-  } else {
-    c.strokeStyle="red"
-  }
-  if (id==="suspect" || id==="hostile"){
-    c.beginPath()
-    const headX = (startx+deltX)-3
-    const headY = (starty+deltY)-3
-    
-    const leftX = headX + 5*Math.cos(toRadians(240))
-    const leftY = headY + 5-Math.sin(toRadians(240))
-    c.moveTo(headX, headY)
-    c.lineTo(leftX,leftY)
-    
-    const rightX = headX + 5*Math.cos(toRadians(300))
-    const rightY = headY + 5-Math.sin(toRadians(300))
-    c.moveTo(headX,headY)
-    c.lineTo(rightX,rightY)
-    c.stroke()
-    c.stroke()
-  }
-}
-
-function drawRadarIff(
-  c:CanvasRenderingContext2D,
-  color:string,
-  startx:number,
-  starty:number,
-  endx:number,
-  endy:number,
-  radarPts: Bullseye[], 
-  iffPts:Bullseye[],
-  drawnRadar:Bullseye[]): { rdrPts: Bullseye[], iPts:Bullseye[], drawnRdr:Bullseye[]}
-{
-  // set initial point(s) and math calculations
-  c.strokeStyle = "#FF8C00"
-  c.beginPath()
-  let xPos = startx
-  let yPos = starty
-  const offsetX = (endx-startx)/4
-  const offsetY = (endy-starty)/4
-
-  const rdrPts:Bullseye[] = []
-  const iPts: Bullseye[] = []
-  const drwPts: Bullseye[] = []
-
-  // draw the radar trail
-  if (!radarPts || radarPts.length === 0){
-    for (let mult = 0; mult< 5; mult++){
-      // add a bit of jitter with randomness
-      const jit = color==="blue" ? 1 : 5
-      xPos = startx+ offsetX*mult + jit* Math.random()+Math.random()+Math.random()
-      yPos = starty+offsetY*mult + jit*Math.random()+Math.random()+Math.random()
-      rdrPts.push({x:xPos, y:yPos})
-      drwPts.push({x:xPos,y:yPos})
-    }
-  } else {
-    for (let i = 0; i < radarPts.length; i++){
-      rdrPts.push(radarPts[i])
-    }
-    for (let idx = 0; idx < drawnRadar.length; idx++){
-      drwPts.push(drawnRadar[idx])
-    } 
-  }
-
-  drwPts.forEach((pt) =>{
-    c.beginPath()
-    c.moveTo(pt.x, pt.y)
-    c.lineTo(pt.x-3, pt.y-3)
-    c.stroke()
-    c.stroke()
-  })
-  
-  // Draw symbology
-  if (color ==="blue"){
-    xPos = startx
-    yPos = starty
-
-    // draw IFF
-    if (!iffPts || iffPts.length === 0){
-      for (let mult = 0; mult < 4; mult++){
-        xPos = startx+ (offsetX*mult) + (offsetX*0.5)
-        yPos = starty+ (offsetY*mult) + (offsetY*0.5)
-        iPts.push({x:xPos,y:yPos})     
-      }
-    } else {
-      for (let k=0; k < iffPts.length; k++){
-        iPts.push(iffPts[k])
-      }
-    }
-    
-    console.log(iPts)
-    for (let l = 0; l < iPts.length; l++){
-      c.strokeStyle = "blue"
-      xPos=iPts[l].x
-      yPos=iPts[l].y
-      c.beginPath()
-      c.moveTo(xPos, yPos)
-      c.lineTo(xPos-3, yPos)
-      c.lineTo(xPos-3, yPos-3)
-      c.lineTo(xPos, yPos-3)
-      c.lineTo(xPos, yPos)
-      c.stroke()
-    }
-    console.log(iPts)
-  } 
-
-  const cPt = rdrPts[rdrPts.length-1]
-  const pPt = rdrPts[rdrPts.length-2]
-  drawSymbology(c, color==="blue"? "friend": "hostile", cPt.x,cPt.y, pPt.x,pPt.y)
-
-  const deltX = cPt.x-pPt.x
-  const deltY = cPt.y-pPt.y
-  // Draw vector stick
-  c.strokeStyle="black"
-  c.beginPath()
-  c.moveTo((cPt.x+deltX)-2.5, (cPt.y+deltY)-2.5)
-  c.lineTo((cPt.x+deltX*1.5)-2.5, (cPt.y+deltY*1.5)-2.5)
-  c.stroke()
-  c.stroke()
-
-  return {rdrPts, iPts, drawnRdr: drwPts }
-}
-
-/**
- * Draw arrows for a group
- * @param canvas Canvas to draw on
- * @param orientation Orientation of the canvas
- * @param numContacts Number of contacts in the group
- * @param startx Start X position for the group
- * @param starty Start Y position for the group
- * @param heading Heading of the group
- * @param color (optional) Color of the arrow lines, default red
- * @param type (optional) Type of aircraft, default "ftr" (fighter)
- */
-export function drawArrow(
-    canvas: HTMLCanvasElement,
-    orientation: string,
-    numContacts:number,
-    startx:number,
-    starty:number,
-    heading: number,
-    dataType:string,
-    color = "red",
-    type="ftr",
-    rdrPts:Bullseye[][]=[],
-    iffPts:Bullseye[][]=[],
-    drawnRadar:Bullseye[][]=[] ): Group {
-
-    const c = canvas.getContext("2d");
-
-    let group: Group = {
-        startX: 0,
-        startY: 0,
-        x: 0,
-        y: 0,
-        heading: heading,
-        desiredHeading: orientation==="EW" ? 360 : 90,
-        z: [0],
-        numContacts: 1,
-        type:type,
-        radarPoints:[],
-        drawnRadar:[],
-        iffPoints:[]
-    }
-
-    if (c === null) return group
-
-    c.lineWidth = 1;
-    c.fillStyle = color;
-
-    let endx = 0
-    let endy = 0
-
-    const iStartX = startx
-    const iStartY = starty
-
-    const retRadarPts = rdrPts
-    const retIffPts = iffPts
-    const retDrwPts = drawnRadar
-    for (let x = 0; x < numContacts; x++){
-
-      const vectors = headingToDeg(heading)
-
-      const rads:number = toRadians(vectors.degrees)
-      const offsetRads: number = toRadians(vectors.offset)
-      const headRads: number = toRadians(vectors.headAngle)
-
-      startx = startx + 5*(Math.cos(offsetRads))
-      starty = starty + 5*(-Math.sin(offsetRads))
-
-      //let type="radar"
-      if (dataType === "arrow"){
-        
-        const dist:number = canvas.width / (canvas.width / 20);
-    
-        endy = starty + dist * -Math.sin(rads);
-        endx = startx + dist * Math.cos(rads);
-        
-        c.beginPath()  
-        c.moveTo(startx, starty);
-        c.lineTo(endx, endy);
-
-        const heady:number = endy + 7 * -Math.sin(headRads)
-        const headx:number = endx + 7 * Math.cos(headRads)
-    
-        c.lineTo(headx, heady);
-    
-        c.strokeStyle = color;
-        c.stroke();
-        c.stroke();
-        c.stroke();
-      } else {
-        const dist:number = canvas.width / (canvas.width / 35);
-        endy = starty + dist * -Math.sin(rads);
-        endx = startx + dist * Math.cos(rads);
-
-        const retVal = drawRadarIff(c, color, startx, starty, endx, endy, rdrPts[x], iffPts[x], drawnRadar[x])
-        retRadarPts[x] = retVal.rdrPts
-        retIffPts[x] = retVal.iPts
-        retDrwPts[x] = retVal.drawnRdr
-      }
-    }
-  
-    let low = 15;
-    let hi = 45;
-    if (type==="rpa"){
-        low = 0o5;
-        hi = 18;
-    }
-    
-    // eslint-disable-next-line
-    const alts: number[] = [...Array(numContacts)].map(_=>randomNumber(low,hi));
-
-    group = {
-        startX: iStartX,
-        startY: iStartY,
-        x: Math.floor(endx),
-        y: Math.floor(endy),
-        heading,
-        desiredHeading: orientation==="EW" ? 360 : 90,
-        z: alts,
-        numContacts: numContacts,
-        type:type,
-        radarPoints: retRadarPts,
-        iffPoints: retIffPts,
-        drawnRadar: retDrwPts
-    };
-
-    return group;
 }
 
 /**
  * Draw a capping group's arrows
- * @param canvas Canvas to draw on
- * @param orientation Orientation of the canvas
+ * @param orientation Orientation of the drawing context
  * @param contacts Number of contacts in the CAP
  * @param startX X starting position
  * @param startY Y starting position
  * @param color (optional) color for the CAP, defaults to red
  */
 export function drawGroupCap(
-  canvas: HTMLCanvasElement,
-  orientation: string,
+  c: CanvasRenderingContext2D,
+  orientation: FightAxis,
   contacts: number,
   startX:number,
   startY:number, 
-  color = "red",
-  type="ftr"): Group{
+  color = "red"): AircraftGroup{
 
-  const c = canvas.getContext("2d");
-  if (!c) { return {x:0, y:0, startX:0, startY:0, heading:0, desiredHeading:0, z:[], numContacts:1, type:"ftr", radarPoints:[], iffPoints:[], drawnRadar:[]}}
+  if (!c) { return new AircraftGroup() }
 
   // eslint-disable-next-line
   let alts:number[] = [...Array(contacts)].map(_=>randomNumber(15,45));
@@ -533,39 +188,34 @@ export function drawGroupCap(
     }
   }
 
-  const angle = (orientation==="EW") ? 270 : 0;
-  const sY: number = startY + radius * Math.sin(toRadians(angle));
-  const sX: number = startX + radius * Math.cos(toRadians(angle));
-  const group = {
-    capping: true,
-    startX: sX,
-    startY: sY,
-    x: Math.floor(sX),
-    y: Math.floor(sY),
-    heading: randomNumber(0,360),
-    desiredHeading: 90,
-    z: alts,
-    numContacts: contacts,
-    type,
-    radarPoints:[],
-    iffPoints:[],
-    drawnRadar:[]
-  };
+  const angle = (orientation===FightAxis.EW) ? 270 : 0;
+  const sY: number = Math.floor(startY + radius * Math.sin(toRadians(angle)))
+  const sX: number = Math.floor(startX + radius * Math.cos(toRadians(angle)))
 
-  return group;
+  const p = {
+    sx: startX,
+    sy: startY,
+    sX, sY,
+    numContacts: contacts,
+    hdg: randomNumber(0,360),
+    alts,
+    desiredHdg: 90
+  }
+  return new AircraftGroup(p);
 }
 
 export function drawBullseye (
-  canvas:HTMLCanvasElement, 
   context:CanvasRenderingContext2D,
-  bull?:Bullseye): Bullseye {
+  bull?:Point,
+  color?:string): Point {
 
+  color = color || "black"
   context.lineWidth = 1;
-  context.fillStyle = "black";
-  context.strokeStyle = "black";
+  context.fillStyle = color;
+  context.strokeStyle = color;
 
-  const centerPointX = bull ? bull.x: randomNumber(canvas.width * 0.33, canvas.width * 0.66);
-  const centerPointY = bull ? bull.y: randomNumber(canvas.height * 0.33, canvas.height * 0.66);
+  const centerPointX = bull ? bull.x: randomNumber(context.canvas.width * 0.33, context.canvas.width * 0.66);
+  const centerPointY = bull ? bull.y: randomNumber(context.canvas.height * 0.33, context.canvas.height * 0.66);
   
   context.beginPath();
   context.arc(centerPointX, centerPointY, 2, 0, 2 * Math.PI, true);
@@ -580,7 +230,7 @@ export function drawBullseye (
   context.lineTo(centerPointX - 6, centerPointY);
   context.stroke();
   
-  return {x: centerPointX, y:centerPointY}
+  return new Point(centerPointX, centerPointY)
 }
 
 export type Bounds = {
@@ -598,15 +248,55 @@ export type Bounds = {
   },
 }
 
-export const getStartPos = (canvas: HTMLCanvasElement, orientation:string, bounds: Bounds, start?: Bullseye):Bullseye => {
-  const lowXMult = (orientation ==="NS") ? bounds.tall.lowX : bounds.wide.lowX
-  const hiXMult = (orientation === "NS") ? bounds.tall.hiX : bounds.wide.hiX
-  const lowYMult = (orientation === "NS") ? bounds.tall.lowY : bounds.wide.lowY
-  const hiYMult = (orientation === "NS") ? bounds.tall.hiY : bounds.wide.hiY
-  const startY:number = (start && start.y) || randomNumber(canvas.height * lowYMult, canvas.height * hiYMult);
-  const startX:number = (start && start.x) || randomNumber(canvas.width * lowXMult, canvas.width * hiXMult);
-  return {
-    x: startX,
-    y: startY
+export const getRestrictedStartPos = (ctx: CanvasRenderingContext2D, bluePos: AircraftGroup, orientation:FightAxis, minNMFromBlue:number, maxNMFromBlue:number, start?: Point):Point => {
+  const isNS = orientation === FightAxis.NS
+  const blueLoc = bluePos.getCenterOfMass()
+  const limitLine = isNS ? blueLoc.y : blueLoc.x
+  
+  const canvasSize = isNS ? ctx.canvas.height : ctx.canvas.width
+  const uBound = (limitLine - (minNMFromBlue*PIXELS_TO_NM)) / canvasSize
+
+  const lBound = (limitLine - (maxNMFromBlue*PIXELS_TO_NM)) / canvasSize
+
+  const bounds: Bounds = {
+    tall: { lowX: 0.2, hiX: 0.8, lowY: lBound, hiY: uBound },
+    wide: { lowX: lBound, hiX: uBound, lowY: 0.2, hiY: 0.8 }
+  }
+
+  const mults = isNS ? bounds.tall : bounds.wide
+
+  const startY:number = (start && start.y) || randomNumber(ctx.canvas.height * mults.lowY, ctx.canvas.height * mults.hiY);
+  const startX:number = (start && start.x) || randomNumber(ctx.canvas.width * mults.lowX, ctx.canvas.width * mults.hiX);
+
+  return new Point(startX, startY)
+}
+
+export const getStartPos = (ctx: CanvasRenderingContext2D, bluePos: AircraftGroup, orientation: FightAxis, start?: Point): Point =>
+{
+  return getRestrictedStartPos(ctx, bluePos, orientation, 45, 100, start)
+}
+
+/**
+ * TODO -- Remove
+ */
+export const getStartPos_Old = (ctx: CanvasRenderingContext2D, orientation:FightAxis, bounds?: Bounds, start?: Point):Point => {
+  const isNS = orientation === FightAxis.NS
+
+  let mults = isNS ? bounds?.tall : bounds?.wide
+  mults = mults || { lowY:0.2, lowX:0.2, hiY:0.8, hiX:0.8}
+
+  const startY:number = (start && start.y) || randomNumber(ctx.canvas.height * mults.lowY, ctx.canvas.height * mults.hiY);
+  const startX:number = (start && start.x) || randomNumber(ctx.canvas.width * mults.lowX, ctx.canvas.width * mults.hiX);
+  return new Point(startX, startY)
+}
+
+export function drawFullInfo(ctx:CanvasRenderingContext2D, state:PictureCanvasState, braaFirst:boolean, showMeasurements:boolean, groups:AircraftGroup[]): void{
+  for (let y = 0; y < groups.length; y++) {
+    const grpPos = groups[y].getCenterOfMass()
+    if (showMeasurements) {
+      new Braaseye(grpPos, state.bluePos.getCenterOfMass(), state.bullseye)
+        .draw(ctx, true, braaFirst)
+    }
+    drawAltitudes(ctx, grpPos, groups[y].getAltitudes());
   }
 }

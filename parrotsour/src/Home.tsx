@@ -1,4 +1,4 @@
-import React, { Suspense, ReactElement } from "react";
+import React, { Suspense, ReactElement, lazy } from "react";
 
 import { Route } from "react-router";
 import { HashRouter } from "react-router-dom";
@@ -8,20 +8,18 @@ import "./css/styles.css";
 import "./css/body.css";
 import "./css/fonts.css";
 
-import ParrotSour from "./pscomponents/parrotsour";
+const ParrotSour = lazy(()=>import("./pscomponents/parrotsour"))
 import ChangeLog from "changelog";
 
 /**
- * This is the main application. 
+ * This is the main entry point into the front-facing application. 
  * 
  * The application is loaded via 'chunks' (Googe: webpack code-splitting), but 
  * once the application is loaded up front, there is no loading time latency.
  * 
- * This main page contains the <Sidebar> component (loads the left navigation pane),
- * and controls the components that are displayed on navigation.
- * 
- * Note: Links don't actually navigate (POST http), the <Router> controls which 
- * React component is rendered in the "Content" pane.
+ * This main page contains a navigational component (SideBar), but the Routes
+ * will not actually redirect - Router controls which Component is rendered in 
+ * the viewport.
  * 
  * To add a 'page', one would:
  * - Determine the desired URL/path
@@ -34,10 +32,8 @@ import ChangeLog from "changelog";
  *               it isn't in the navigation pane but the AirspaceList component links to it
  * - Design/implement your Component
  */
-//export default class BMC2Portal extends React.PureComponent {
 const Home = ():ReactElement => {
 
-  
   function getPS() : JSX.Element {
     return <ParrotSour type="chooser" interceptLink="/#/msncrew/parrotsourintercept.html" proceduralLink="/#/msncrew/parrotsourprocedural.html"/>
   }

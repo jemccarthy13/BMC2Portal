@@ -1,111 +1,106 @@
-import { getAltStack, getBR, getTrackDir, randomHeading, randomNumber } from "../../../utils/mathutilities";
-import { AltStack, Braaseye, Bullseye, DrawAnswer, DrawFunction, Group } from "../../../utils/interfaces";
-import { PicCanvasProps, PicCanvasState } from "./picturecanvas";
-import { drawAltitudes, drawArrow, drawBraaseye, drawGroupCap, drawMeasurement } from "../drawutils";
-import { formatGroup } from "../formatutils";
+// Interfaces
+import { AltStack } from "../../../classes/interfaces";
+import { FightAxis, PictureAnswer, PictureDrawFunction, PictureCanvasProps, PictureCanvasState } from "canvas/canvastypes";
+import { AircraftGroup } from "classes/groups/group";
+import { Point } from "classes/point";
+import { GroupFactory } from "classes/groups/groupfactory";
+import { Braaseye } from "classes/braaseye";
 
-function checkCap(): { ngCap: boolean, sgCap: boolean } {
-    const whichCap: number = randomNumber(0,100);
+// Functions
+import { drawAltitudes, drawGroupCap, drawMeasurement, getStartPos } from "../drawutils";
+import { formatGroup } from "../formatutils";
+import { randomNumber } from "utils/psmath";
+
+/**
+ * A wrapper to actually draw a CAP picture
+ * 
+ * TODO -- to allow other pictures to include CAPs, convert 
+ * group.draw() to draw caps, and this function wraps 
+ * drawRandomPic with establishing random group.setCapping(true)
+ * 
+ * @param context the current drawing context
+ * @param props PicCanvasProps with settings from the controls
+ * @param state PicCanvasState current state of canvas
+ * @param start (Optional) point to start drawing at
+ * @returns 
+ */
+export const drawCap:PictureDrawFunction = (
+    ctx: CanvasRenderingContext2D,
+    props: PictureCanvasProps,
+    state: PictureCanvasState,
+    start?: Point|undefined ): PictureAnswer => {
+
+    const bounds = {
+        tall: { lowX: 0.2, hiX: 0.6, lowY: 0.35, hiY: 0.9},
+        wide: { lowX: 0.2, hiX: 0.6, lowY: 0.2, hiY: 0.6}
+    }
+    //start = getStartPos(ctx, props.orientation.orient, bounds, start)
+    start = getStartPos(ctx, state.bluePos, props.orientation.orient, start)
+
+    const incr:number = ctx.canvas.width / (ctx.canvas.width / 10);
+    const drawDist:number = randomNumber(3.5 * incr, 10 * incr);
+
+    // TODO -- this will be replaced with CAP in group draw/format logic??
+    const capCheck = randomNumber(0,100)
     let ngCap = false
     let sgCap = false
-    if (whichCap < 33){
-        ngCap = true;
-    } else if (whichCap < 66) {
-        sgCap = true;
+
+    if (capCheck < 33){
+        ngCap = true
+    } else if (capCheck < 66) {
+        sgCap = true
     } else {
-        ngCap = true;
-        sgCap = true;
+        ngCap = true
+        sgCap = true
     }
-    return { ngCap, sgCap }
-}
-
-export const drawCap:DrawFunction = (
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
-    props: PicCanvasProps,
-    state: PicCanvasState,
-    start?: Bullseye|undefined ): DrawAnswer => {
-    
-    if (!state.bluePos) { return { pic: "", groups: []} }
-
-    const offsetDeg1: number = randomNumber(-10, 10);
-    const offsetDeg2: number = randomNumber(-10, 10);
-    
-    let startY:number|undefined = start && start.y;
-    let startX:number|undefined = start && start.x;
-
-    if (startY === undefined){
-        startY = randomNumber(canvas.height / 20, canvas.height * 0.7);
-    }
-    if (startX === undefined) {
-        startX = randomNumber(canvas.width / 20, canvas.width * 0.5);
-    }
-    
-    const incr:number = canvas.width / (canvas.width / 10);
-
-    let distanceX = 0;
-    let distanceY = 0;
-
-    if (props.orientation==="NS"){
-        distanceX = randomNumber(2.5 * incr, 10 * incr);
-    } else {
-        distanceY = randomNumber(2.5 * incr, 10 * incr);
-    }
-    
-    const heading1: number = randomHeading(props.format, state.bluePos.heading);
-    const heading2: number = randomHeading(props.format, state.bluePos.heading);
-    
-    const nNumContacts:number = randomNumber(1, 4);
-    const sNumContacts:number = randomNumber(1, 4);
-
-    const caps = checkCap()
-    const ngCap = caps.ngCap
-    const sgCap = caps.sgCap
-    
-    let ntrackDir: string = getTrackDir(heading1);
-    let strackDir: string = getTrackDir(heading2);
-
-    let ng: Group, sg: Group
+    let ng: AircraftGroup, sg: AircraftGroup
     let nOffset = 0
     let sOffset = 0
+
     if (ngCap){
-        ntrackDir = "CAP";
         nOffset = 12
-        ng = drawGroupCap (canvas, props.orientation, nNumContacts, startX, startY);
+        ng = drawGroupCap (ctx, props.orientation.orient, randomNumber(1,4), start.x, start.y);
     } else {
-        ng = drawArrow(canvas, props.orientation, nNumContacts, startX, startY, heading1 + offsetDeg1, props.dataStyle);
+        ng = GroupFactory.randomGroupAtLoc(ctx, props, state, start)
+        ng.draw(ctx, props.dataStyle)
     }
+    
+    const offsetX = props.orientation.orient === FightAxis.NS ? drawDist : 0
+    const offsetY = props.orientation.orient === FightAxis.EW ? drawDist : 0
+
     if (sgCap){
-        strackDir = "CAP";
         sOffset = 12
-        sg = drawGroupCap (canvas, props.orientation, sNumContacts, startX + distanceX, startY + distanceY);
+        sg = drawGroupCap (ctx, props.orientation.orient, randomNumber(1,4), start.x + offsetX, start.y + offsetY);
     } else {
-        sg = drawArrow(canvas, props.orientation, sNumContacts, startX + distanceX, startY + distanceY, heading2 + offsetDeg2, props.dataStyle);
+        sg = GroupFactory.randomGroupAtLoc(ctx, props, state, new Point(start.x+offsetX, start.y+offsetY ))
+        sg.draw(ctx, props.dataStyle)
     }
     
     let realWidth:number
-    if (props.orientation==="NS"){
-        realWidth = getBR(ng.x-nOffset, ng.y, {x: sg.x-sOffset, y:ng.y}).range
-        drawMeasurement(canvas, context, ng.x - nOffset, ng.y, sg.x - sOffset, ng.y, realWidth, props.showMeasurements);
+
+    const ngPos = ng.getCenterOfMass()
+    const sgPos = sg.getCenterOfMass()
+    if (props.orientation.orient===FightAxis.NS){
+        realWidth = new Point(sgPos.x-sOffset, ngPos.y).getBR(new Point(ngPos.x-nOffset, ngPos.y)).range
+        drawMeasurement(ctx, ngPos.x - nOffset, ngPos.y, sgPos.x - sOffset, ngPos.y, realWidth, props.showMeasurements);
     } else {
-        realWidth = getBR(ng.x, ng.y+nOffset, {x:ng.x, y:sg.y+sOffset}).range
-        drawMeasurement(canvas, context, ng.x, ng.y + nOffset, ng.x, sg.y + sOffset, realWidth, props.showMeasurements);
+        realWidth = new Point(ngPos.x, sgPos.y+sOffset).getBR(new Point(ngPos.x, ngPos.y+nOffset)).range
+        drawMeasurement(ctx, ngPos.x, ngPos.y + nOffset, ngPos.x, sgPos.y + sOffset, realWidth, props.showMeasurements);
     }
     
-    let offsetX = 0;
-    if (props.orientation==="NS"){
-        offsetX = -70;
-    }
+    const drawOffsetX = props.orientation.orient === FightAxis.NS ? -70 : 0
     
-    drawAltitudes(canvas, context, ng.x + offsetX + 20, ng.y - 11, ng.z);
-    drawAltitudes(canvas, context, sg.x + 20, sg.y - 11, sg.z);
+    drawAltitudes(ctx, ngPos, ng.getAltitudes(), drawOffsetX);
+    drawAltitudes(ctx, sgPos, sg.getAltitudes());
     
+    const ngBraaseye: Braaseye = new Braaseye(ngPos, state.bluePos.getCenterOfMass(), state.bullseye)
+    const sgBraaseye: Braaseye = new Braaseye(sgPos, state.bluePos.getCenterOfMass(), state.bullseye)
     
-    const ngBraaseye: Braaseye = drawBraaseye(canvas, context, state.bluePos, ng, state.bullseye, props.showMeasurements, props.braaFirst, offsetX);
-    const sgBraaseye: Braaseye = drawBraaseye(canvas, context, state.bluePos, sg, state.bullseye, props.showMeasurements, props.braaFirst);
-    
-    const ngAlts: AltStack = getAltStack(ng.z, props.format);
-    const sgAlts: AltStack = getAltStack(sg.z, props.format);
+    ngBraaseye.draw(ctx, props.showMeasurements, props.braaFirst, drawOffsetX)
+    sgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
+
+    const ngAlts: AltStack = ng.getAltStack( props.format );
+    const sgAlts: AltStack = sg.getAltStack( props.format );
 
     let answer = "";
    
@@ -116,25 +111,25 @@ export const drawCap:DrawFunction = (
 
     let nLbl = "NORTH";
     let sLbl = "SOUTH";
-    if (props.orientation==="NS"){
+    if (props.orientation.orient===FightAxis.NS){
         nLbl = "WEST";
         sLbl = "EAST";
     }
     // TODO -- assess anchoring P's 
     if (ngBraaseye.braa.range < sgBraaseye.braa.range) {
-        answer += formatGroup(nLbl, ngBraaseye, ngAlts, nNumContacts, true, ntrackDir);
+        answer += formatGroup(nLbl, ngBraaseye, ngAlts, ng.getStrength(), true, ng.getTrackDir());
         answer +=
-        " " + formatGroup(sLbl, sgBraaseye, sgAlts, sNumContacts, includeBull, strackDir);
+        " " + formatGroup(sLbl, sgBraaseye, sgAlts, sg.getStrength(), includeBull, sg.getTrackDir());
     } else {
-        answer += formatGroup(sLbl, sgBraaseye, sgAlts, sNumContacts, true, strackDir);
+        answer += formatGroup(sLbl, sgBraaseye, sgAlts, sg.getStrength(), true, sg.getTrackDir());
         answer +=
-        " " + formatGroup(nLbl, ngBraaseye, ngAlts, nNumContacts, includeBull, ntrackDir);
+        " " + formatGroup(nLbl, ngBraaseye, ngAlts, ng.getStrength(), includeBull, ng.getTrackDir());
     }
     
     const groups = [];
     
-    ng.label = nLbl + " GROUP";
-    sg.label = sLbl +" GROUP";
+    ng.setLabel(nLbl + " GROUP")
+    sg.setLabel(sLbl + " GROUP")
     groups.push(ng);
     groups.push(sg);
     

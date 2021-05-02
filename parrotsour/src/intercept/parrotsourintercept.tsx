@@ -6,21 +6,17 @@ import '../css/slider.css'
 import '../css/parrotsour.css'
 import '../css/toggle.css'
 
-import { InterceptQT } from '../quicktips/interceptQT'
+import { InterceptQT } from '../pscomponents/quicktips/interceptQT'
+import { FightAxis, PictureAnswer, CanvasOrient } from 'canvas/canvastypes'
+import { SensorType } from 'classes/groups/datatrail'
 
 const PicTypeSelector = lazy(()=>import('./pictypeselector'))
 const StandardSelector = lazy(()=>import('./standardselector'))
 const ParrotSourHeader = lazy(()=>import('../pscomponents/parrotsourheader'))
 const ParrotSourControls = lazy(()=>import("../pscomponents/parrotsourcontrols"))
 
-const PictureCanvas = lazy(()=>import('../canvas/draw/intercept/picturecanvas'))
+const PictureCanvas = lazy(()=>import('../canvas/picturecanvas'))
 const VersionInfo = lazy(()=>import('../versioninfo'))
-
-interface CanvasConfig {
-    height: number,
-    width: number,
-    orient: string
-}
 
 interface PSIState {
     showAnswer: boolean,
@@ -28,13 +24,13 @@ interface PSIState {
     isHardMode: boolean,
     format: string,
     speedSliderValue: number,
-    canvasConfig: CanvasConfig,
+    canvasConfig: CanvasOrient,
     braaFirst: boolean,
     picType: string,
-    answer: string,
+    answer: PictureAnswer,
     animate:boolean,
     newPic: boolean,
-    dataStyle: string
+    dataStyle: SensorType
 }
 
 /**
@@ -53,16 +49,22 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
             canvasConfig: {
                 height: 500,
                 width:800,
-                orient:"EW"
+                orient: FightAxis.EW
             },
             braaFirst: true,
             picType:"random",
-            answer: "",
+            answer: {
+                pic: "",
+                groups:[]
+            },
             newPic: false,
             animate: false,
-            dataStyle: "arrow"
+            dataStyle: SensorType.ARROW
         }
+        this.dummyCallback = this.pauseAnimate.bind(this)
     }
+
+    dummyCallback: () =>void
 
     /**
      * Called when the PSControls slider value is changed
@@ -87,6 +89,7 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
      * Called to display a new Picture
      */
     onNewPic = ():void =>{
+        this.setState({animate:false})
         this.setState(prevState=>({newPic:!prevState.newPic}))
     }
 
@@ -122,8 +125,8 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
      * Called when an answer is avaiable; to be displayed in the answer collapsible
      * @param answer - the answer to the displayed picture
      */
-    setAnswer = (answer: string):void => {
-        this.setState({answer: answer})
+    setAnswer = (answer: PictureAnswer):void => {
+        this.setState({answer})
     }
 
     /**
@@ -147,16 +150,16 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
         const { canvasConfig } = this.state
         const { orient } = canvasConfig
 
-        let newConfig = {
+        let newConfig:CanvasOrient = {
             height:700,
             width:600,
-            orient:"NS"
+            orient: FightAxis.NS
         }
-        if (orient==="NS"){
+        if (orient==FightAxis.NS){
             newConfig = {
                 height:500,
                 width:800,
-                orient:"EW"
+                orient:FightAxis.EW
             }
         }
         this.setState({canvasConfig:newConfig})
@@ -171,31 +174,26 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
             this.setState({picType:e.target.value})
     }
 
-    getAnswer = ():string => {
-        // eslint-disable-next-line
-        return this.state.answer
-    }
-
     onDataStyleChange = ():void => {
         const { dataStyle } = this.state
-        if (dataStyle==="arrow") {
-            this.setState({dataStyle:"radar" })
+        if (dataStyle===SensorType.ARROW) {
+            this.setState({dataStyle:SensorType.RAW })
         } else {
-            this.setState({dataStyle:"arrow"})
+            this.setState({dataStyle:SensorType.ARROW})
         }
     }
 
     render():ReactElement {
-        const { showAnswer, answer, picType } = this.state
+        const { showAnswer, answer, picType, dataStyle } = this.state
         const { canvasConfig, braaFirst, format } = this.state
         const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } = this.state
-        const { dataStyle } = this.state
+
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>} >
                     <ParrotSourHeader 
                         comp={<InterceptQT/>}
-                        getAnswer={this.getAnswer} />
+                        answer={answer} />
                 </Suspense>
 
                 <hr />
@@ -232,26 +230,24 @@ export default class ParrotSourIntercept extends React.PureComponent<Record<stri
                 <button type="button" className={showAnswer ? "collapsible active":"collapsible"} onClick={this.handleRevealPic}>Reveal Pic</button>
                 {showAnswer && 
                     <div className="content" id="answerDiv" style={{color:"black", padding:"20px"}}>
-                        {answer ? answer : <div/>}
+                        {answer ? answer.pic : <div/>}
                     </div>
                 }  
                 <br/><br/><br/>
 
                 <Suspense fallback={<div/>} >
                     <PictureCanvas 
-                        height={canvasConfig.height}
-                        width={canvasConfig.width}
+                        orientation={canvasConfig}
                         braaFirst={braaFirst}
                         picType={picType}
                         format={format}
                         showMeasurements={showMeasurements}
                         isHardMode={isHardMode}
-                        orientation={canvasConfig.orient}
                         setAnswer={this.setAnswer}
                         newPic={newPic}
                         animate={animate}
                         sliderSpeed={speedSliderValue}
-                        resetCallback={this.pauseAnimate}
+                        resetCallback={this.dummyCallback}
                         animateCallback={this.startAnimate}
                         dataStyle={dataStyle}
                     />
