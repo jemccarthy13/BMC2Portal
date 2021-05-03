@@ -2,14 +2,23 @@ import { SensorType } from "classes/groups/datatrail";
 import { AircraftGroup as AircraftGroup } from "classes/groups/group";
 import { Point } from "classes/point";
 
-export enum FightAxis {
-    NS, EW
+export enum BlueInThe {
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
 }
 
-export type CanvasOrient = {
-    height: number,
-    width: number,
-    orient: FightAxis
+export class FightAxis {
+    public static isNS(orientation:BlueInThe): boolean{
+        return orientation === BlueInThe.NORTH || orientation === BlueInThe.SOUTH
+    }
+}
+
+export class CanvasOrient {
+    height = 0
+    width = 0
+    orient = BlueInThe.EAST
 }
 
 export interface CanvasProps {

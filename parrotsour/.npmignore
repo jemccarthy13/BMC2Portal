@@ -10,7 +10,10 @@
 /build
 /dist
 
-/parrotsour-components*.tgz
+# dev files
+/src/depcheck.ts
+/src/__tests__
+/src/__tests__/*
 
 # misc
 .DS_Store

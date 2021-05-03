@@ -2,12 +2,12 @@
  * This file contains utilities for group and answer formatting
  */
 
-import { Braaseye } from 'classes/braaseye';
-import { AircraftGroup } from 'classes/groups/group';
-import { AltStack } from '../../classes/interfaces'
+import { Braaseye } from "../../classes/braaseye"
+import { AircraftGroup } from "../../classes/groups/group"
+import { AltStack } from "../../classes/interfaces"
 
 type RangeBack = {
-  label: string,
+  label: string
   range: number
 }
 
@@ -15,9 +15,9 @@ type RangeBack = {
  * Convert an altitude to a 3-digit flight level
  * @param alt int altitude to change to padded string
  */
-export function formatAlt(alt: number): string{
-    const altF = (alt*10).toString().substring(0,3);
-    return altF.length < 3 ? "0" + altF : altF;
+export function formatAlt(alt: number): string {
+  const altF = (alt * 10).toString().substring(0, 3)
+  return altF.length < 3 ? "0" + altF : altF
 }
 
 /**
@@ -31,44 +31,48 @@ export function formatAlt(alt: number): string{
  * @param rangeBack separation, if included
  */
 export function formatGroup(
-    label: string,
-    braaseye: Braaseye,
-    altitudes: AltStack,
-    numContacts: number,
-    anchor:boolean,
-    trackDir: string|undefined,
-    rangeBack?: RangeBack): string {
-    
-    // format label
-    let answer = label + " GROUP ";
+  label: string,
+  braaseye: Braaseye,
+  altitudes: AltStack,
+  numContacts: number,
+  anchor: boolean,
+  trackDir: string | undefined,
+  rangeBack?: RangeBack
+): string {
+  // format label
+  let answer = label + " GROUP "
 
-    // format separation
-    if (rangeBack !== null && rangeBack !== undefined) {
-      answer += rangeBack.label + " " + rangeBack.range + " ";
-    }
-  
-    // format bullseye if anchor priority
-    if (anchor || false) {
-      answer += " BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", ";
-    }
-  
-    // format altitude stack
-    answer += altitudes.stack
+  // format separation
+  if (rangeBack !== null && rangeBack !== undefined) {
+    answer += rangeBack.label + " " + rangeBack.range + " "
+  }
 
-    // format track direction (if given)
-    answer += (trackDir !== undefined) ? (trackDir === "CAP" ? " " : " TRACK ") + trackDir  : "";
-    
-    // apply ID
-    answer += " HOSTILE ";
-  
-    // apply fill-in for # contacts
-    if (numContacts > 1) {
-      answer += (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS";
-    }
-  
-    // apply fill-ins (HI/FAST/etc)
-    answer += " " + altitudes.fillIns;
-    return answer;
+  // format bullseye if anchor priority
+  if (anchor || false) {
+    answer +=
+      " BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
+  }
+
+  // format altitude stack
+  answer += altitudes.stack
+
+  // format track direction (if given)
+  answer +=
+    trackDir !== undefined
+      ? (trackDir === "CAP" ? " " : " TRACK ") + trackDir
+      : ""
+
+  // apply ID
+  answer += " HOSTILE "
+
+  // apply fill-in for # contacts
+  if (numContacts > 1) {
+    answer += (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
+  }
+
+  // apply fill-ins (HI/FAST/etc)
+  answer += " " + altitudes.fillIns
+  return answer
 }
 
 /**
@@ -76,7 +80,10 @@ export function formatGroup(
  * @param fg First group of picture
  * @param sg Second group of picture
  */
-export function getGroupOpenClose( fg: AircraftGroup, sg: AircraftGroup ): string{  
+export function getGroupOpenClose(
+  fg: AircraftGroup,
+  sg: AircraftGroup
+): string {
   const fgPos = fg.getCenterOfMass()
   const sgPos = sg.getCenterOfMass()
   const fgStartPos = fg.getStartPos()
@@ -86,25 +93,25 @@ export function getGroupOpenClose( fg: AircraftGroup, sg: AircraftGroup ): strin
   const b1 = sgPos.getBR(fgPos).range
   const b2 = sgPos.getBR(fgStartPos).range
   const mina = Math.min(b1, b2)
-  
+
   const b3 = sgStartPos.getBR(fgPos).range
   const b4 = sgStartPos.getBR(fgStartPos).range
-  const minb = Math.min(b3,b4)
+  const minb = Math.min(b3, b4)
 
   const b5 = fgPos.getBR(sgPos).range
   const b6 = fgPos.getBR(sgStartPos).range
   const minc = Math.min(b5, b6)
-  
+
   const b7 = fgStartPos.getBR(sgPos).range
   const b8 = fgStartPos.getBR(sgStartPos).range
-  const mind = Math.min(b7,b8)
+  const mind = Math.min(b7, b8)
 
-  if (mina+2 < minb && minc+2 < mind ){ 
+  if (mina + 2 < minb && minc + 2 < mind) {
     return "CLOSING"
   }
-  if (mina-2 > minb && minc-2 > mind){
+  if (mina - 2 > minb && minc - 2 > mind) {
     return "OPENING"
   }
 
-  return "";
+  return ""
 }

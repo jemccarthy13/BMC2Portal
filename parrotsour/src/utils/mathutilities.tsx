@@ -1,10 +1,10 @@
 /**
- * This file holds commonly used functions for manipulation of 
+ * This file holds commonly used functions for manipulation of
  * angles/degrees/headings, altitudes, and bearings
  */
 
-import { BRAA } from 'classes/braa';
-import { AircraftGroup } from 'classes/groups/group';
+import { BRAA } from "classes/braa"
+import { AircraftGroup } from "../classes/groups/group"
 
 /**
  * Left pad a string with 0s
@@ -12,41 +12,46 @@ import { AircraftGroup } from 'classes/groups/group';
  * @param padding - how long the resulting string should be
  */
 export function lpad(value: number, padding: number): string {
-  return ([...Array(padding)].join("0") + value).slice(-padding);
+  return ([...Array(padding)].join("0") + value).slice(-padding)
 }
 
 /**
  * Get 'aspect' (HOT/FLANK/BEAM, etc) between groups
- * 
+ *
  * Aspect is calculated by taking the angle difference between
  * other a/c heading, and the reciprocal bearing between ownship
- * and other a/c. 
- * 
+ * and other a/c.
+ *
  * In otherwords, if "ownship" turned around, how much would
  * other a/c have to turn to point at ownship?
- * 
- * @param group1 - 'ownship'  
+ *
+ * @param group1 - 'ownship'
  * @param group2 - other aircraft
  */
-export function getAspect(group1:AircraftGroup, group2:AircraftGroup):string{
-  const recipBrg:BRAA = group2.getCenterOfMass().getBR(group1.getCenterOfMass())
+export function getAspect(
+  group1: AircraftGroup,
+  group2: AircraftGroup
+): string {
+  const recipBrg: BRAA = group2
+    .getCenterOfMass()
+    .getBR(group1.getCenterOfMass())
 
-  let dist = (group2.getHeading() - parseInt(recipBrg.bearing) + 360) % 360;
-  if (dist > 180) dist = 360 - dist;
-  const cata = dist;
+  let dist = (group2.getHeading() - parseInt(recipBrg.bearing) + 360) % 360
+  if (dist > 180) dist = 360 - dist
+  const cata = dist
 
-  let aspectH = "MANEUVER";
+  let aspectH = "MANEUVER"
 
-  if (cata < 30){
-    aspectH = "HOT";
-  } else if (cata < 60 ){
-    aspectH = "FLANK";
-  } else if (cata < 110){
-    aspectH = "BEAM";
-  } else if (cata <= 180){
-    aspectH = "DRAG";
+  if (cata < 30) {
+    aspectH = "HOT"
+  } else if (cata < 60) {
+    aspectH = "FLANK"
+  } else if (cata < 110) {
+    aspectH = "BEAM"
+  } else if (cata <= 180) {
+    aspectH = "DRAG"
   }
-  return aspectH;
+  return aspectH
 }
 
 /**
@@ -55,11 +60,11 @@ export function getAspect(group1:AircraftGroup, group2:AircraftGroup):string{
  */
 export function trackDirFromHdg(heading: number): string {
   const arr = [
-    "NORTH", 
+    "NORTH",
     "NORTHEAST",
     "NORTHEAST",
     "NORTHEAST",
-    "EAST", 
+    "EAST",
     "SOUTHEAST",
     "SOUTHEAST",
     "SOUTHEAST",
@@ -70,10 +75,10 @@ export function trackDirFromHdg(heading: number): string {
     "WEST",
     "NORTHWEST",
     "NORTHWEST",
-    "NORTHWEST"];
+    "NORTHWEST",
+  ]
   // the compass is divided every 20 degrees, so find the 'box' of degrees the
   // current heading is in
-  const val = Math.floor((heading / (360/arr.length))+0.5);
-  return arr[(val % arr.length)];
+  const val = Math.floor(heading / (360 / arr.length) + 0.5)
+  return arr[val % arr.length]
 }
-  

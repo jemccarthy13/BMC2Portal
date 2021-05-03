@@ -4,31 +4,41 @@
  */
 
 // Interfaces
-import { AircraftGroup } from 'classes/groups/group';
-import { FightAxis, PictureCanvasState } from 'canvas/canvastypes';
-import { Point } from 'classes/point';
-import { Braaseye } from 'classes/braaseye';
+import { AircraftGroup } from "../../classes/groups/group"
+import {
+  BlueInThe,
+  FightAxis,
+  PictureCanvasState,
+} from "../../canvas/canvastypes"
+import { Point } from "../../classes/point"
+import { Braaseye } from "../../classes/braaseye"
 
 // Utility functions
-import { formatAlt } from './formatutils';
-import { PIXELS_TO_NM, randomNumber, toRadians } from 'utils/psmath';
+import { formatAlt } from "./formatutils"
+import { randomNumber, toRadians } from "../../utils/psmath"
 
 /**
  * 'Clamp' the location to the confines of the drawing context
  * @param ctx The context to constrict it to
  * @param pos the current position
  */
-export function clampInContext(ctx: CanvasRenderingContext2D, x:number|Point, y?:number): Point {
+export function clampInContext(
+  ctx: CanvasRenderingContext2D,
+  x: number | Point,
+  y?: number
+): Point {
   let retPoint = Point.DEFAULT
-  if (x instanceof Point){
+  if (x instanceof Point) {
     retPoint = new Point(
       Math.min(Math.max(x.x, 0), ctx.canvas.width),
-      Math.min(Math.max(x.y, 0), ctx.canvas.height))
+      Math.min(Math.max(x.y, 0), ctx.canvas.height)
+    )
   } else {
     if (y === undefined) y = 0
     retPoint = new Point(
       Math.min(Math.max(x, 0), ctx.canvas.width),
-      Math.min(Math.max(y, 0), ctx.canvas.height))
+      Math.min(Math.max(y, 0), ctx.canvas.height)
+    )
   }
   return retPoint
 }
@@ -42,21 +52,21 @@ export function clampInContext(ctx: CanvasRenderingContext2D, x:number|Point, y?
  * @param endY end y of the line
  * @param color (optional) color of the line, defaults to black
  */
-export function drawLine (
-  ctx:CanvasRenderingContext2D,
+export function drawLine(
+  ctx: CanvasRenderingContext2D,
   startX: number,
   startY: number,
   endX: number,
-  endY: number, 
-  color="black"): void 
-{
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(endX, endY);
-  ctx.stroke();
-  ctx.stroke();
+  endY: number,
+  color = "black"
+): void {
+  ctx.lineWidth = 1
+  ctx.strokeStyle = color
+  ctx.beginPath()
+  ctx.moveTo(startX, startY)
+  ctx.lineTo(endX, endY)
+  ctx.stroke()
+  ctx.stroke()
 }
 
 /**
@@ -74,19 +84,19 @@ export function drawText(
   x: number,
   y: number,
   size = 12,
-  color = "black"): void 
-{
-  ctx.lineWidth = 1;
-  ctx.fillStyle = color;
-  ctx.font = size + "px Arial";
-  const pos = clampInContext(ctx, x,y)
-  
-  ctx.fillText(text, pos.x, pos.y);
+  color = "black"
+): void {
+  ctx.lineWidth = 1
+  ctx.fillStyle = color
+  ctx.font = size + "px Arial"
+  const pos = clampInContext(ctx, x, y)
+
+  ctx.fillText(text, pos.x, pos.y)
 }
 
 /**
  * Draw altitudes next to a group with optional offset
- * 
+ *
  * @param ctx Current drawing context
  * @param grpPos group's current position
  * @param alts altitudes to draw
@@ -97,13 +107,22 @@ export function drawAltitudes(
   ctx: CanvasRenderingContext2D,
   grpPos: Point,
   alts: number[],
-  offX?:number,
-  offY?:number): void
-{
+  offX?: number,
+  offY?: number
+): void {
   const offsetX = offX || 0
   const offsetY = offY || 0
-  const formattedAlts: string[] = alts.map((a:number) => {return formatAlt(a)})
-  drawText(ctx, formattedAlts.join(","), grpPos.x + 25 + offsetX, grpPos.y - 11 + offsetY, 11, "#ff8c00");
+  const formattedAlts: string[] = alts.map((a: number) => {
+    return formatAlt(a)
+  })
+  drawText(
+    ctx,
+    formattedAlts.join(","),
+    grpPos.x + 25 + offsetX,
+    grpPos.y - 11 + offsetY,
+    11,
+    "#ff8c00"
+  )
 }
 
 /**
@@ -117,17 +136,23 @@ export function drawAltitudes(
  * @param showMeasurements true iff measurement should be drawn/shown
  */
 export function drawMeasurement(
-    ctx: CanvasRenderingContext2D, 
-    startX: number,
-    startY: number,
-    endX: number,
-    endY: number,
-    distance: number,
-    showMeasurements:boolean): void {
-    if (showMeasurements) {
-      drawLine(ctx, startX, startY, endX, endY);
-      drawText(ctx, Math.floor(distance).toString(), (startX + endX) / 2, (startY + endY) / 2 - 3);
-    }
+  ctx: CanvasRenderingContext2D,
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  distance: number,
+  showMeasurements: boolean
+): void {
+  if (showMeasurements) {
+    drawLine(ctx, startX, startY, endX, endY)
+    drawText(
+      ctx,
+      Math.floor(distance).toString(),
+      (startX + endX) / 2,
+      (startY + endY) / 2 - 3
+    )
+  }
 }
 
 /**
@@ -140,163 +165,122 @@ export function drawMeasurement(
  */
 export function drawGroupCap(
   c: CanvasRenderingContext2D,
-  orientation: FightAxis,
+  orientation: BlueInThe,
   contacts: number,
-  startX:number,
-  startY:number, 
-  color = "red"): AircraftGroup{
-
-  if (!c) { return new AircraftGroup() }
+  startX: number,
+  startY: number,
+  color = "red"
+): AircraftGroup {
+  if (!c) {
+    return new AircraftGroup()
+  }
 
   // eslint-disable-next-line
-  let alts:number[] = [...Array(contacts)].map(_=>randomNumber(15,45));
+  let alts: number[] = [...Array(contacts)].map((_) => randomNumber(15, 45))
 
-  c.lineWidth = 1;
-  c.fillStyle = color;
-  c.strokeStyle=color;
+  c.lineWidth = 1
+  c.fillStyle = color
+  c.strokeStyle = color
 
-  c.beginPath();
+  c.beginPath()
 
-  let radius = 10;
-  if (contacts === 1 ){
-    c.arc(startX, startY, 10, 1.0*Math.PI, 0.8*Math.PI);
-    c.stroke();
-    drawLine(c, startX-8, startY+6, startX-6, startY+12, color);
-  } else{
-    const ratio = 2/contacts - 0.1; 
-    let startPI = 0;
+  let radius = 10
+  if (contacts === 1) {
+    c.arc(startX, startY, 10, 1.0 * Math.PI, 0.8 * Math.PI)
+    c.stroke()
+    drawLine(c, startX - 8, startY + 6, startX - 6, startY + 12, color)
+  } else {
+    const ratio = 2 / contacts - 0.1
+    let startPI = 0
     let endPI = ratio
-    radius = 12;
-    for (let x = 1 ; x<= contacts; x++){
-      c.arc(startX,startY, radius, startPI*Math.PI, endPI*Math.PI);
-      c.stroke();
+    radius = 12
+    for (let x = 1; x <= contacts; x++) {
+      c.arc(startX, startY, radius, startPI * Math.PI, endPI * Math.PI)
+      c.stroke()
 
-      const opp:number = radius * Math.sin(endPI*Math.PI);
-      const adj:number = radius * Math.cos(endPI*Math.PI);
-    
-      const endy = startY + opp;
-      const endx = startX + adj;
-    
-      c.beginPath();
-      c.moveTo(startX+(adj*0.6), startY+(opp*0.9));
-      c.lineTo(endx, endy);
-      c.stroke();
-      c.beginPath();
+      const opp: number = radius * Math.sin(endPI * Math.PI)
+      const adj: number = radius * Math.cos(endPI * Math.PI)
 
-      startPI = (endPI+0.1);
-      endPI = startPI+ratio;
+      const endy = startY + opp
+      const endx = startX + adj
+
+      c.beginPath()
+      c.moveTo(startX + adj * 0.6, startY + opp * 0.9)
+      c.lineTo(endx, endy)
+      c.stroke()
+      c.beginPath()
+
+      startPI = endPI + 0.1
+      endPI = startPI + ratio
     }
   }
 
-  const angle = (orientation===FightAxis.EW) ? 270 : 0;
+  const angle = FightAxis.isNS(orientation) ? 0 : 270
   const sY: number = Math.floor(startY + radius * Math.sin(toRadians(angle)))
   const sX: number = Math.floor(startX + radius * Math.cos(toRadians(angle)))
 
   const p = {
     sx: startX,
     sy: startY,
-    sX, sY,
+    sX,
+    sY,
     numContacts: contacts,
-    hdg: randomNumber(0,360),
+    hdg: randomNumber(0, 360),
     alts,
-    desiredHdg: 90
+    desiredHdg: 90,
   }
-  return new AircraftGroup(p);
+  return new AircraftGroup(p)
 }
 
-export function drawBullseye (
-  context:CanvasRenderingContext2D,
-  bull?:Point,
-  color?:string): Point {
-
+export function drawBullseye(
+  context: CanvasRenderingContext2D,
+  bull?: Point,
+  color?: string
+): Point {
   color = color || "black"
-  context.lineWidth = 1;
-  context.fillStyle = color;
-  context.strokeStyle = color;
+  context.lineWidth = 1
+  context.fillStyle = color
+  context.strokeStyle = color
 
-  const centerPointX = bull ? bull.x: randomNumber(context.canvas.width * 0.33, context.canvas.width * 0.66);
-  const centerPointY = bull ? bull.y: randomNumber(context.canvas.height * 0.33, context.canvas.height * 0.66);
-  
-  context.beginPath();
-  context.arc(centerPointX, centerPointY, 2, 0, 2 * Math.PI, true);
-  context.stroke();
-  context.fill();
-  
-  context.moveTo(centerPointX, centerPointY + 6);
-  context.lineTo(centerPointX, centerPointY - 6);
-  context.stroke();
-  
-  context.moveTo(centerPointX + 6, centerPointY);
-  context.lineTo(centerPointX - 6, centerPointY);
-  context.stroke();
-  
+  const centerPointX = bull
+    ? bull.x
+    : randomNumber(context.canvas.width * 0.33, context.canvas.width * 0.66)
+  const centerPointY = bull
+    ? bull.y
+    : randomNumber(context.canvas.height * 0.33, context.canvas.height * 0.66)
+
+  context.beginPath()
+  context.arc(centerPointX, centerPointY, 2, 0, 2 * Math.PI, true)
+  context.stroke()
+  context.fill()
+
+  context.moveTo(centerPointX, centerPointY + 6)
+  context.lineTo(centerPointX, centerPointY - 6)
+  context.stroke()
+
+  context.moveTo(centerPointX + 6, centerPointY)
+  context.lineTo(centerPointX - 6, centerPointY)
+  context.stroke()
+
   return new Point(centerPointX, centerPointY)
 }
 
-export type Bounds = {
-  tall: {
-    lowX: number,
-    hiX: number,
-    lowY: number,
-    hiY: number
-  },
-  wide:{
-    lowX: number,
-    hiX: number,
-    lowY: number,
-    hiY: number
-  },
-}
-
-export const getRestrictedStartPos = (ctx: CanvasRenderingContext2D, bluePos: AircraftGroup, orientation:FightAxis, minNMFromBlue:number, maxNMFromBlue:number, start?: Point):Point => {
-  const isNS = orientation === FightAxis.NS
-  const blueLoc = bluePos.getCenterOfMass()
-  const limitLine = isNS ? blueLoc.y : blueLoc.x
-  
-  const canvasSize = isNS ? ctx.canvas.height : ctx.canvas.width
-  const uBound = (limitLine - (minNMFromBlue*PIXELS_TO_NM)) / canvasSize
-
-  const lBound = (limitLine - (maxNMFromBlue*PIXELS_TO_NM)) / canvasSize
-
-  const bounds: Bounds = {
-    tall: { lowX: 0.2, hiX: 0.8, lowY: lBound, hiY: uBound },
-    wide: { lowX: lBound, hiX: uBound, lowY: 0.2, hiY: 0.8 }
-  }
-
-  const mults = isNS ? bounds.tall : bounds.wide
-
-  const startY:number = (start && start.y) || randomNumber(ctx.canvas.height * mults.lowY, ctx.canvas.height * mults.hiY);
-  const startX:number = (start && start.x) || randomNumber(ctx.canvas.width * mults.lowX, ctx.canvas.width * mults.hiX);
-
-  return new Point(startX, startY)
-}
-
-export const getStartPos = (ctx: CanvasRenderingContext2D, bluePos: AircraftGroup, orientation: FightAxis, start?: Point): Point =>
-{
-  return getRestrictedStartPos(ctx, bluePos, orientation, 45, 100, start)
-}
-
-/**
- * TODO -- Remove
- */
-export const getStartPos_Old = (ctx: CanvasRenderingContext2D, orientation:FightAxis, bounds?: Bounds, start?: Point):Point => {
-  const isNS = orientation === FightAxis.NS
-
-  let mults = isNS ? bounds?.tall : bounds?.wide
-  mults = mults || { lowY:0.2, lowX:0.2, hiY:0.8, hiX:0.8}
-
-  const startY:number = (start && start.y) || randomNumber(ctx.canvas.height * mults.lowY, ctx.canvas.height * mults.hiY);
-  const startX:number = (start && start.x) || randomNumber(ctx.canvas.width * mults.lowX, ctx.canvas.width * mults.hiX);
-  return new Point(startX, startY)
-}
-
-export function drawFullInfo(ctx:CanvasRenderingContext2D, state:PictureCanvasState, braaFirst:boolean, showMeasurements:boolean, groups:AircraftGroup[]): void{
+export function drawFullInfo(
+  ctx: CanvasRenderingContext2D,
+  state: PictureCanvasState,
+  braaFirst: boolean,
+  showMeasurements: boolean,
+  groups: AircraftGroup[]
+): void {
   for (let y = 0; y < groups.length; y++) {
     const grpPos = groups[y].getCenterOfMass()
     if (showMeasurements) {
-      new Braaseye(grpPos, state.bluePos.getCenterOfMass(), state.bullseye)
-        .draw(ctx, true, braaFirst)
+      new Braaseye(
+        grpPos,
+        state.bluePos.getCenterOfMass(),
+        state.bullseye
+      ).draw(ctx, true, braaFirst)
     }
-    drawAltitudes(ctx, grpPos, groups[y].getAltitudes());
+    drawAltitudes(ctx, grpPos, groups[y].getAltitudes())
   }
 }
