@@ -2,7 +2,7 @@ module.exports = function(api) {
   api.cache(true);
   const ignore = [
       "**/__tests__", // ignore the whole test directory
-      "**/*.test.(js|ts|jsx|tsx)" // ignore test files only
+      /\.test\.(jsx|js|ts|tsx)?$/, // ignore test files
   ];
   const presets = [
     [
@@ -25,8 +25,7 @@ module.exports = function(api) {
     'add-module-exports',
     'babel-plugin-dynamic-import-node',
     ["@babel/plugin-transform-typescript", { isTSX: true}], 
-    "@babel/plugin-transform-flow-strip-types",
-    "babel-plugin-rewire"
+    "@babel/plugin-transform-flow-strip-types"
   ];
 
   return {
