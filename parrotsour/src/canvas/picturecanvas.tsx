@@ -108,6 +108,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
       })
     })
 
+    drawBullseye(context, new Point(1, 1), "green")
     drawAzimuth(
       context,
       this.props,
@@ -120,9 +121,9 @@ export default class PictureCanvas extends ParrotSourCanvas {
         50
       )
     )
-    drawAzimuth(context, this.props, this.state, new Point(-1000, 1000))
-    drawAzimuth(context, this.props, this.state, new Point(1000, -1000))
-    drawAzimuth(context, this.props, this.state, new Point(-1000, -1000))
+    //drawAzimuth(context, this.props, this.state, new Point(-1000, 1000))
+    //drawAzimuth(context, this.props, this.state, new Point(1000, -1000))
+    //drawAzimuth(context, this.props, this.state, new Point(-1000, -1000))
 
     return answer
   }
