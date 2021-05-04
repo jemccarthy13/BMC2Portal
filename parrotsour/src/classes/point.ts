@@ -35,7 +35,7 @@ export class Point {
       Math.sqrt(deltaX * deltaX + deltaY * deltaY) / PIXELS_TO_NM
     )
 
-    // convert cartesian direction to heading
+    // convert cartesian angle to heading
     let brg = Math.round(
       270 + toDegrees(Math.atan2(this.y - toPoint.y, this.x - toPoint.x))
     )
@@ -52,7 +52,7 @@ export class Point {
   public straightDistNM(toPoint: Point, orientation: BlueInThe): number {
     return Math.floor(
       Math.abs(
-        orientation === BlueInThe.NORTH
+        orientation === BlueInThe.NORTH || orientation === BlueInThe.SOUTH
           ? this.y - toPoint.y
           : this.x - toPoint.x
       ) / PIXELS_TO_NM
