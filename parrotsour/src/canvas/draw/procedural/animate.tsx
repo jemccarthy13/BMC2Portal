@@ -5,7 +5,7 @@ import {
   PictureCanvasState,
 } from "../../../canvas/canvastypes"
 
-import { Snackbar } from "../../../classes/alert"
+import PSAlert from "../../../pscomponents/psalert"
 
 // Functions
 import { drawAltitudes, drawGroupCap, drawText } from "../drawutils"
@@ -45,7 +45,7 @@ function checkForCoAltitude(
     })
   )
   if (result.length !== 0) {
-    Snackbar.alert("CoAlt!", 5000, "red")
+    PSAlert.error("CoAlt!")
   }
 }
 
