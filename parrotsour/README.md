@@ -4,6 +4,13 @@ Much of the underlying 'core' library (i.e. math computations and drawing)
 has been updated for stability. Components of the library should now be easier
 to use/modify/extend. This README will explain the new thought process at the end.
 
+### Install
+
+Clone the repository \
+Download [canvas dependencies](https://www.npmjs.com/package/canvas), depending on OS architecture
+npm || yarn install
+Run tests/coverage
+
 ## Available Scripts
 
 In the project directory with yarn or npm, you can run:

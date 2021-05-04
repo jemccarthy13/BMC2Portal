@@ -126,10 +126,7 @@ export const getRestrictedStartPos = (
     start: new Point(startX, startY),
   }
 
-  console.log(pInfo)
-  console.log("before:", pInfo.start)
   const point = _clampPictureInContext(ctx, pInfo, orientation)
-  console.log("after", point)
 
   let fromX = startX
   let fromY = 0

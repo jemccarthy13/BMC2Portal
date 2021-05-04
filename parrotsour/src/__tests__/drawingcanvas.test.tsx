@@ -14,6 +14,7 @@ function emptyFunc() {}
  * @param context the Context to draw in
  */
 const drawMock = async (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ctx: CanvasRenderingContext2D | null | undefined
 ): Promise<void> => {
   return new Promise(emptyFunc)
@@ -36,5 +37,7 @@ describe("drawingCanvas", () => {
         animateCallback={emptyFunc}
       />
     )
+
+    expect(canvasMock).not.toBe(null)
   })
 })

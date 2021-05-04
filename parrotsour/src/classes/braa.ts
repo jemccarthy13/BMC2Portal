@@ -23,7 +23,7 @@ export class BRAA {
    * @returns Formatted bearing and range
    */
   public toString(): string {
-    return this.label + " " + this.bearing + "/" + this.range
+    return this.bearing + "/" + this.range
   }
 
   /**
@@ -43,7 +43,7 @@ export class BRAA {
     showMeasurements?: boolean
   ): void {
     if (showMeasurements) {
-      drawText(ctx, this.bearing + "/" + this.range, x, y, 11, color)
+      drawText(ctx, this.toString(), x, y, 11, color)
     }
   }
 }
