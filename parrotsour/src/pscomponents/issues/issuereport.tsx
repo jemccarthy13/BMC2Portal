@@ -9,7 +9,8 @@ import {
 } from "@material-ui/core"
 import IssueSelector from "./issueselector"
 
-import { Snackbar } from "../../classes/alert"
+import Snackbar from "../psalert"
+
 import { PictureAnswer } from "../../canvas/canvastypes"
 
 import "../../css/collapsible.css"
@@ -97,10 +98,9 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
       )
 
       if (response.ok) {
-        Snackbar.alert("Submitted!", 5000, "green")
-        this.setState({ showIssueForm: false })
+        Snackbar.success("Submitted!")
       } else {
-        Snackbar.alert("Issue report failed.\nTry again later.", 5000, "red")
+        Snackbar.error("Issue report failed.\nTry again later.")
       }
     }
 
