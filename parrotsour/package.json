@@ -66,7 +66,7 @@
     "start": "react-scripts start",
     "build": "json --in-place -f package.json -e 'this.homepage=\"http://www.parrotsour.com\"' && react-scripts build",
     "build-standalone": "json --in-place -f package.json -e 'this.homepage=\".\"' && react-scripts build",
-    "compile": "npm run clean && cross-env NODE_ENV=production babel src --extensions \".ts,.js,.tsx,.jsx\" --out-dir dist --ignore \"**/__tests__\" --ignore \"**/*.test*.ext\" --no-copy-ignored",
+    "compile": "npm run clean && cross-env NODE_ENV=production babel src --extensions \".ts,.js,.tsx,.jsx\" --out-dir dist --no-copy-ignored",
     "pub": "npm run compile && npm publish",
     "clean": "rimraf dist && rimraf build && rimraf coverage",
     "clean-build": "npm run clean && npm install && npm run build",
@@ -75,7 +75,7 @@
     "clint": "eslint src/**/*.{ts,tsx}",
     "clint-fixdr": "eslint src/**/*.{ts,tsx} --fix-dry-run",
     "clint-fix": "eslint src/**/*.{ts,tsx} --fix",
-    "coverage": "npm run test -- --coverage",
+    "coverage": "npm run test -- --coverage --watchAll",
     "test": "react-scripts test"
   },
   "eslintConfig": {
