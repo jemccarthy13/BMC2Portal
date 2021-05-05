@@ -5,5 +5,6 @@ module.exports = {
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     moduleDirectories: ['node_modules', 'src'],
     setupFiles: ["jest-canvas-mock", "./setupTests.js" ],
-    testURL: "http://localhost/"
+    testURL: "http://localhost/",
+    verbose:"true"
 };

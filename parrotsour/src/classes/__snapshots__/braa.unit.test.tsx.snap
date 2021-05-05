@@ -2,7 +2,7 @@
 
 exports[`BRAA draws_correctly 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAUCAYAAADPym6aAAAABmJLR0QA/wD/AP+gvaeTAAABQklEQVRIie3UvytFcRjH8VeS34UJGdxJGZWBiQxiUJRV3VWRP4B/RCkrpQwGs8Gg/BgkXEr4AyQRE8P3q3vcuOfqWuS863SenvP5PM/5fs/zPWT8XYZwhiccYjTm+7Af81toS9FDDtcYxDGecYSBCrxVs4UFtGAZ2zG/hxk0YAIrKXrIYw0XmIzeOZxU4K2aO8Xd7sZljJ9iQ2iOunJ6cRH5kvpNuK/AWzUvqI1xPR5jfIBxYVfn8ZqiJ4xVrqT+mOLXLOetmsdYlPDSDzHuF0biAUuJpt/pc8JCknRiB60p3l/hCh0x7sLpF5pexTn/Tp8XRkvi2Tp6ftjrEzVpggT7mEVjvBdivoAptGMamyn6YezGeBwbWMRNBb1+hRHcCmfgXPhFfuQvhXFYRV2KPnk+bvBWcpXzZmRkZGRkZPwL3gHchmKGFUrUNwAAAABJRU5ErkJggg=="
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAUCAYAAADPym6aAAAABmJLR0QA/wD/AP+gvaeTAAACDklEQVRIie2VP0uqYRjGr86goC/iB9BUlFcUl3IQWlobGhICV0Hwi9gXKMHVwbEhaahcjJZyiNZo0kG0TUHlMRp+Z0qO5+Crh4QjB3/wLA/Xdd/PxfNvB0D/AT/+9QLWxcpBnp6elEgk5PV6lU6n1Ww2JUmvr6/KZDLyer3KZrMaDoeOeknqdDqKRCJqtVra29uTx+PR/v6+np+fl3oXwoqcnJxwcXHBaDSiVCpxfHwMwMHBAZeXlxhjuLm5oVgsOuoBqtUq+Xwe27a5vr7GGEOlUiGVSi31LmLlIIFAgMFgAEC32yUWiwHg8XgYjUYAjMdjAoGAox4gn89TrVbn6k8mE/x+/1Lvt4O43W4+Pz8BmE6nWJYFQDqd5vb2FmMM5XIZl8vlqAcIh8O02+25+o1GY7abTt5vB7Esi+l0CoAxBp/PB8DLywupVAqfz8fZ2dms6SJ9u90mHA7P1e73+xwdHTEcDh29awkSjUZ5f38HoNfrkUwm/9C8vb3Nzvki/df9+KLX65HL5eh0On/V63dWfrUymYxqtZqMMarVarJtW5Jk27bq9boGg4Gurq50enrqqH94eNDh4aEk6e7uTrlcTufn5wqFQkt7reXVur+/JxgM4nK5iMfjPD4+zuZjsRiWZVEoFPj4+HDU/3o/dnd3kTQ3nLxO7MD2Z98otkE2jW2QTWMbZNPYBtk0fgKqpysW4IlZLwAAAABJRU5ErkJggg=="
   height="20"
   width="50"
 />
@@ -10,7 +10,7 @@ exports[`BRAA draws_correctly 1`] = `
 
 exports[`BRAA draws_only_when_showmeasure_true 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAUCAYAAADPym6aAAAABmJLR0QA/wD/AP+gvaeTAAAAG0lEQVRIie3BMQEAAADCoPVPbQ0PoAAAAIBHAw+0AAGPFGGuAAAAAElFTkSuQmCC"
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAUCAYAAADPym6aAAAABmJLR0QA/wD/AP+gvaeTAAAANklEQVRIie3PgQkAMAjEwNr9d36XEAySmyCpJHkH/O2AKY7QOELjCI0jNI7QOELjCI0jNI7QNNSvBCS3oAPJAAAAAElFTkSuQmCC"
   height="20"
   width="50"
 />
