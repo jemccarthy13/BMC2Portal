@@ -26,7 +26,7 @@ describe("drawingCanvas", () => {
       <DrawingCanvas
         draw={drawMock}
         bullseye={new Point(0, 0)}
-        orientation={{ height: 500, width: 800, orient: BlueInThe.NORTH }}
+        orientation={{ height: 400, width: 400, orient: BlueInThe.NORTH }}
         picType="azimuth"
         braaFirst
         dataStyle={SensorType.ARROW}

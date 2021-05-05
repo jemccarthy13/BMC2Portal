@@ -57,7 +57,7 @@ function doAnimation(
   animateCanvas: ImageData,
   resetCallback?: (showMeasure: boolean) => void
 ): void {
-  if (!ctx || !state.bluePos) return
+  if (!ctx || !state.blueAir) return
 
   ctx.putImageData(animateCanvas, 0, 0)
 
@@ -160,7 +160,7 @@ export function animateGroups(
     if (randomNumber(0, 10) <= 2) {
       groups[x].setManeuvers(1)
     }
-    const bPos = state.bluePos.getCenterOfMass()
+    const bPos = state.blueAir.getCenterOfMass()
     groups[x].updateIntent({
       desiredHeading: groups[x].getCenterOfMass().getBR(bPos).bearingNum,
     })

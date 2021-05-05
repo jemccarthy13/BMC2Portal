@@ -26,7 +26,7 @@ export default class ProceduralCanvas extends React.PureComponent<
     super(props)
     this.state = {
       bullseye: Point.DEFAULT,
-      bluePos: new AircraftGroup(),
+      blueAir: new AircraftGroup(),
       reDraw: this.drawPicture,
       answer: { pic: "", groups: [] },
     }
@@ -93,9 +93,9 @@ export default class ProceduralCanvas extends React.PureComponent<
     start?: Point
   ): PictureAnswer => {
     const { orientation } = this.props
-    const { bluePos } = this.state
+    const { blueAir } = this.state
 
-    const startPos = getStartPos(ctx, bluePos, orientation.orient, { start })
+    const startPos = getStartPos(ctx, blueAir, orientation.orient, { start })
 
     const grp = drawGroupCap(
       ctx,

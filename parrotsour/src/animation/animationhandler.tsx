@@ -66,6 +66,18 @@ export abstract class AnimationHandler {
   }
 
   /**
+   * Update blue air intent as required. Same rules as with applyLogic.
+   *
+   * @param grp Group to check intent for
+   * @param state Current state of canvas
+   */
+  abstract applyBlueLogic(
+    blueAir: AircraftGroup,
+    groups: AircraftGroup[],
+    ctx?: CanvasRenderingContext2D
+  ): void
+
+  /**
    * Update group's intent as required.
    *
    * A group can navigate based on desired locations (route of points) or
@@ -107,7 +119,7 @@ export abstract class AnimationHandler {
     animateCanvas?: ImageData,
     resetCallback?: () => void
   ): Promise<void> {
-    if (!context || !state.bluePos || !animateCanvas) return
+    if (!context || !state.blueAir || !animateCanvas) return
     context.putImageData(animateCanvas, 0, 0)
 
     // For each group:
@@ -127,8 +139,9 @@ export abstract class AnimationHandler {
       this.applyLogic(grp, state, resetCallback, context)
     }
 
-    state.bluePos.move()
-    state.bluePos.draw(context, props.dataStyle)
+    state.blueAir.move()
+    this.applyBlueLogic(state.blueAir, groups, context)
+    state.blueAir.draw(context, props.dataStyle)
 
     // get slider speed/default speed
     const slider: HTMLInputElement = document.getElementById(

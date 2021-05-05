@@ -33,7 +33,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   //let furthestPic1Group = groups1[0]
   //let furthestRange = 0
   //groups1.forEach((grp) => {
-  //const grpRange = grp.getCenterOfMass().getBR(state.bluePos.getCenterOfMass()).range
+  //const grpRange = grp.getCenterOfMass().getBR(state.blueAir.getCenterOfMass()).range
   //if (grpRange > furthestRange){
   //furthestPic1Group = grp
   // furthestRange = grpRange
@@ -67,7 +67,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   //   wide: { lowX: lBound, hiX: uBound, lowY: 0.2, hiY: 0.8 }
   // }
 
-  //const pic2StartPos = getStartPos(ctx, state.bluePos, props.orientation.orient, start )
+  //const pic2StartPos = getStartPos(ctx, state.blueAir, props.orientation.orient, start )
 
   //const answer2 = state.reDraw( ctx, true, pic2StartPos )
   //const groups2 = answer2.groups
@@ -75,7 +75,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   //let closestPic2Group = groups1[0]
   //let closestRange = Number.MAX_VALUE
   //groups2.forEach((grp) => {
-  //  const grpRange = grp.getCenterOfMass().getBR(state.bluePos.getCenterOfMass()).range
+  //  const grpRange = grp.getCenterOfMass().getBR(state.blueAir.getCenterOfMass()).range
   //  if (grpRange < closestRange){
   //    closestPic2Group = grp
   //    closestRange = grpRange

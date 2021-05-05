@@ -40,7 +40,7 @@ export const drawCap: PictureDrawFunction = (
   const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
   const drawDist: number = randomNumber(3.5 * incr, 10 * incr)
 
-  start = getStartPos(ctx, state.bluePos, props.orientation.orient, {
+  start = getStartPos(ctx, state.blueAir, props.orientation.orient, {
     start,
     wide: drawDist,
   })
@@ -139,12 +139,12 @@ export const drawCap: PictureDrawFunction = (
 
   const ngBraaseye: Braaseye = new Braaseye(
     ngPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   const sgBraaseye: Braaseye = new Braaseye(
     sgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
 

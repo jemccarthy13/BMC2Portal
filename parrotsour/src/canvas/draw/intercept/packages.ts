@@ -14,14 +14,14 @@ import { randomNumber } from "../../../utils/psmath"
 const _getPicBull = (
   isRange: boolean,
   orientation: BlueInThe,
-  bluePos: AircraftGroup,
+  blueAir: AircraftGroup,
   groups: AircraftGroup[]
 ): Point => {
   let closestGroup = groups[0]
 
   let closestRng = 9999
   let sum = 0
-  const bPos = bluePos.getCenterOfMass()
+  const bPos = blueAir.getCenterOfMass()
 
   const isNS = FightAxis.isNS(orientation)
   for (let x = 0; x < groups.length; x++) {
@@ -144,7 +144,7 @@ export const drawPackage: PictureDrawFunction = (
   let finalAnswer: PictureAnswer = { pic: "", groups: [] }
   const answer1 = state.reDraw(ctx, true, start1)
   const answer2 = state.reDraw(ctx, true, start2)
-  if (!state.bluePos) {
+  if (!state.blueAir) {
     return { pic: "", groups: [] }
   }
   const groups1: AircraftGroup[] = answer1.groups
@@ -153,13 +153,13 @@ export const drawPackage: PictureDrawFunction = (
   const bull1 = _getPicBull(
     isRange,
     props.orientation.orient,
-    state.bluePos,
+    state.blueAir,
     groups1
   )
   const bull2 = _getPicBull(
     isRange,
     props.orientation.orient,
-    state.bluePos,
+    state.blueAir,
     groups2
   )
 
@@ -178,7 +178,7 @@ export const drawPackage: PictureDrawFunction = (
     if (rngBack.range < 40) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       drawBullseye(ctx, state.bullseye)
-      state.bluePos.draw(ctx, props.dataStyle)
+      state.blueAir.draw(ctx, props.dataStyle)
       finalAnswer = drawPackage(ctx, props, state, start)
     } else {
       realAnswer.pic =
@@ -205,10 +205,10 @@ export const drawPackage: PictureDrawFunction = (
     if (rngBack.range < 40) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       drawBullseye(ctx, state.bullseye)
-      state.bluePos.draw(ctx, props.dataStyle)
+      state.blueAir.draw(ctx, props.dataStyle)
       finalAnswer = drawPackage(ctx, props, state, start)
     } else {
-      const bPos = state.bluePos.getCenterOfMass()
+      const bPos = state.blueAir.getCenterOfMass()
       const leadBR = bPos.getBR(bull1).range
       const trailBR = bPos.getBR(bull2).range
       const anchorLead = _getAnchorPkg(leadBR, trailBR, groups1, groups2)

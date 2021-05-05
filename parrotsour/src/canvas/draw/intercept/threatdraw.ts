@@ -21,13 +21,13 @@ export const drawThreat: PictureDrawFunction = (
   state: PictureCanvasState,
   start?: Point | undefined
 ): PictureAnswer => {
-  if (!state.bluePos) {
+  if (!state.blueAir) {
     return { pic: "", groups: [] }
   }
 
   const offsetDeg1: number = randomNumber(-10, 10)
 
-  const bPos = state.bluePos.getCenterOfMass()
+  const bPos = state.blueAir.getCenterOfMass()
 
   if (start === undefined) {
     start = new Point(
@@ -44,7 +44,7 @@ export const drawThreat: PictureDrawFunction = (
 
   const heading: number = randomHeading(
     props.format,
-    state.bluePos.getHeading()
+    state.blueAir.getHeading()
   )
 
   const sg = new AircraftGroup({
@@ -62,14 +62,14 @@ export const drawThreat: PictureDrawFunction = (
 
   const closestBraaseye = new Braaseye(
     sgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   closestBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
 
   const closestGrp: AircraftGroup = sg
 
-  const aspectH = getAspect(state.bluePos, sg)
+  const aspectH = getAspect(state.blueAir, sg)
   const trackDir = sg.getTrackDir()
 
   let answer: string =

@@ -15,7 +15,7 @@ export class GroupFactory {
   ): AircraftGroup {
     const hdg = heading
       ? heading
-      : randomHeading(props.format, state.bluePos.getHeading())
+      : randomHeading(props.format, state.blueAir.getHeading())
     const startPos = startLoc
 
     const p = { sx: startPos.x, sy: startPos.y, hdg, ctx }
@@ -29,7 +29,7 @@ export class GroupFactory {
     state: PictureCanvasState,
     heading?: number
   ): AircraftGroup {
-    const startLoc = getStartPos(ctx, state.bluePos, props.orientation.orient)
+    const startLoc = getStartPos(ctx, state.blueAir, props.orientation.orient)
     return this.randomGroupAtLoc(ctx, props, state, startLoc, heading)
   }
 }

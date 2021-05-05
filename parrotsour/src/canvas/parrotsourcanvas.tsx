@@ -28,7 +28,7 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
     super(props)
     this.state = {
       bullseye: Point.DEFAULT,
-      bluePos: new AircraftGroup(), // TODO -- avoid creating new group twice just for it to be GC'd
+      blueAir: new AircraftGroup(), // TODO -- avoid creating new group twice just for it to be GC'd
       reDraw: (): PictureAnswer => {
         throw "Should not use parent reDraw"
       },

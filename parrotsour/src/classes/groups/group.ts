@@ -108,8 +108,6 @@ export interface GroupParams {
   ctx: CanvasRenderingContext2D
   sx?: number
   sy?: number
-  endx?: number
-  endy?: number
   nContacts?: number
   hdg?: number
   alts?: number[]

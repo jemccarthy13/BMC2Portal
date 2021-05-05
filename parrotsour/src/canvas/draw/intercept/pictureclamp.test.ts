@@ -1,14 +1,11 @@
-import {
-  getRestrictedStartPos,
-  _clampPictureInContext,
-} from "../canvas/draw/intercept/pictureclamp"
+import { getRestrictedStartPos, _clampPictureInContext } from "./pictureclamp"
 
-import { BlueInThe } from "../canvas/canvastypes"
-import { Point } from "../classes/point"
-import { PIXELS_TO_NM } from "../utils/psmath"
+import { BlueInThe } from "../../canvastypes"
+import { Point } from "../../../classes/point"
+import { PIXELS_TO_NM } from "../../../utils/psmath"
 
-import { _howFarOut } from "../canvas/draw/intercept/pictureclamp"
-import { AircraftGroup } from "../classes/groups/group"
+import { _howFarOut } from "./pictureclamp"
+import { AircraftGroup } from "../../../classes/groups/group"
 
 const TEN_NM = PIXELS_TO_NM * 10
 
@@ -179,9 +176,9 @@ describe("_clampPictureInContext", () => {
     expect(warnSpy).toBeCalledTimes(1)
     warnSpy.mockRestore()
 
-    expect(result.x).toBeLessThan(ctx.canvas.width - 1)
+    expect(result.x).toBeLessThanOrEqual(ctx.canvas.width - 1)
     expect(result.x).toBeGreaterThanOrEqual(1)
-    expect(result.y).toBeLessThan(ctx.canvas.height - 1)
+    expect(result.y).toBeLessThanOrEqual(ctx.canvas.height - 1)
     expect(result.y).toBeGreaterThanOrEqual(1)
   })
 })
@@ -191,11 +188,9 @@ describe("_clampPictureInContext", () => {
  * from blue and within the canvas.
  */
 describe("getRestrictedStartPos", () => {
-  const bluePos = new AircraftGroup({
+  const blueAir = new AircraftGroup({
     sx: 100,
     sy: 100,
-    endx: 100,
-    endy: 100,
     nContacts: 4,
     hdg: 270,
     alts: [100, 100, 100, 100],
@@ -204,7 +199,7 @@ describe("getRestrictedStartPos", () => {
   it("runs", () => {
     const startPos = getRestrictedStartPos(
       ctx,
-      bluePos,
+      blueAir,
       BlueInThe.NORTH,
       45,
       50,
@@ -212,7 +207,7 @@ describe("getRestrictedStartPos", () => {
         wide: TEN_NM,
       }
     )
-    fail("not implemented")
+    expect("").toEqual("this test not implemented")
     //expect(startPos.getBR(new Point(100, 100)).range).toBeGreaterThan(45)
     //expect(startPos.getBR(new Point(100, 100)).range).toBeLessThan(50)
   })

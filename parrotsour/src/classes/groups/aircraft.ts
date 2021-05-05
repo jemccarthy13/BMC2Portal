@@ -3,9 +3,14 @@ import { GroupParams } from "./group"
 import { IDMatrix } from "./id"
 import { AircraftIntent, IntentParams } from "./intent"
 import { Point } from "../point"
+import Tasking from "./tasking"
 
 import { PaintBrush } from "../../canvas/draw/paintbrush"
-import { headingToRadians, randomNumber } from "../../utils/psmath"
+import {
+  getDegDeltaBetween,
+  headingToRadians,
+  randomNumber,
+} from "../../utils/psmath"
 
 /*
  * TODO -- For EWI fill-ins, implement more AC types?
@@ -22,6 +27,11 @@ interface AircraftParams extends GroupParams {
   type: ACType
 }
 
+/**
+ * TODO -- AIRCRAFT -- consider moving to a structure like
+ * https://khalilstemmler.com/blogs/typescript/getters-and-setters/
+ * To reduce the number of functions provided in the aircraft "api"
+ */
 export class Aircraft {
   // AASI (alt, aspect, speed, ID)
   private altitude: number
@@ -37,9 +47,9 @@ export class Aircraft {
   private type: ACType
 
   private startPos = new Point(0, 0)
-  private centerOfMass = new Point(0, 0)
 
   private intent = new AircraftIntent()
+  private tasking: Tasking | undefined
 
   private ctx: CanvasRenderingContext2D | undefined
 
@@ -47,11 +57,10 @@ export class Aircraft {
     if (!p) p = {}
     // temporary
     this.dataTrail = new DataTrail()
-    if (p) {
-      this.dataTrail = new DataTrail()
-    }
+    //if (p) { // why would we need to pass in a DataTrail if it's associated with this aircraft?
+    // this.dataTrail = new DataTrail()
+    //}
 
-    this.altitude = p.alt || 10
     this.heading = p.hdg || 90
     this.id = p.id || IDMatrix.HOSTILE
     this.type = p.type || ACType.FTR
@@ -69,9 +78,6 @@ export class Aircraft {
 
     // Set AACSI (alt, aspect, # contacts, speed, ID)
     this.altitude = p.alt || randomNumber(low, hi)
-
-    // Set center of mass
-    this.centerOfMass = this._getCenterOfMass(p.ctx, p.dataTrailType)
 
     this.ctx = p.ctx || undefined
   }
@@ -118,19 +124,17 @@ export class Aircraft {
 
     const context = ctx || this.ctx
     if (context) {
-      dist = context.canvas.width / (context.canvas.width / 20)
+      dist = Math.floor(context.canvas.width / (context.canvas.width / 20))
     }
 
-    const x = this.startPos.x + 5 * Math.cos(vector.offset)
-    const y = this.startPos.y + 5 * -Math.sin(vector.offset)
     return new Point(
-      x + 1.2 * dist * Math.cos(vector.radians),
-      y + 1.2 * dist * -Math.sin(vector.radians)
+      Math.floor(this.startPos.x + 1.2 * dist * Math.cos(vector.radians)),
+      Math.floor(this.startPos.y + 1.2 * dist * -Math.sin(vector.radians))
     )
   }
 
   getCenterOfMass(): Point {
-    return this.centerOfMass
+    return this._getCenterOfMass()
   }
 
   public getHeading(): number {
@@ -145,7 +149,7 @@ export class Aircraft {
     return this.id
   }
 
-  settIDMatrix(newID: IDMatrix): void {
+  setIDMatrix(newID: IDMatrix): void {
     this.id = newID
   }
 
@@ -168,8 +172,6 @@ export class Aircraft {
 
   /**
    * Move the arrow once based on the current heading / vector.
-   *
-   * Primarily used for animation to move arrows.
    */
   move(): void {
     // if (this.isCapping()) return
@@ -183,9 +185,6 @@ export class Aircraft {
     // apply offsets based on start/end position
     this.startPos.x += offsetX
     this.startPos.y += offsetY
-
-    // compute a new center of mass
-    this.centerOfMass = this._getCenterOfMass()
   }
 
   turnToTarget(): void {
@@ -196,27 +195,29 @@ export class Aircraft {
       )
     }
 
-    const LH = (this.getHeading() - this.intent.getDesiredHeading() + 360) % 360
-    const RH = (this.intent.getDesiredHeading() - this.getHeading() + 360) % 360
-    let deltaA = RH
-    if (LH < RH) {
-      deltaA = -LH
-    }
+    const turnDegrees = getDegDeltaBetween(
+      this.getHeading(),
+      this.intent.getDesiredHeading()
+    )
 
     let divisor = 7
-    const absDelt = Math.abs(deltaA)
-    if (absDelt > 90) {
+    const absDelt = Math.abs(turnDegrees)
+    if (absDelt >= 90) {
       divisor = 15
     } else if (absDelt < 7) {
       divisor = 1
     }
 
-    this.setCurHeading(this.getHeading() + deltaA / divisor)
+    this.setCurHeading(this.getHeading() + turnDegrees / divisor)
   }
 
   updateIntent(newIntent: Partial<IntentParams>): void {
     this.intent.updateIntent(newIntent)
   }
+
+  /**
+   * Routing logic
+   */
 
   doNextRouting(): void {
     if (!this.intent.atFinalDestination()) {
@@ -228,7 +229,7 @@ export class Aircraft {
         desiredHeading: this.getCenterOfMass().getBR(nextPt).bearingNum,
       })
     } else {
-      // this.setCapping(true)
+      throw "Need to make capping logic compatible with Intent & class structure."
     }
   }
 
@@ -244,22 +245,37 @@ export class Aircraft {
     this.intent.addRoutingPoint(pt)
   }
 
-  changeAltBy(incr: number): void {
-    this.altitude += incr
-  }
-
+  /**
+   * If not at desired altitude, increment to climb/descend towards intended altitude.
+   */
   doNextAltChange(): void {
     const atDesiredAlt = this.intent.getDesiredAltitude() === this.getAltitude()
     if (!atDesiredAlt) {
       if (this.intent.getDesiredAltitude() > this.getAltitude()) {
-        this.changeAltBy(0.5)
+        this.altitude += 0.5
       } else {
-        this.changeAltBy(-0.5)
+        this.altitude += -0.5
       }
     }
   }
 
+  /**
+   * Tasking logic section
+   */
+
   isTasked(): boolean {
-    return this.intent.isOnTask()
+    return this.tasking !== undefined
+  }
+
+  clearTasking(): void {
+    this.tasking = undefined
+  }
+
+  setTasking(task: Tasking): void {
+    this.tasking = task
+  }
+
+  getTasking(): Tasking | undefined {
+    return this.tasking
   }
 }

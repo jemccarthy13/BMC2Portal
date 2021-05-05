@@ -39,13 +39,13 @@ export const drawWall: PictureDrawFunction = (
    */
   const numGroups = randomNumber(3, 5)
   // const startPos = getStartPos(ctx, props.orientation.orient, boundaries, start)
-  const startPos = getStartPos(ctx, state.bluePos, props.orientation.orient, {
+  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
     start,
   })
   const startX = startPos.x
   const startY = startPos.y
 
-  let heading = randomHeading(props.format, state.bluePos.getHeading())
+  let heading = randomHeading(props.format, state.blueAir.getHeading())
 
   let totalArrowOffset = 0
 
@@ -61,7 +61,7 @@ export const drawWall: PictureDrawFunction = (
     let altOffsetY = 0
 
     if (props.isHardMode)
-      heading = randomHeading(props.format, state.bluePos.getHeading())
+      heading = randomHeading(props.format, state.blueAir.getHeading())
 
     if (isNS) {
       const grp = new AircraftGroup({
@@ -91,7 +91,7 @@ export const drawWall: PictureDrawFunction = (
 
     const grpBraaseye = new Braaseye(
       grpPos,
-      state.bluePos.getCenterOfMass(),
+      state.blueAir.getCenterOfMass(),
       state.bullseye
     )
     grpBraaseye.draw(

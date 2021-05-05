@@ -28,6 +28,8 @@ import { drawPOD } from "./draw/intercept/poddraw"
 import { IDMatrix } from "../classes/groups/id"
 import { randomNumber } from "../utils/psmath"
 import { getRestrictedStartPos } from "./draw/intercept/pictureclamp"
+import { Aircraft } from "../classes/groups/aircraft"
+import { SensorType } from "../classes/groups/datatrail"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -91,9 +93,9 @@ export default class PictureCanvas extends ParrotSourCanvas {
     console.log(type)
     const answer = drawFunc(context, this.props, this.state, start)
 
-    const { bluePos } = this.state
-    bluePos.updateIntent({
-      desiredHeading: bluePos
+    const { blueAir } = this.state
+    blueAir.updateIntent({
+      desiredHeading: blueAir
         .getCenterOfMass()
         .getBR(answer.groups[0].getCenterOfMass()).bearingNum,
     })
@@ -101,10 +103,9 @@ export default class PictureCanvas extends ParrotSourCanvas {
     answer.groups.forEach((grp) => {
       const bearingToBlue = grp
         .getCenterOfMass()
-        .getBR(bluePos.getCenterOfMass()).bearingNum
+        .getBR(blueAir.getCenterOfMass()).bearingNum
       grp.updateIntent({
         desiredHeading: Math.round(bearingToBlue / 90.0) * 90,
-        //desiredLoc: [bluePos.getCenterOfMass()]
       })
     })
 
@@ -115,7 +116,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
       this.state,
       getRestrictedStartPos(
         context,
-        this.state.bluePos,
+        this.state.blueAir,
         this.props.orientation.orient,
         45,
         50
@@ -170,7 +171,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
         heading = 180
       }
 
-      const bluePos = new AircraftGroup({
+      const blueAir = new AircraftGroup({
         ctx,
         sx: xPos,
         sy: yPos,
@@ -179,7 +180,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
         id: IDMatrix.FRIEND,
       })
 
-      await this.setState({ bluePos, bullseye })
+      await this.setState({ blueAir, bullseye })
 
       const blueOnly = ctx.getImageData(
         0,
@@ -191,7 +192,18 @@ export default class PictureCanvas extends ParrotSourCanvas {
       const answer: PictureAnswer = this.drawPicture(ctx)
       this.props.setAnswer(answer)
 
-      bluePos.draw(ctx, this.props.dataStyle)
+      blueAir.draw(ctx, this.props.dataStyle)
+      const acft = new Aircraft({
+        sx: 100,
+        sy: 100,
+        hdg: 180,
+        ctx: ctx,
+        id: IDMatrix.ASSUME_FRIEND,
+      })
+      acft.draw(ctx, SensorType.ARROW)
+      acft.setCurHeading(180)
+      drawBullseye(ctx, acft.getStartPos(), "orange")
+      drawBullseye(ctx, acft.getCenterOfMass(), "orange")
       this.setState({ ctx, answer, animateCanvas: blueOnly })
     }
   }

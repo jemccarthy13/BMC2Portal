@@ -19,12 +19,12 @@ export const drawPOD: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState
 ): PictureAnswer => {
-  if (!state.bluePos) {
+  if (!state.blueAir) {
     return { pic: "", groups: [] }
   }
   const numGrps: number = randomNumber(3, 11)
 
-  const bPos = state.bluePos.getCenterOfMass()
+  const bPos = state.blueAir.getCenterOfMass()
 
   drawText(ctx, '"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
 
@@ -44,7 +44,7 @@ export const drawPOD: PictureDrawFunction = (
       state.bullseye.y - 2
     )
 
-    new Braaseye(grpPos, state.bluePos.getCenterOfMass(), state.bullseye).draw(
+    new Braaseye(grpPos, state.blueAir.getCenterOfMass(), state.bullseye).draw(
       ctx,
       props.showMeasurements,
       props.braaFirst
@@ -53,8 +53,8 @@ export const drawPOD: PictureDrawFunction = (
   }
 
   function sortFun(a: AircraftGroup, b: AircraftGroup) {
-    const aBR = state.bluePos.getCenterOfMass().getBR(a.getCenterOfMass())
-    const bBR = state.bluePos.getCenterOfMass().getBR(b.getCenterOfMass())
+    const aBR = state.blueAir.getCenterOfMass().getBR(a.getCenterOfMass())
+    const bBR = state.blueAir.getCenterOfMass().getBR(b.getCenterOfMass())
     return aBR.range > bBR.range ? 1 : -1
   }
 
@@ -65,7 +65,7 @@ export const drawPOD: PictureDrawFunction = (
   for (let z = 0; z < closestGroups.length; z++) {
     const braaseye = new Braaseye(
       closestGroups[z].getCenterOfMass(),
-      state.bluePos.getCenterOfMass(),
+      state.blueAir.getCenterOfMass(),
       state.bullseye
     )
     response += formatGroup(

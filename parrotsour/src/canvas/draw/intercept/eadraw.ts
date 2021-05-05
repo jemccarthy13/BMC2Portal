@@ -123,17 +123,17 @@ function formatMusic(
  * which (random) group will we use if we don't use closest?
  *
  * @param groups current red air picture groups
- * @param bluePos current blue air position
+ * @param blueAir current blue air group
  * @returns Object containing closest group, closest braa, query
  * text, strobe range, and group matching the query
  */
-function getEAInfo(groups: AircraftGroup[], bluePos: AircraftGroup): EAInfo {
+function getEAInfo(groups: AircraftGroup[], blueAir: AircraftGroup): EAInfo {
   // find the closest group
   let closestGrp: AircraftGroup = groups[0]
   let closestRng = 9999
   let braa = new BRAA(0, 0)
   for (let x = 0; x < groups.length; x++) {
-    const tmpBraa = bluePos.getCenterOfMass().getBR(groups[x].getCenterOfMass())
+    const tmpBraa = blueAir.getCenterOfMass().getBR(groups[x].getCenterOfMass())
     if (braa.range < closestRng) {
       braa = tmpBraa
       closestRng = braa.range
@@ -143,7 +143,7 @@ function getEAInfo(groups: AircraftGroup[], bluePos: AircraftGroup): EAInfo {
 
   // pick a random group if not using closest (i.e. not a BRAA request)
   const grp: AircraftGroup = groups[randomNumber(0, groups.length)]
-  const strBR = bluePos.getCenterOfMass().getBR(grp.getCenterOfMass())
+  const strBR = blueAir.getCenterOfMass().getBR(grp.getCenterOfMass())
 
   const info = {
     braa,
@@ -198,7 +198,7 @@ export const drawEA: PictureDrawFunction = (
   const answer = state.reDraw(ctx, true, start)
 
   // get info needed for EA response
-  const eaInfo = getEAInfo(answer.groups, state.bluePos)
+  const eaInfo = getEAInfo(answer.groups, state.blueAir)
   eaInfo.altStack = eaInfo.closestGrp.getAltStack(props.format)
 
   const finalAnswer = {
@@ -212,13 +212,13 @@ export const drawEA: PictureDrawFunction = (
     case 0:
       request = '"EAGLE01, BOGEY DOPE NEAREST GRP"'
       eaInfo.altStack = eaInfo.closestGrp.getAltStack(props.format)
-      eaInfo.aspectH = getAspect(state.bluePos, eaInfo.closestGrp)
+      eaInfo.aspectH = getAspect(state.blueAir, eaInfo.closestGrp)
       finalAnswer.pic = formatBRAA(eaInfo)
       break
     case 1:
       request = '"EAGLE01 STROBE ' + eaInfo.query + '"'
       eaInfo.altStack = eaInfo.grp.getAltStack(props.format)
-      eaInfo.aspectH = getAspect(state.bluePos, eaInfo.grp)
+      eaInfo.aspectH = getAspect(state.blueAir, eaInfo.grp)
       finalAnswer.pic = formatStrobe(eaInfo)
       break
     default:

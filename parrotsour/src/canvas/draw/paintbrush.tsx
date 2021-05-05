@@ -199,9 +199,6 @@ export class PaintBrush {
 
     const vector = headingToRadians(acft.getHeading())
 
-    startx += PIXELS_TO_NM * Math.cos(vector.offset)
-    starty += PIXELS_TO_NM * -Math.sin(vector.offset)
-
     if (dataType === SensorType.ARROW) {
       const dist: number = this.ctx.canvas.width / (this.ctx.canvas.width / 20)
 
@@ -226,7 +223,7 @@ export class PaintBrush {
       endy = starty + dist * -Math.sin(vector.radians)
       endx = startx + dist * Math.cos(vector.radians)
 
-      const retVal = this._drawRadarIff(
+      this._drawRadarIff(
         acft.getIDMatrix(),
         startx,
         starty,

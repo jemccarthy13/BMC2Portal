@@ -1,4 +1,4 @@
-export const test=""
+export const test = ""
 // // Interfaces
 // import { FightAxis, PictureAnswer, PictureDrawFunction, PictureCanvasProps, PictureCanvasState } from 'canvas/canvastypes';
 // import { AircraftGroup } from 'classes/groups/group';
@@ -25,16 +25,16 @@ export const test=""
 //     pic:"", groups:[]
 //   }
 //   const answer1 = state.reDraw( ctx, true, startPos)
-   
+
 //   const boundaries2: Bounds = {
 //     tall: { lowX: 0.2, hiX: 0.8, lowY: 0.8, hiY: 0.9 },
 //     wide: { lowX: 0.30, hiX: 0.40, lowY: 0.25, hiY: 0.29 }
 //   }
-  
+
 //   const startPos2 = getStartPos(ctx, props.orientation.orient, boundaries2, start )
 //   const answer2 = state.reDraw( ctx, true, startPos2 )
-  
-//   if (!state.bluePos) { return { pic: "", groups: []} }
+
+//   if (!state.blueAir) { return { pic: "", groups: []} }
 //   const groups1 = answer1.groups;
 //   const groups2 = answer2.groups;
 
@@ -44,7 +44,7 @@ export const test=""
 //   const closestLead = leadFunc(...groups1.map(function(o:AircraftGroup) { const oPos = o.getCenterOfMass(); return isNS ? oPos.y : oPos.x}))
 
 //   let rngBack;
-  
+
 //   const grpStPos = groups1[0].getCenterOfMass()
 //   if (props.orientation.orient===FightAxis.EW) {
 //     rngBack = new Point(closestLead, grpStPos.y).getBR(new Point(closestFollow, grpStPos.y))
@@ -63,7 +63,7 @@ export const test=""
 //   if (overlap || rngBack.range <=5 || rngBack.range >= 40){
 //     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 //     drawBullseye(ctx, state.bullseye);
-//     state.bluePos.draw(ctx, props.dataStyle)
+//     state.blueAir.draw(ctx, props.dataStyle)
 //     finalAnswer = drawLeadEdge(ctx, props, state, start);
 //   }
 //   else {
@@ -78,6 +78,6 @@ export const test=""
 //       groups: groups1.concat(groups2)
 //     };
 //   }
-  
+
 //   return finalAnswer;
 // }

@@ -40,7 +40,7 @@ export const drawAzimuth: PictureDrawFunction = (
   const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
   const drawDistance: number = randomNumber(3.5 * incr, 10 * incr)
 
-  const startPos = getStartPos(ctx, state.bluePos, props.orientation.orient, {
+  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
     wide: drawDistance,
     start,
   })
@@ -55,7 +55,7 @@ export const drawAzimuth: PictureDrawFunction = (
   // if hard mode and ALSA, we randomize the 2nd groups heading
   // otherwise, pair to first group +/- 10 degrees
   const heading = props.isHardMode
-    ? randomHeading(props.format, state.bluePos.getHeading())
+    ? randomHeading(props.format, state.blueAir.getHeading())
     : ng.getHeading() + randomNumber(-10, 10)
 
   const isNS = FightAxis.isNS(props.orientation.orient)
@@ -115,12 +115,12 @@ export const drawAzimuth: PictureDrawFunction = (
 
   const ngBraaseye = new Braaseye(
     ng.getCenterOfMass(),
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   const sgBraaseye = new Braaseye(
     sg.getCenterOfMass(),
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
 

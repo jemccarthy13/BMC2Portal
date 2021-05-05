@@ -38,13 +38,13 @@ export const drawLadder: PictureDrawFunction = (
    * This means calculating offset per group / depth ahead of time,
    * then creating / drawing groups later
    */
-  const startPos = getStartPos(ctx, state.bluePos, props.orientation.orient, {
+  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
     start,
   })
   const startX = startPos.x
   const startY = startPos.y
 
-  let heading = randomHeading(props.format, state.bluePos.getHeading())
+  let heading = randomHeading(props.format, state.blueAir.getHeading())
 
   let totalArrowOffset = 0
 
@@ -56,7 +56,7 @@ export const drawLadder: PictureDrawFunction = (
 
     heading = !props.isHardMode
       ? heading
-      : randomHeading(props.format, state.bluePos.getHeading())
+      : randomHeading(props.format, state.blueAir.getHeading())
 
     let offsetX = 0
     let offsetY = 0
@@ -87,7 +87,7 @@ export const drawLadder: PictureDrawFunction = (
 
     const grpBraaseye = new Braaseye(
       gPos,
-      state.bluePos.getCenterOfMass(),
+      state.blueAir.getCenterOfMass(),
       state.bullseye
     )
     grpBraaseye.draw(

@@ -63,13 +63,13 @@ export const _clampPictureInContext = (
 
 export const getRestrictedStartPos = (
   ctx: CanvasRenderingContext2D,
-  bluePos: AircraftGroup,
+  blueAir: AircraftGroup,
   orientation: BlueInThe,
   minNMFromBlue: number,
   maxNMFromBlue: number,
   pInfo?: PictureInfo
 ): Point => {
-  const blueLoc = bluePos.getCenterOfMass()
+  const blueLoc = blueAir.getCenterOfMass()
 
   let limitLine = blueLoc.x
   let canvasSize = ctx.canvas.width
@@ -146,7 +146,7 @@ export const getRestrictedStartPos = (
 
 export const getStartPos = (
   ctx: CanvasRenderingContext2D,
-  bluePos: AircraftGroup,
+  blueAir: AircraftGroup,
   orientation: BlueInThe,
   pInfo?: PictureInfo
 ): Point => {
@@ -155,5 +155,5 @@ export const getStartPos = (
     canvasSize = ctx.canvas.height
   }
   const maxMiles = canvasSize / PIXELS_TO_NM
-  return getRestrictedStartPos(ctx, bluePos, orientation, 45, maxMiles, pInfo)
+  return getRestrictedStartPos(ctx, blueAir, orientation, 45, maxMiles, pInfo)
 }

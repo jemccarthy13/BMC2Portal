@@ -33,14 +33,14 @@ export const drawChampagne: PictureDrawFunction = (
 
   const startPos = getStartPos(
     ctx,
-    state.bluePos,
+    state.blueAir,
     props.orientation.orient,
     picture
   )
   const startX = startPos.x
   const startY = startPos.y
 
-  let heading: number = randomHeading(props.format, state.bluePos.getHeading())
+  let heading: number = randomHeading(props.format, state.blueAir.getHeading())
   const tg = new AircraftGroup({
     ctx,
     sx: startX,
@@ -50,7 +50,7 @@ export const drawChampagne: PictureDrawFunction = (
   tg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
-    heading = randomHeading(props.format, state.bluePos.getHeading())
+    heading = randomHeading(props.format, state.blueAir.getHeading())
 
   const isNS = FightAxis.isNS(props.orientation.orient)
 
@@ -73,7 +73,7 @@ export const drawChampagne: PictureDrawFunction = (
   nlg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
-    heading = randomHeading(props.format, state.bluePos.getHeading())
+    heading = randomHeading(props.format, state.blueAir.getHeading())
   let slg: AircraftGroup
   let offsetX = 0
   let offsetX2 = 0
@@ -156,17 +156,17 @@ export const drawChampagne: PictureDrawFunction = (
 
   const tgBraaseye = new Braaseye(
     tgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   const nlgBraaseye = new Braaseye(
     nlgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   const slgBraaseye = new Braaseye(
     slgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
 

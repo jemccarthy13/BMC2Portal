@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Aircraft draws_AFid_correctly 1`] = `
+<canvas
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAApUlEQVQ4jWNgGM5AsIjvn2AR3z90cSZiDRhVODwUVgcr7VwVqq2CTyELAwMDQ4fmQzfZ90K38NnAxMDAwBB1V/HVA5HXjK0BSlNxKWSEMTgrOP4z/2NiYP3D8p+BgYHhfd8nFNPhnKrbssu+cH1j+ML1nZEBC0ARlMoT+vdM8B2j4Ge+/zhNZGBgYGh6LmmBy40YwDFB4Se2PIMVBMUqfyLaZNoDANZrK4UBkSJ0AAAAAElFTkSuQmCC"
+  height="30"
+  width="10"
+/>
+`;
+
+exports[`Aircraft draws_Hid_correctly 1`] = `
+<canvas
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAe0lEQVQ4je3TsQ3CUAxF0RM6KlZgByQKBmApWuZgH2oWyASRaEAIiUfzCxSR/DQ0Ea+y7KvrxmbOCW1o+/3FVMEfnAcY9mFZpcMjnEs9ej0HbMNmSNZ8WDs8cS+D9dD6XUi4fVvdhy8FroKr8Kq+QsMVp1Fbz3ycDP8+b4G2KENdAA1tAAAAAElFTkSuQmCC"
+  height="30"
+  width="10"
+/>
+`;
+
+exports[`Aircraft draws_Nid_correctly 1`] = `
+<canvas
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAnklEQVQ4jWNgGM5gglDBvwlCBf/QxZmINWBU4fBQeNzUYt5jS0tpggr3nHdJ3P5I9xFBhRY6p68/eyrJdNLCpBqXQkYYo4Or/D8T818GNtY//xkYGBgK3k1AcT+c46x7oPvbZx6Gr194GBmwALhC05Mny8TEX///9YsZtxthwFXhjA4jVvPQFKqePHlNV+PqRxz+wQTb9L0fE62Y9gAA5OstCQQiAdYAAAAASUVORK5CYII="
+  height="30"
+  width="10"
+/>
+`;
+
+exports[`Aircraft draws_Sid_correctly 1`] = `
+<canvas
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAmUlEQVQ4jWNgGM7g/2SGP/8nM/xBF2ci1oBRhcND4f9Ehsr/oQxChE10ZGhjMGF4RFjhcYatDNIM3P/jGKJwKWSEMf7PZvjH8JfhP8Nvhv8MDAwMjLkMLJgmMjAwMBxjyGTgZWBi4GVgxm01AwMD43yGmQzPGX4wsOJzIwwcZFDH7xmYqZsZHjFcZriJSzEG+F/AcIRoxbQHABATH4G/PExqAAAAAElFTkSuQmCC"
+  height="30"
+  width="10"
+/>
+`;

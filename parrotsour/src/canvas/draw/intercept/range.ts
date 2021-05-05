@@ -40,14 +40,14 @@ export const drawRange: PictureDrawFunction = (
 
   const startPos = getStartPos(
     ctx,
-    state.bluePos,
+    state.blueAir,
     props.orientation.orient,
     picture
   )
   const startX = startPos.x
   const startY = startPos.y
 
-  let heading: number = randomHeading(props.format, state.bluePos.getHeading())
+  let heading: number = randomHeading(props.format, state.blueAir.getHeading())
 
   const tg = new AircraftGroup({
     ctx,
@@ -58,7 +58,7 @@ export const drawRange: PictureDrawFunction = (
   tg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
-    heading = randomHeading(props.format, state.bluePos.getHeading())
+    heading = randomHeading(props.format, state.blueAir.getHeading())
 
   let lg: AircraftGroup
   let m2: Point
@@ -115,12 +115,12 @@ export const drawRange: PictureDrawFunction = (
 
   const lgBraaseye = new Braaseye(
     lgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
   const tgBraaseye = new Braaseye(
     tgPos,
-    state.bluePos.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(),
     state.bullseye
   )
 

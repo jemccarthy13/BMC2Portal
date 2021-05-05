@@ -92,6 +92,7 @@ export function drawText(
   const pos = clampInContext(ctx, x, y)
 
   ctx.fillText(text, pos.x, pos.y)
+  ctx.fillText(text, pos.x, pos.y)
 }
 
 /**
@@ -277,7 +278,7 @@ export function drawFullInfo(
     if (showMeasurements) {
       new Braaseye(
         grpPos,
-        state.bluePos.getCenterOfMass(),
+        state.blueAir.getCenterOfMass(),
         state.bullseye
       ).draw(ctx, true, braaFirst)
     }
