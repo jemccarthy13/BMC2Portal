@@ -3,13 +3,13 @@ import { PIXELS_TO_NM } from "../utils/psmath"
 import { Point } from "./point"
 
 describe("point", () => {
-  it("has X/Y", () => {
+  it("has_XY", () => {
     const p: Point = new Point(10, 10)
     expect(p.x).toEqual(10)
     expect(p.y).toEqual(10)
   })
 
-  it("canComputeBearingAndRangeToPoint", () => {
+  it("computs_BR_to_other_point", () => {
     const p: Point = new Point(10, 10)
 
     // p2 is directly West
@@ -71,7 +71,7 @@ describe("point", () => {
     expect(br.bearing).toEqual("315")
   })
 
-  it("canComputeStraightDistanceNM", () => {
+  it("computes_straight_distance_NM_to_other_point", () => {
     const p: Point = new Point(100, 100)
     const p2: Point = new Point(52, 76)
     let dist = p.straightDistNM(p2, BlueInThe.NORTH)

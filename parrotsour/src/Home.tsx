@@ -64,7 +64,6 @@ const Home = (): ReactElement => {
           </Suspense>
         </HashRouter>
       </div>
-      <div id="snackbar" />
     </div>
   )
 }

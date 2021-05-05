@@ -13,22 +13,22 @@ export const SnackbarUtilsConfigurator: React.FC = () => {
 }
 
 export default {
-  success(msg: string, options: OptionsObject = {}): void {
-    this.toast(msg, { ...options, variant: "success" })
+  success(msg: string, options: OptionsObject = {}): SnackbarKey {
+    return this.toast(msg, { ...options, variant: "success" })
   },
-  warning(msg: string, options: OptionsObject = {}): void {
-    this.toast(msg, { ...options, variant: "warning" })
+  warning(msg: string, options: OptionsObject = {}): SnackbarKey {
+    return this.toast(msg, { ...options, variant: "warning" })
   },
-  info(msg: string, options: OptionsObject = {}): void {
-    this.toast(msg, { ...options, variant: "info" })
+  info(msg: string, options: OptionsObject = {}): SnackbarKey {
+    return this.toast(msg, { ...options, variant: "info" })
   },
-  error(msg: string, options: OptionsObject = {}): void {
-    this.toast(msg, { ...options, variant: "error" })
+  error(msg: string, options: OptionsObject = {}): SnackbarKey {
+    return this.toast(msg, { ...options, variant: "error" })
   },
   closeSnackbar(key: SnackbarKey): void {
     snackbarRef.closeSnackbar(key)
   },
-  toast(msg: string, options: OptionsObject = {}): void {
-    snackbarRef.enqueueSnackbar(msg, options)
+  toast(msg: string, options: OptionsObject = {}): SnackbarKey {
+    return snackbarRef.enqueueSnackbar(msg, options)
   },
 }

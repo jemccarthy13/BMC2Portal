@@ -174,7 +174,7 @@ describe("_clampPictureInContext", () => {
     )
   })
 
-  it("clamp_shouldWarnRandomPointProvided", () => {
+  it("clamp_warns_no_point_provided", () => {
     const warnSpy = jest.spyOn(global.console, "warn").mockImplementation()
     const result = _clampPictureInContext(ctx, {}, BlueInThe.EAST)
 
@@ -182,9 +182,9 @@ describe("_clampPictureInContext", () => {
     warnSpy.mockRestore()
 
     expect(result.x).toBeLessThan(ctx.canvas.width - 1)
-    expect(result.x).toBeGreaterThan(1)
+    expect(result.x).toBeGreaterThanOrEqual(1)
     expect(result.y).toBeLessThan(ctx.canvas.height - 1)
-    expect(result.y).toBeGreaterThan(1)
+    expect(result.y).toBeGreaterThanOrEqual(1)
   })
 })
 
@@ -214,6 +214,7 @@ describe("getRestrictedStartPos", () => {
         wide: TEN_NM,
       }
     )
+    fail("not implemented")
     //expect(startPos.getBR(new Point(100, 100)).range).toBeGreaterThan(45)
     //expect(startPos.getBR(new Point(100, 100)).range).toBeLessThan(50)
   })

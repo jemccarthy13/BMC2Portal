@@ -1,6 +1,6 @@
-import { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom-canvas-2';
 
-import Adapter from 'enzyme-adapter-react-16';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
 const { window } = jsdom;
@@ -18,5 +18,13 @@ global.requestAnimationFrame = function (callback) {
 global.cancelAnimationFrame = function (id) {
   clearTimeout(id);
 };
+
+function copyProps(src, target) {
+  Object.defineProperties(target, {
+    ...Object.getOwnPropertyDescriptors(src),
+    ...Object.getOwnPropertyDescriptors(target),
+  })
+}
+copyProps(window, global)
 
 configure({adapter: new Adapter()})

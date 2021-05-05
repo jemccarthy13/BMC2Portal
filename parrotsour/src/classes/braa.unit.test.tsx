@@ -5,7 +5,7 @@ const canvasSerializer = require("jest-canvas-snapshot-serializer")
 
 expect.addSnapshotSerializer(canvasSerializer)
 
-describe("BRAA Class", () => {
+describe("BRAA", () => {
   let canvas: HTMLCanvasElement
   let ctx: CanvasRenderingContext2D
 
@@ -21,25 +21,25 @@ describe("BRAA Class", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
   })
 
-  it("constructABraa", () => {
+  it("constructs_correctly", () => {
     const br = new BRAA(90, 20)
     expect(br.bearing).toEqual("090")
     expect(br.range).toEqual(20)
     expect(br.bearingNum).toEqual(90)
   })
 
-  it("BraaToString", () => {
+  it("converts_to_pretty_string", () => {
     const br = new BRAA(90, 20)
     expect(br.toString()).toEqual("090/20")
   })
 
-  it("drawsCorrectly", () => {
+  it("draws_correctly", () => {
     const br = new BRAA(90, 20)
     br.draw(ctx, 10, 10, "black", true)
     expect(canvas).toMatchSnapshot()
   })
 
-  it("drawsOnlyOnShowMeasurements", () => {
+  it("draws_only_when_showmeasure_true", () => {
     const br = new BRAA(90, 20)
     br.draw(ctx, 10, 10, "black", false)
     expect(canvas).toMatchSnapshot()
