@@ -50,6 +50,7 @@ export class Aircraft {
 
   private intent = new AircraftIntent()
   private tasking: Tasking | undefined
+  private capping = false
 
   private ctx: CanvasRenderingContext2D | undefined
 
@@ -93,30 +94,6 @@ export class Aircraft {
   }
 
   /**
-   * Get the center of mass position for this group.
-   *
-   * The type of data trail dictates where the center of mass is.
-   * (i.e. radar - last sensed radar vs. arrow - loc of arrow head)
-   *
-   * @param ctx Current drawing context
-   * @param dataStyle (Radar & IFF) | Arrows - must explicitly be set if drawing
-   *                  anything other than arrows
-   */
-  private _getCenterOfMass(
-    ctx?: CanvasRenderingContext2D,
-    dataStyle?: SensorType
-  ): Point {
-    dataStyle = dataStyle || SensorType.ARROW
-    if (dataStyle === SensorType.ARROW) {
-      return this._getCenterOfMassArrow(ctx)
-    } else {
-      // return this.snsrData.current
-      throw "help"
-      //return Point.DEFAULT
-    }
-  }
-
-  /**
    * The "center of mass" for a singular aircraft is the end point
    * of the Arrow.
    */
@@ -135,8 +112,29 @@ export class Aircraft {
     )
   }
 
-  getCenterOfMass(): Point {
-    return this._getCenterOfMass()
+  /**
+   * Get the center of mass position for this group.
+   *
+   * The type of data trail dictates where the center of mass is.
+   * (i.e. radar - last sensed radar vs. arrow - loc of arrow head)
+   *
+   * @param ctx Current drawing context
+   * @param dataStyle (Radar & IFF) | Arrows - must explicitly be set if drawing
+   *                  anything other than arrows
+   */
+  getCenterOfMass(
+    dataStyle?: SensorType,
+    ctx?: CanvasRenderingContext2D
+  ): Point {
+    dataStyle = dataStyle || SensorType.ARROW
+    if (dataStyle === SensorType.ARROW) {
+      // TODO -- DATATRAIL -- move this function to DataTrail
+      return this._getCenterOfMassArrow(ctx)
+    } else {
+      console.warn("DataTrails not supported. TODO -- DATATRAIL")
+      // return this.dataTrail.present(dataStyle)
+      return new Point(-1, -1)
+    }
   }
 
   public getHeading(): number {
@@ -176,18 +174,18 @@ export class Aircraft {
    * Move the arrow once based on the current heading / vector.
    */
   move(): void {
-    // if (this.isCapping()) return
+    if (!this.capping) {
+      // convert heading to radians and calculate how much arrow needs to move
+      const rads: number = headingToRadians(this.getHeading()).radians
+      const offsetX: number = 7 * Math.cos(rads)
+      const offsetY: number = -7 * Math.sin(rads)
 
-    // convert heading to radians and calculate how much arrow needs to move
-    const rads: number = headingToRadians(this.getHeading()).radians
-    const offsetX: number = 7 * Math.cos(rads)
-    const offsetY: number = -7 * Math.sin(rads)
+      // apply offsets based on start/end position
+      this.startPos.x += offsetX
+      this.startPos.y += offsetY
 
-    // apply offsets based on start/end position
-    this.startPos.x += offsetX
-    this.startPos.y += offsetY
-
-    this.turnToTarget()
+      this.turnToTarget()
+    }
   }
 
   turnToTarget(): void {
@@ -211,7 +209,7 @@ export class Aircraft {
       divisor = 1
     }
 
-    this.setCurHeading(this.getHeading() + turnDegrees / divisor)
+    this.setCurHeading(Math.floor(this.getHeading() + turnDegrees / divisor))
   }
 
   updateIntent(newIntent: Partial<IntentParams>): void {
@@ -228,16 +226,20 @@ export class Aircraft {
         this.intent.removeRoutingPoint()
       }
       const nextPt = this.intent.getNextRoutingPoint()
-      this.updateIntent({
-        desiredHeading: this.getCenterOfMass().getBR(nextPt).bearingNum,
-      })
+      if (nextPt)
+        this.updateIntent({
+          desiredHeading: this.getCenterOfMass().getBR(nextPt).bearingNum,
+        })
+      this.turnToTarget()
     } else {
-      throw "Need to make capping logic compatible with Intent & class structure."
+      this.capping =
+        this.intent.atFinalDestination() &&
+        this.intent.getDesiredHeading() == this.heading
     }
   }
 
-  hasRouting(): boolean {
-    return !this.intent.atFinalDestination()
+  atFinalDestination(): boolean {
+    return this.intent.atFinalDestination()
   }
 
   getNextRoutingPoint(): Point {
@@ -246,6 +248,10 @@ export class Aircraft {
 
   addRoutingPoint(pt: Point): void {
     this.intent.addRoutingPoint(pt)
+  }
+
+  isCapping(): boolean {
+    return this.capping
   }
 
   /**

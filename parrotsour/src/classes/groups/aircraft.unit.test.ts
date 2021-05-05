@@ -37,13 +37,18 @@ describe("Aircraft", () => {
     expect(acft.getAltitude()).toBeGreaterThanOrEqual(0o5)
   })
 
-  it("computes_center_of_mass", () => {
+  it("computes_center_of_mass_arrows", () => {
     const bluePos = new Point(50, 50)
     const acft = new Aircraft({ sx: bluePos.x, sy: bluePos.y, ctx: ctx })
     expect(acft.getCenterOfMass()).toEqual({ x: 74, y: 50 })
 
     acft.setCurHeading(180)
     expect(acft.getCenterOfMass()).toEqual({ x: 49, y: 74 })
+  })
+
+  it("computs_center_of_mass_rawdata", () => {
+    const acft = new Aircraft({ sx: 50, sy: 50, hdg: 90 })
+    expect(acft.getCenterOfMass(SensorType.RAW)).toEqual(new Point(10, 10))
   })
 
   it("draws_Hid_correctly", () => {
@@ -201,7 +206,57 @@ describe("Aircraft", () => {
     })
     acft.updateIntent({ desiredHeading: 135 })
     acft.move() // move once
-    expect(acft.getHeading()).toEqual(180 - (180 - 135) / 7)
+    expect(acft.getHeading()).toEqual(Math.floor(180 - (180 - 135) / 7))
     expect(acft.getStartPos()).toEqual(new Point(50, 45))
+  })
+
+  it("handles_at_next_routing_point", () => {
+    const acft = new Aircraft({
+      sx: 10,
+      sy: 30,
+      hdg: 90,
+    })
+    acft.addRoutingPoint(new Point(30, 30))
+    acft.addRoutingPoint(new Point(40, 30))
+    acft.doNextRouting()
+    expect(acft.isCapping()).toEqual(false)
+    expect(acft.atFinalDestination()).toEqual(false)
+    expect(acft.getHeading()).toEqual(90)
+    expect(acft.getStartPos()).toEqual(new Point(10, 30))
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    expect(acft.atFinalDestination()).toEqual(true)
+    expect(acft.isCapping()).toEqual(true)
+  })
+
+  it("handles_chained_routing", () => {
+    const acft = new Aircraft({
+      sx: 10,
+      sy: 30,
+      hdg: 90,
+    })
+    acft.addRoutingPoint(new Point(100, 100))
+    acft.addRoutingPoint(new Point(200, 200))
+    acft.doNextRouting()
+    expect(acft.isCapping()).toEqual(false)
+    expect(acft.atFinalDestination()).toEqual(false)
+    expect(acft.getHeading()).toEqual(96)
+    expect(acft.getStartPos()).toEqual(new Point(10, 30))
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    acft.move()
+    acft.doNextRouting()
+    expect(acft.atFinalDestination()).toEqual(false)
+    expect(acft.isCapping()).toEqual(false)
   })
 })

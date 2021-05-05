@@ -41,10 +41,6 @@ export class AircraftIntent {
     this.desiredLoc = newIntent.desiredLoc || this.desiredLoc
   }
 
-  hasRouting(): boolean {
-    return this.desiredLoc.length !== 0
-  }
-
   addRoutingPoint(pt: Point): void {
     this.desiredLoc.push(pt)
   }

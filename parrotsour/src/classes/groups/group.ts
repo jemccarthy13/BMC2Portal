@@ -182,7 +182,7 @@ export class AircraftGroup extends Array<Aircraft> {
 
   // To check if a group has routing, see if any of the AC have routing
   hasRouting(): boolean {
-    return this.find((ac) => ac.hasRouting()) !== undefined
+    return this.find((ac) => !ac.atFinalDestination()) !== undefined
   }
 
   doNextRouting(): void {
