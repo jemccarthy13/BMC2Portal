@@ -156,17 +156,52 @@ describe("Aircraft", () => {
   })
 
   it("doesnt_turn_at_target", () => {
-    // the turn goes off of center of mass, so here we position the aircraft
-    // such that the turn math becomes easier ('desired Hdg' = 90, so the updated
-    // heading is easier to expect)
+    const dest = new Point(50, 50)
+    const acft = new Aircraft({
+      sx: dest.x,
+      sy: 38,
+      hdg: 180,
+    })
+    acft.turnToTarget() // expect nothing to change
+    expect(acft.getHeading()).toEqual(180)
+    expect(acft.getStartPos()).toEqual(new Point(50, 38))
+  })
+
+  it("sharp_turn_near_desired_hdg", () => {
     const dest = new Point(50, 50)
     const acft = new Aircraft({
       sx: dest.x,
       sy: dest.y,
       hdg: 180,
     })
-    acft.turnToTarget()
+    acft.updateIntent({ desiredHeading: 175 })
+    acft.turnToTarget() // < 7 turn delta is snap to desired (to avoid data trail sin wave)
+    expect(acft.getHeading()).toEqual(175)
+    expect(acft.getStartPos()).toEqual(dest)
+  })
+
+  it("moves_along_heading", () => {
+    const dest = new Point(50, 50)
+    const acft = new Aircraft({
+      sx: dest.x,
+      sy: 38,
+      hdg: 180,
+    })
+    acft.move() // move once
     expect(acft.getHeading()).toEqual(180)
-    expect(acft.getStartPos()).toEqual(new Point(50, 50))
+    expect(acft.getStartPos()).toEqual(new Point(50, 45))
+  })
+
+  it("turns_during_move_if_intent", () => {
+    const dest = new Point(50, 50)
+    const acft = new Aircraft({
+      sx: dest.x,
+      sy: 38,
+      hdg: 180,
+    })
+    acft.updateIntent({ desiredHeading: 135 })
+    acft.move() // move once
+    expect(acft.getHeading()).toEqual(180 - (180 - 135) / 7)
+    expect(acft.getStartPos()).toEqual(new Point(50, 45))
   })
 })

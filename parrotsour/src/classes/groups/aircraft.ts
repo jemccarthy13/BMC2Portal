@@ -80,6 +80,8 @@ export class Aircraft {
     this.altitude = p.alt || randomNumber(low, hi)
 
     this.ctx = p.ctx || undefined
+
+    this.intent.setDesiredHeading(this.heading)
   }
 
   public getAltitude(): number {
@@ -175,7 +177,6 @@ export class Aircraft {
    */
   move(): void {
     // if (this.isCapping()) return
-    this.turnToTarget()
 
     // convert heading to radians and calculate how much arrow needs to move
     const rads: number = headingToRadians(this.getHeading()).radians
@@ -185,6 +186,8 @@ export class Aircraft {
     // apply offsets based on start/end position
     this.startPos.x += offsetX
     this.startPos.y += offsetY
+
+    this.turnToTarget()
   }
 
   turnToTarget(): void {

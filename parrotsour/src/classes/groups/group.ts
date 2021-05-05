@@ -149,6 +149,10 @@ export class AircraftGroup extends Array<Aircraft> {
       p.sy += PIXELS_TO_NM * -Math.sin(vectors.offset)
     }
 
+    // TODO -- MANEUVER -- % chance of 2 maneuvers (i.e. flank turn back hot)
+    if (randomNumber(0, 100) < 20) {
+      this.maneuvers = 1
+    }
     // TODO -- CAP -- console.warn("Fix isCapping (group/aircraft capping logic is broken)")
   }
 
