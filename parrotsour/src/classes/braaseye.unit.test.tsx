@@ -50,4 +50,10 @@ describe("Braaseye", () => {
     braaseye.draw(ctx, true, true, -10, 10)
     expect(canvas).toMatchSnapshot()
   })
+
+  it("draws_correctly_braaFirst", () => {
+    const braaseye = new Braaseye(toPoint, bluePos, bullseye)
+    braaseye.draw(ctx, true, false, -10, 10)
+    expect(canvas).toMatchSnapshot()
+  })
 })
