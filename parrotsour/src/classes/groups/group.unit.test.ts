@@ -5,6 +5,7 @@ import { ACType, Aircraft } from "./aircraft"
 import { IDMatrix } from "./id"
 import { SensorType } from "./datatrail"
 import Tasking from "../taskings/tasking"
+import { FORMAT } from "../supportedformats"
 
 /**
  * TODO -- TESTING RANDOM --
@@ -52,7 +53,7 @@ describe("AircraftGroup", () => {
       const myMock = jest
         .spyOn(AltStackHelper, "getAltStack")
         .mockImplementationOnce(jest.fn())
-      grp.getAltStack("alsa")
+      grp.getAltStack(FORMAT.ALSA)
       expect(myMock).toHaveBeenCalled()
     })
 
@@ -135,8 +136,8 @@ describe("AircraftGroup", () => {
         nContacts: 2,
       })
       const dest = new Point(20, 20)
-      grp.addRoutingPoint(dest)
       const myMock = jest.spyOn(Aircraft.prototype, "addRoutingPoint")
+      grp.addRoutingPoint(dest)
       expect(grp.getNextRoutingPoint()).toEqual(dest)
       expect(myMock).toHaveBeenCalledTimes(2)
     })
