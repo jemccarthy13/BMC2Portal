@@ -60,6 +60,7 @@
     "eslint-plugin-no-unsanitized": "^3.1.5",
     "eslint-plugin-prototype-pollution-security-rules": "^1.0.6",
     "eslint-plugin-react": "^7.23.2",
+    "history": "^5.0.0",
     "jest-canvas-mock": "^2.3.1",
     "jest-canvas-snapshot-serializer": "^1.0.1",
     "rimraf": "^3.0.2",
