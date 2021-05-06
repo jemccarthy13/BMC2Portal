@@ -4,12 +4,16 @@
     $email=$_POST['email'];
     $image=$_POST['image'];
     $comments=$_POST['comments'];
+    $problem_type=$_POST['problemtype'];
 
-	if (!isset($email)){
-		$email=$_PUT['email'];
-	}
-	if (!isset($image)){
-		$image=$_PUT['image'];
+    if (!isset($email)){
+      $email=$_PUT['email'];
+    }
+    if (!isset($image)){
+      $image=$_PUT['image'];
+    }
+    if(!isset($problem_type)){
+      $problem_type=$_PUT["othprob"]
     }
     $headers="From:".$email."\r\n";
     $headers .= "MIME-Version: 1.0\r\n"; 
@@ -28,7 +32,18 @@
     
     $my_file = "issue".$nowtime.".png";
     $my_path = "images/";
+
     $my_subject = "Issue Reported";
+    if ($problem_type === "picprob"){
+      $my_subject = $my_subject." -- Picture"
+    } else if ($problem_type === "othprob"){
+      $my_subject = $my_subject." -- Other"
+    } else if ($problem_type === "feature"){
+      $my_subject = $my_subject." -- Feature"
+    } else {
+      $my_subject = $my_subject." -- Unknown"
+    }
+
     $my_message = "Reported by ".$email.': '.$comments;
     mail_attachment($my_file, $my_path, "jem3973@rit.edu", $email, $email, $email, $my_subject, $my_message);        
     mail_attachment($my_file, $my_path, "john.mccarthy.24@us.af.mil", $email, $email, $email, $my_subject, $my_message);
