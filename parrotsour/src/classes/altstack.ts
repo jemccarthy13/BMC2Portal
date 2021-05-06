@@ -86,5 +86,5 @@ export function getAltStack(altitudes: number[], format: string): AltStack {
     }
   }
 
-  return { stack: answer, fillIns: answer2 }
+  return { stack: answer.trim(), fillIns: answer2.trim() }
 }
