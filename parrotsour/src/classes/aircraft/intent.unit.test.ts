@@ -113,8 +113,6 @@ describe("Intent", () => {
       const intent = new AircraftIntent({
         desiredLoc: [p1],
       })
-      const p = intent.getNextRoutingPoint()
-      console.log(p1.x, p1.y, p?.x, p?.y)
       expect(intent.atNextRoutingPoint(p1)).toEqual(true)
       const p2 = new Point(50 + 3 * PIXELS_TO_NM, 50 + 3 * PIXELS_TO_NM)
       expect(intent.atNextRoutingPoint(p2)).toEqual(true)
