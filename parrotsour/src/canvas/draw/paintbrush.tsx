@@ -1,6 +1,6 @@
-import { Aircraft } from "../../classes/groups/aircraft"
-import { SensorType } from "../../classes/groups/datatrail"
-import { IDMatrix } from "../../classes/groups/id"
+import { Aircraft } from "../../classes/aircraft/aircraft"
+import { SensorType } from "../../classes/aircraft/datatrail/datatrail"
+import { IDMatrix } from "../../classes/aircraft/id"
 import { Point } from "../../classes/point"
 import { headingToRadians, PIXELS_TO_NM, toRadians } from "../../utils/psmath"
 

@@ -1,9 +1,9 @@
 // Classes & Interfaces
-import { SensorType } from "../groups/datatrail"
+import { SensorType } from "../aircraft/datatrail/datatrail"
 import { Point } from "../point"
-import { ACType, Aircraft } from "../groups/aircraft"
-import { IDMatrix } from "../groups/id"
-import { IntentParams } from "../groups/intent"
+import { ACType, Aircraft } from "../aircraft/aircraft"
+import { IDMatrix } from "../aircraft/id"
+import { IntentParams } from "../aircraft/intent"
 import Tasking from "../taskings/tasking"
 import { FORMAT } from "../supportedformats"
 
@@ -91,11 +91,11 @@ export class AircraftGroup extends Array<Aircraft> {
   }
 
   /*************************************************************************
-   * Attribute accessors
+   * Location
    *************************************************************************/
   /**
    * @returns Start position for where this group's draw will start; will be approximately
-   * the tail end of the data trail.
+   * the 'rear' end of the data trail.
    */
   getStartPos(): Point {
     return this.startPos
@@ -131,81 +131,8 @@ export class AircraftGroup extends Array<Aircraft> {
     )
   }
 
-  /**
-   * @returns Number of contacts in this group
-   */
-  getStrength(): number {
-    return this.length
-  }
-
-  /**
-   * Update maneuver count
-   * @param newNumManeuvers New number of maneuvers remaining
-   */
-  setManeuvers(newNumManeuvers: number): void {
-    this.maneuvers = newNumManeuvers
-  }
-
-  /**
-   * @returns true iff group has at least one maneuver left.
-   */
-  doesManeuvers(): boolean {
-    return this.maneuvers > 0
-  }
-
-  /**
-   * @returns Current group label
-   */
-  getLabel(): string {
-    return this.label
-  }
-
-  /**
-   * @param newLbl New group label
-   */
-  setLabel(newLbl: string): void {
-    this.label = newLbl
-  }
-
-  /**
-   * @returns The Type of Aircraft in this group. Currently only supports one type
-   * for the entire group (first aircraft)
-   */
-  getType(): ACType {
-    return this[0].getType()
-  }
-
   /*************************************************************************
-   * Altitude(s)
-   *************************************************************************/
-  /**
-   * @returns Altitude of the highest Aircraft in this group
-   */
-  getAltitude(): number {
-    return Math.max(...this.getAltitudes())
-  }
-
-  /**
-   * @param format The desired formatting
-   * @returns AltStack containing formatted STACKS/Fillins
-   */
-  getAltStack(format: FORMAT): AltStack {
-    return getAltStack(this.getAltitudes(), format)
-  }
-
-  /**
-   * @returns number[] containing the altitude of every Aircraft in this Group
-   */
-  getAltitudes(): number[] {
-    const alts = []
-    for (let idx = 0; idx < this.length; idx++) {
-      alts.push(this[idx].getAltitude())
-    }
-    return alts
-  }
-
-  /*************************************************************************
-   * Heading and track direction
+   * Heading and track direction/aspect
    *************************************************************************/
   /**
    * @returns Current heading of the Group. Currently assumes all Aicraft are
@@ -246,50 +173,91 @@ export class AircraftGroup extends Array<Aircraft> {
   setPicDir(newDir: string | undefined): void {
     this.picDir = newDir
   }
+  /**
+   * Update maneuver count
+   * @param newNumManeuvers New number of maneuvers remaining
+   */
+  setManeuvers(newNumManeuvers: number): void {
+    this.maneuvers = newNumManeuvers
+  }
+
+  /**
+   * @returns true iff group has at least one maneuver left.
+   */
+  doesManeuvers(): boolean {
+    return this.maneuvers > 0
+  }
 
   /*************************************************************************
-   * Routing
+   * Altitude(s)
    *************************************************************************/
   /**
-   * @returns true iff there is an Aircraft with intended destination
+   * @returns Altitude of the highest Aircraft in this group
    */
-  hasRouting(): boolean {
-    return this.find((ac) => !ac.atFinalDestination()) !== undefined
+  getAltitude(): number {
+    return Math.max(...this.getAltitudes())
   }
 
   /**
-   * @returns The next Point on this group's intended route. Assumes
-   * all Aircraft in the Group are following the same route, therefore returns
-   * only the first Aircraft's next routing point.
+   * @param format The desired formatting
+   * @returns AltStack containing formatted STACKS/Fillins
    */
-  getNextRoutingPoint(): Point {
-    return this[0].getNextRoutingPoint()
+  getAltStack(format: FORMAT): AltStack {
+    return getAltStack(this.getAltitudes(), format)
   }
 
   /**
-   * @param pt Point to add to all group Aircraft(s) routes
+   * @returns number[] containing the altitude of every Aircraft in this Group
    */
-  addRoutingPoint(pt: Point): void {
-    this.forEach((ac) => ac.addRoutingPoint(pt))
-  }
-
-  /**
-   * Perform the next routing action for each aircraft. See Aircraft.doNextRouting()
-   */
-  doNextRouting(): void {
-    this.forEach((ac) => ac.doNextRouting())
-  }
-
-  /**
-   * Update intent for each Aircraft in the group. See Aircraft.updateIntent()
-   * @param newIntent Object representing new intent for each Aircraft.
-   */
-  updateIntent(newIntent: Partial<IntentParams>): void {
-    this.forEach((ac) => ac.updateIntent(newIntent))
+  getAltitudes(): number[] {
+    const alts = []
+    for (let idx = 0; idx < this.length; idx++) {
+      alts.push(this[idx].getAltitude())
+    }
+    return alts
   }
 
   /*************************************************************************
-   * Drawing, movement and animation
+   * Speed -- TODO
+   *************************************************************************/
+
+  /*************************************************************************
+   * ID
+   *************************************************************************/
+  /**
+   * @returns Current group label
+   */
+  getLabel(): string {
+    return this.label
+  }
+
+  /**
+   * @param newLbl New group label
+   */
+  setLabel(newLbl: string): void {
+    this.label = newLbl
+  }
+
+  /*************************************************************************
+   * Fillins
+   *************************************************************************/
+  /**
+   * @returns Number of contacts in this group
+   */
+  getStrength(): number {
+    return this.length
+  }
+
+  /**
+   * @returns The Type of Aircraft in this group. Currently only supports one type
+   * for the entire group (first aircraft)
+   */
+  getType(): ACType {
+    return this[0].getType()
+  }
+
+  /*************************************************************************
+   * Drawing and animation
    *************************************************************************/
   /**
    * Draw each aircraft. See Aircraft.draw(...)
@@ -312,6 +280,47 @@ export class AircraftGroup extends Array<Aircraft> {
    */
   updateAltitude(): void {
     this.forEach((ac) => ac.doNextAltChange())
+  }
+
+  /*************************************************************************
+   * Routing
+   *************************************************************************/
+  /**
+   * Update intent for each Aircraft in the group. See Aircraft.updateIntent()
+   * @param newIntent Object representing new intent for each Aircraft.
+   */
+  updateIntent(newIntent: Partial<IntentParams>): void {
+    this.forEach((ac) => ac.updateIntent(newIntent))
+  }
+
+  /**
+   * @returns true iff there is an Aircraft with intended destination
+   */
+  hasRouting(): boolean {
+    return this.find((ac) => !ac.atFinalDestination()) !== undefined
+  }
+
+  /**
+   * @returns The next Point on this group's intended route. Assumes
+   * all Aircraft in the Group are following the same route, therefore returns
+   * only the first Aircraft's next routing point.
+   */
+  getNextRoutingPoint(): Point | undefined {
+    return this[0].getNextRoutingPoint()
+  }
+
+  /**
+   * @param pt Point to add to all group Aircraft(s) routes
+   */
+  addRoutingPoint(pt: Point): void {
+    this.forEach((ac) => ac.addRoutingPoint(pt))
+  }
+
+  /**
+   * Perform the next routing action for each aircraft. See Aircraft.doNextRouting()
+   */
+  doNextRouting(): void {
+    this.forEach((ac) => ac.doNextRouting())
   }
 
   /*************************************************************************

@@ -12,7 +12,7 @@ import { ProceduralQT } from "../pscomponents/quicktips/proceduralQT"
 import DifficultySelector from "./difficultyselector"
 import ChatBox from "./chatbox"
 import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
-import { SensorType } from "../classes/groups/datatrail"
+import { SensorType } from "../classes/aircraft/datatrail/datatrail"
 import { FORMAT } from "../classes/supportedformats"
 
 const ProceduralCanvas = lazy(

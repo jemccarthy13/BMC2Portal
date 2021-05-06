@@ -104,10 +104,9 @@ function doAnimation(
 
       let newHeading = groups[x].getHeading()
 
-      if (groups[x].hasRouting()) {
-        newHeading = groups[x]
-          .getCenterOfMass()
-          .getBR(groups[x].getNextRoutingPoint()).bearingNum
+      const nextPoint = groups[x].getNextRoutingPoint()
+      if (nextPoint) {
+        newHeading = groups[x].getCenterOfMass().getBR(nextPoint).bearingNum
       }
       groups[x].updateIntent({
         desiredHeading: newHeading,

@@ -1,4 +1,4 @@
-import { ACType } from "../classes/groups/aircraft"
+import { ACType } from "../classes/aircraft/aircraft"
 import { PictureAnswer } from "../canvas/canvastypes"
 import { AircraftGroup } from "../classes/groups/group"
 import { Point } from "../classes/point"
@@ -235,8 +235,8 @@ export function aiProcess(
           "working " + convertToCGRS(assetSPos.x, assetSPos.y),
           msg.voice
         )
-      } else if (asset.getNextRoutingPoint()) {
-        const rPoint = asset.getNextRoutingPoint()
+      } else if (asset.getNextRoutingPoint() !== undefined) {
+        const rPoint = asset.getNextRoutingPoint()!
         const current = convertToCGRS(assetSPos.x, assetSPos.y).replace("+", "")
         const desired = convertToCGRS(rPoint.x, rPoint.y)
         sendResponse(

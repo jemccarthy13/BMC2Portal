@@ -1,6 +1,25 @@
-import { BlueInThe } from "../canvas/canvastypes"
-import { PIXELS_TO_NM } from "../utils/psmath"
+const PIXELS_TO_NM = 4
+
+// Come back to this to self-contain 100% coverage in unit tests
+// // mock BRAA to self-contain intent tests
+// const mockFn = jest.fn()
+// jest.mock("./braa", () => {
+//   return function (x: number, y: number) {
+//     return {
+//       x,
+//       y,
+//       getBR: mockFn,
+//       getStraightDistanceNM: mockFn,
+//     }
+//   }
+// })
+// // // eslint-disable-next-line @typescript-eslint/no-var-requires
+// // import { BRAA } from "./braa"
+// jest.mock("./braa")
+
 import { Point } from "./point"
+
+import { BlueInThe } from "../canvas/canvastypes"
 
 describe("point", () => {
   it("has_XY", () => {

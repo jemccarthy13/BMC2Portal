@@ -1,11 +1,21 @@
 import { Point } from "../point"
 import { ACType, Aircraft } from "./aircraft"
-import { SensorType } from "./datatrail"
+import { SensorType } from "./datatrail/datatrail"
 import { IDMatrix } from "./id"
 import Tasking from "../taskings/tasking"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const canvasSerializer = require("jest-canvas-snapshot-serializer")
 
+/**
+ * Integration tests for Aircraft.
+ *
+ * NOTE:
+ * This integration test covers Aircraft with the real underlying external
+ * references.
+ *
+ * This means if the underlying unit tests (like Point) were to fail,
+ * there's a high likelihood this test will also fail.
+ */
 expect.addSnapshotSerializer(canvasSerializer)
 describe("Aircraft", () => {
   const canvas = document.createElement("canvas")
@@ -48,7 +58,7 @@ describe("Aircraft", () => {
       acft.setCurHeading(180)
       expect(acft.getCenterOfMass()).toEqual({ x: 49, y: 74 })
     })
-    it("computs_for_rawdata", () => {
+    it("computes_for_rawdata", () => {
       const acft = new Aircraft({ sx: 50, sy: 50, hdg: 90 })
       expect(acft.getCenterOfMass(SensorType.RAW)).toEqual(new Point(10, 10))
     })
@@ -150,6 +160,12 @@ describe("Aircraft", () => {
   })
 
   describe("move_turns", () => {
+    it("no_turn_when_no_target", () => {
+      const acft = new Aircraft()
+      acft.turnToTarget()
+      expect(acft.getHeading()).toEqual(90)
+    })
+
     it("turns_to_target", () => {
       // the turn goes off of center of mass, so here we position the aircraft
       // such that the turn math becomes easier ('desired Hdg' = 90, so the updated

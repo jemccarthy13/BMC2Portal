@@ -1,5 +1,5 @@
-import { SensorType } from "classes/groups/datatrail"
-import { AircraftGroup as AircraftGroup } from "classes/groups/group"
+import { SensorType } from "classes/aircraft/datatrail/datatrail"
+import { AircraftGroup } from "classes/groups/group"
 import { Point } from "classes/point"
 import { FORMAT } from "../classes/supportedformats"
 

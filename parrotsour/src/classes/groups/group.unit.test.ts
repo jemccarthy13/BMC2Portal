@@ -1,14 +1,14 @@
 import { Point } from "../point"
 import * as AltStackHelper from "../altstack"
 import { AircraftGroup } from "./group"
-import { ACType, Aircraft } from "./aircraft"
-import { IDMatrix } from "./id"
-import { SensorType } from "./datatrail"
+import { ACType, Aircraft } from "../aircraft/aircraft"
+import { IDMatrix } from "../aircraft/id"
+import { SensorType } from "../aircraft/datatrail/datatrail"
 import Tasking from "../taskings/tasking"
 import { FORMAT } from "../supportedformats"
 
 /**
- * TODO -- TESTING RANDOM --
+ * TODO -- TESTING -- Underlying random utility
  * https://luetkemj.github.io/170421/mocking-modules-in-jest
  */
 describe("AircraftGroup", () => {

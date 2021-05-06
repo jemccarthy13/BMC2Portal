@@ -25,11 +25,11 @@ import { drawThreat } from "./draw/intercept/threatdraw"
 import { drawCap } from "./draw/intercept/capdraw"
 import { drawEA } from "./draw/intercept/eadraw"
 import { drawPOD } from "./draw/intercept/poddraw"
-import { IDMatrix } from "../classes/groups/id"
+import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
 import { getRestrictedStartPos } from "./draw/intercept/pictureclamp"
-import { Aircraft } from "../classes/groups/aircraft"
-import { SensorType } from "../classes/groups/datatrail"
+import { Aircraft } from "../classes/aircraft/aircraft"
+import { SensorType } from "../classes/aircraft/datatrail/datatrail"
 
 /**
  * This component is the main control for drawing pictures for intercepts.

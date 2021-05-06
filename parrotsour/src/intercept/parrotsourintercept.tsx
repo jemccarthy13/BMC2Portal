@@ -8,7 +8,7 @@ import "../css/toggle.css"
 
 import { InterceptQT } from "../pscomponents/quicktips/interceptQT"
 import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
-import { SensorType } from "../classes/groups/datatrail"
+import { SensorType } from "../classes/aircraft/datatrail/datatrail"
 import { FORMAT } from "../classes/supportedformats"
 
 const PicTypeSelector = lazy(() => import("./pictypeselector"))

@@ -4,7 +4,7 @@ import DrawingCanvas from "../canvas/drawingcanvas"
 
 import { Point } from "../classes/point"
 import { BlueInThe } from "../canvas/canvastypes"
-import { SensorType } from "../classes/groups/datatrail"
+import { SensorType } from "../classes/aircraft/datatrail/datatrail"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function emptyFunc() {}
