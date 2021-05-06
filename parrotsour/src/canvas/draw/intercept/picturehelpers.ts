@@ -2,6 +2,7 @@ import { BlueInThe, FightAxis } from "../../../canvas/canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
+import { FORMAT } from "../../../classes/supportedformats"
 import { trackDirFromHdg } from "../../../utils/mathutilities"
 
 /**
@@ -63,7 +64,7 @@ export const isEchelon = (
 }
 
 export const picTrackDir = (
-  format: string,
+  format: FORMAT,
   groups: AircraftGroup[]
 ): string => {
   const trackDir: string | undefined = groups[0].getTrackDir()
@@ -71,7 +72,7 @@ export const picTrackDir = (
     return trackDir === group.getTrackDir()
   })
   let answer = ""
-  if (format !== "ipe" && sameTrackDir) {
+  if (format !== FORMAT.IPE && sameTrackDir) {
     answer = " TRACK " + trackDir + ". "
   }
   groups.forEach((group) => {

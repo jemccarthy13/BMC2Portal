@@ -1,3 +1,5 @@
+import { FORMAT } from "../classes/supportedformats"
+
 export const PIXELS_TO_NM = 4
 
 /**
@@ -60,8 +62,8 @@ export function randomNumber(min: number, max: number): number {
  * Return a random heading (0-360 for ALSA, HOT/FLANK blue for !ALSA)
  * @param format
  */
-export function randomHeading(format: string, blueHeading = -1): number {
-  const bound = format === "ipe" ? 45 : 360
+export function randomHeading(format: FORMAT, blueHeading = -1): number {
+  const bound = format === FORMAT.IPE ? 45 : 360
   const offset = randomNumber(-bound, bound)
 
   let blueOpp = blueHeading - 180

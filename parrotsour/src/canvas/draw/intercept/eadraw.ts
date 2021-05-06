@@ -14,6 +14,7 @@ import { AltStack } from "../../../classes/altstack"
 import { getAspect, trackDirFromHdg } from "../../../utils/mathutilities"
 import { drawText } from "../drawutils"
 import { randomNumber } from "../../../utils/psmath"
+import { FORMAT } from "../../../classes/supportedformats"
 
 /**
  * Contains required info for resposne to EA
@@ -91,11 +92,11 @@ function formatMusic(
   grp: AircraftGroup,
   bull: BRAA,
   altStack: AltStack,
-  format: string
+  format: FORMAT
 ): string {
   let answer = grp.getLabel() + " BULLSEYE " + bull.bearing + "/" + bull.range
   answer += ", " + altStack.stack
-  if (format === "alsa") {
+  if (format === FORMAT.ALSA) {
     let trkDir = grp.getTrackDir() ? grp.getTrackDir() : grp.getPicDir()
     trkDir = trkDir || ""
     answer += grp.isCapping() ? " CAP " : ", TRACK " + trkDir

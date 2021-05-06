@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime"
 import React, { lazy, ReactElement, Suspense } from "react"
 
 import "../css/collapsible.css"
@@ -12,6 +13,7 @@ import DifficultySelector from "./difficultyselector"
 import ChatBox from "./chatbox"
 import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
 import { SensorType } from "../classes/groups/datatrail"
+import { FORMAT } from "../classes/supportedformats"
 
 const ProceduralCanvas = lazy(
   () => import("../canvas/draw/procedural/proceduralcanvas")
@@ -181,7 +183,7 @@ export default class ParrotSourProcedural extends React.PureComponent<
               orientation={canvasConfig}
               braaFirst={braaFirst}
               picType="random"
-              format="alsa"
+              format={FORMAT.ALSA}
               showMeasurements={showMeasurements}
               isHardMode={isHardMode}
               setAnswer={this.setAnswer}

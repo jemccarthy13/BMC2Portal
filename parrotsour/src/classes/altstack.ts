@@ -1,3 +1,5 @@
+import { FORMAT } from "./supportedformats"
+
 export interface AltStack {
   stack: string
   fillIns: string
@@ -13,7 +15,7 @@ export interface AltStack {
  * @param altitudes - group's altitudes for each contact
  * @param format - comm format
  */
-export function getAltStack(altitudes: number[], format: string): AltStack {
+export function getAltStack(altitudes: number[], format: FORMAT): AltStack {
   // convert altitudes to 3-digit flight level and sort low->high
   const formattedAlts: string[] = altitudes
     .map((a: number) => ("0" + a).slice(-2) + "0")
@@ -61,7 +63,7 @@ export function getAltStack(altitudes: number[], format: string): AltStack {
     answer = "STACK "
     for (let y = 0; y < stacks.length; y++) {
       // check to add "AND" for alsa, when on last stack alt
-      const AND = y === stacks.length - 1 && format !== "ipe" ? "AND " : ""
+      const AND = y === stacks.length - 1 && format !== FORMAT.IPE ? "AND " : ""
       answer += AND + stacks[y][0].replace(/0$/, "k") + " "
     }
 

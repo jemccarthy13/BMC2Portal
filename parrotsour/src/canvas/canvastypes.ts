@@ -1,6 +1,7 @@
 import { SensorType } from "classes/groups/datatrail"
 import { AircraftGroup as AircraftGroup } from "classes/groups/group"
 import { Point } from "classes/point"
+import { FORMAT } from "../classes/supportedformats"
 
 export enum BlueInThe {
   NORTH,
@@ -53,7 +54,7 @@ export interface DrawCanvasProps extends CanvasProps {
 }
 
 export interface PictureCanvasProps extends CanvasProps {
-  format: string
+  format: FORMAT
   setAnswer: { (answer: PictureAnswer): void }
   sliderSpeed: number
 }

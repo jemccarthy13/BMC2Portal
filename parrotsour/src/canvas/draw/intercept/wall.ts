@@ -24,6 +24,7 @@ import {
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { FORMAT } from "../../../classes/supportedformats"
 
 export const drawWall: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
@@ -175,7 +176,7 @@ export const drawWall: PictureDrawFunction = (
 
   //console.log("DETERMINE IF WEIGHTED WALL");
 
-  const includeBull = width > 10 && props.format !== "ipe"
+  const includeBull = width > 10 && props.format !== FORMAT.IPE
 
   for (let g = 0; g < numGroups; g++) {
     const idx: number = anchorNorth ? g : numGroups - 1 - g

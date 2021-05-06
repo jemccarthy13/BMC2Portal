@@ -9,6 +9,7 @@ import "../css/toggle.css"
 import { InterceptQT } from "../pscomponents/quicktips/interceptQT"
 import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
 import { SensorType } from "../classes/groups/datatrail"
+import { FORMAT } from "../classes/supportedformats"
 
 const PicTypeSelector = lazy(() => import("./pictypeselector"))
 const StandardSelector = lazy(() => import("./standardselector"))
@@ -24,7 +25,7 @@ interface PSIState {
   showAnswer: boolean
   showMeasurements: boolean
   isHardMode: boolean
-  format: string
+  format: FORMAT
   speedSliderValue: number
   canvasConfig: CanvasOrient
   braaFirst: boolean
@@ -48,7 +49,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
       showAnswer: false,
       showMeasurements: true,
       isHardMode: false,
-      format: "alsa",
+      format: FORMAT.ALSA,
       speedSliderValue: 50,
       canvasConfig: {
         height: 500,
@@ -82,7 +83,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
    * Called when the format selection changes
    * @param fmt - new format to use to generate answers
    */
-  formatSelChange = (fmt: string): (() => void) => {
+  formatSelChange = (fmt: FORMAT): (() => void) => {
     return () => {
       this.setState({ format: fmt })
       this.onNewPic()

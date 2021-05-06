@@ -24,6 +24,7 @@ import {
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
 import { randomHeading, randomNumber } from "../../../utils/psmath"
+import { FORMAT } from "../../../classes/supportedformats"
 
 /**
  * Draw two groups azimuth and return the correct answer.
@@ -144,7 +145,7 @@ export const drawAzimuth: PictureDrawFunction = (
   const sgAlts = sg.getAltStack(props.format)
 
   // anchor both outrigger with bullseye if >10 az and !ipe
-  const includeBull = width >= 10 && props.format !== "ipe"
+  const includeBull = width >= 10 && props.format !== FORMAT.IPE
 
   let answer = "TWO GROUPS AZIMUTH " + width + " "
 

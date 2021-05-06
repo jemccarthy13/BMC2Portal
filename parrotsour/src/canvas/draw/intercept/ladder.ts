@@ -21,6 +21,7 @@ import {
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
+import { FORMAT } from "../../../classes/supportedformats"
 
 export const drawLadder: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
@@ -160,7 +161,7 @@ export const drawLadder: PictureDrawFunction = (
   //console.log("CHECK FOR ECHELON LADDER?");
 
   const rangeBack = {
-    label: "SEPARATION",
+    label: props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
     range: groups[groups.length - 2]
       .getCenterOfMass()
       .getBR(groups[groups.length - 1].getCenterOfMass()).range,

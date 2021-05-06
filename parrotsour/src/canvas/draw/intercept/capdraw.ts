@@ -17,6 +17,7 @@ import { drawAltitudes, drawGroupCap, drawMeasurement } from "../drawutils"
 import { formatGroup } from "../formatutils"
 import { randomNumber } from "../../../utils/psmath"
 import { getStartPos } from "canvas/draw/intercept/pictureclamp"
+import { FORMAT } from "../../../classes/supportedformats"
 
 /**
  * A wrapper to actually draw a CAP picture
@@ -157,7 +158,7 @@ export const drawCap: PictureDrawFunction = (
   let answer = ""
 
   // anchor cap if width > 0 for alsa
-  const includeBull = realWidth >= 10 && props.format !== "ipe"
+  const includeBull = realWidth >= 10 && props.format !== FORMAT.IPE
 
   answer = "TWO GROUPS AZIMUTH " + realWidth + ", "
 

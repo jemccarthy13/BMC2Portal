@@ -20,6 +20,7 @@ import {
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
 import { randomHeading, randomNumber } from "../../../utils/psmath"
+import { FORMAT } from "../../../classes/supportedformats"
 
 export const drawChampagne: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
@@ -193,7 +194,7 @@ export const drawChampagne: PictureDrawFunction = (
 
   answer += picTrackDir(props.format, [nlg, slg, tg])
 
-  const includeBull = realWidth >= 10 && props.format !== "ipe"
+  const includeBull = realWidth >= 10 && props.format !== FORMAT.IPE
 
   // TODO -- anchoring priorities for LE of champagne
   const anchorN = isAnchorNorth(nlgBraaseye, slgBraaseye, nlg, slg)
