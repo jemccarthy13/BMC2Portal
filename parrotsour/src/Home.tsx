@@ -1,4 +1,4 @@
-import React, { Suspense, ReactElement, lazy } from "react"
+import React, { Suspense, lazy } from "react"
 
 import { Route } from "react-router"
 import { HashRouter } from "react-router-dom"
@@ -9,6 +9,7 @@ import "./css/body.css"
 import "./css/fonts.css"
 
 const ParrotSour = lazy(() => import("./pscomponents/parrotsour"))
+
 import ChangeLog from "./changelog"
 
 /**
@@ -32,40 +33,41 @@ import ChangeLog from "./changelog"
  *               it isn't in the navigation pane but the AirspaceList component links to it
  * - Design/implement your Component
  */
-const Home = (): ReactElement => {
-  function getPS(): JSX.Element {
+
+export default class Home extends React.PureComponent {
+  getPS = (): JSX.Element => {
     return (
       <ParrotSour
         type="chooser"
-        interceptLink="/#/msncrew/parrotsourintercept.html"
-        proceduralLink="/#/msncrew/parrotsourprocedural.html"
+        interceptLink="/#/intercept.html"
+        proceduralLink="/#/procedural.html"
       />
     )
   }
 
-  function getPSP(): JSX.Element {
+  getPSP = (): JSX.Element => {
     return <ParrotSour type="procedural" />
   }
 
-  function getPSI(): JSX.Element {
+  getPSI = (): JSX.Element => {
     return <ParrotSour type="intercept" />
   }
 
-  return (
-    <div className="app">
-      <div className="body-content" style={{ width: "100%" }}>
-        <HashRouter>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Route exact path="/" component={getPSI} />
-            <Route path="/changelog.html" component={ChangeLog} />
-            <Route path="/msncrew/parrotsour.html" render={getPS} />
-            <Route path="/msncrew/parrotsourintercept.html" render={getPSI} />
-            <Route path="/msncrew/parrotsourprocedural.html" render={getPSP} />
-          </Suspense>
-        </HashRouter>
+  render(): React.ReactElement {
+    return (
+      <div className="app">
+        <div className="body-content" style={{ width: "100%" }}>
+          <HashRouter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Route exact path="/" component={this.getPSI} />
+              <Route path="/changelog.html" component={ChangeLog} />
+              <Route path="/parrotsour.html" render={this.getPS} />
+              <Route path="/intercept.html" render={this.getPSI} />
+              <Route path="/procedural.html" render={this.getPSP} />
+            </Suspense>
+          </HashRouter>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
-
-export default Home

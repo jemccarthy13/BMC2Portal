@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home should_render_default 1`] = `ShallowWrapper {}`;
