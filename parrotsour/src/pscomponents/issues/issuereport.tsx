@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core"
 import IssueSelector from "./issueselector"
 
-import Snackbar from "../psalert"
+import Snackbar from "../alert/psalert"
 
 import { PictureAnswer } from "../../canvas/canvastypes"
 
@@ -87,6 +87,8 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
       const formData = new FormData()
       formData.append("email", realEmail)
       formData.append("comments", realText + " \n\n" + answer)
+      formData.append("problemtype", selection)
+
       if (selection === "picprob")
         formData.append("image", canvas.toDataURL("image/png"))
       const response = await fetch(
