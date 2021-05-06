@@ -90,7 +90,6 @@ export default class PictureCanvas extends ParrotSourCanvas {
     let drawFunc: PictureDrawFunction = this.functions[type]
     if (drawFunc === undefined) drawFunc = drawAzimuth
 
-    console.log(type)
     const answer = drawFunc(context, this.props, this.state, start)
 
     const { blueAir } = this.state
