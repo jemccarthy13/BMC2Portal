@@ -17,7 +17,7 @@ import ReactDOM from "react-dom"
 import React, { Suspense } from "react"
 import Home from "./Home"
 
-import GlobalSnackbarProvider from "./pscomponents/globalalertprovider"
+import GlobalSnackbarProvider from "./pscomponents/alert/globalalertprovider"
 
 export {
   DrawingCanvas as Canvas,

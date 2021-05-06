@@ -5,7 +5,7 @@ import {
   PictureCanvasState,
 } from "../../../canvas/canvastypes"
 
-import PSAlert from "../../../pscomponents/psalert"
+import PSAlert from "../../../pscomponents/alert/psalert"
 
 // Functions
 import { drawAltitudes, drawGroupCap, drawText } from "../drawutils"
