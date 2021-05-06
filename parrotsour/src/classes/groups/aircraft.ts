@@ -3,7 +3,7 @@ import { GroupParams } from "./group"
 import { IDMatrix } from "./id"
 import { AircraftIntent, IntentParams } from "./intent"
 import { Point } from "../point"
-import Tasking from "./tasking"
+import Tasking from "../taskings/tasking"
 
 import { PaintBrush } from "../../canvas/draw/paintbrush"
 import {

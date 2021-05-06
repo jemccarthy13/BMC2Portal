@@ -1,5 +1,5 @@
 // Interfaces
-import { AltStack } from "../../../classes/interfaces"
+import { AltStack } from "../../../classes/altstack"
 import {
   PictureAnswer,
   PictureDrawFunction,

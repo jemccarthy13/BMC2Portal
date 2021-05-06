@@ -4,7 +4,7 @@
 
 import { Braaseye } from "../../classes/braaseye"
 import { AircraftGroup } from "../../classes/groups/group"
-import { AltStack } from "../../classes/interfaces"
+import { AltStack } from "../../classes/altstack"
 
 type RangeBack = {
   label: string

@@ -1,5 +1,4 @@
 // Interfaces
-import { AltStack } from "../../../classes/interfaces"
 import {
   PictureAnswer,
   PictureDrawFunction,
@@ -7,13 +6,14 @@ import {
   PictureCanvasState,
 } from "../../../canvas/canvastypes"
 import { AircraftGroup } from "../../../classes/groups/group"
+import { Braaseye } from "../../../classes/braaseye"
+import { Point } from "../../../classes/point"
+import { AltStack } from "../../../classes/altstack"
 
 // Functions
 import { drawAltitudes } from "../drawutils"
 import { getAspect } from "../../../utils/mathutilities"
-import { Braaseye } from "../../../classes/braaseye"
 import { randomHeading, randomNumber } from "../../../utils/psmath"
-import { Point } from "../../../classes/point"
 
 export const drawThreat: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,

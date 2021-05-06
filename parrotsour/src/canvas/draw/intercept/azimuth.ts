@@ -1,3 +1,4 @@
+// Classes & Types
 import {
   FightAxis,
   PictureAnswer,
@@ -5,6 +6,12 @@ import {
   PictureCanvasState,
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
+import { Braaseye } from "../../../classes/braaseye"
+import { AircraftGroup } from "../../../classes/groups/group"
+import { GroupFactory } from "../../../classes/groups/groupfactory"
+import { Point } from "../../../classes/point"
+
+// Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import {
   formatGroup,
@@ -16,10 +23,6 @@ import {
   isEchelon,
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
-import { Braaseye } from "../../../classes/braaseye"
-import { AircraftGroup } from "../../../classes/groups/group"
-import { GroupFactory } from "../../../classes/groups/groupfactory"
-import { Point } from "../../../classes/point"
 import { randomHeading, randomNumber } from "../../../utils/psmath"
 
 /**
@@ -45,10 +48,8 @@ export const drawAzimuth: PictureDrawFunction = (
     start,
   })
 
-  console.log(startPos)
   // Create the first group
   const ng = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
-  console.log(ng.getStartPos())
 
   ng.draw(ctx, props.dataStyle)
 

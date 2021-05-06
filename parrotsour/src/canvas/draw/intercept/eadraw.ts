@@ -1,5 +1,4 @@
 // Interfaces
-import { AltStack } from "../../../classes/interfaces"
 import {
   PictureAnswer,
   PictureDrawFunction,
@@ -8,11 +7,12 @@ import {
 } from "../../../canvas/canvastypes"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
+import { BRAA } from "../../../classes/braa"
+import { AltStack } from "../../../classes/altstack"
 
 // Functions
 import { getAspect, trackDirFromHdg } from "../../../utils/mathutilities"
 import { drawText } from "../drawutils"
-import { BRAA } from "../../../classes/braa"
 import { randomNumber } from "../../../utils/psmath"
 
 /**

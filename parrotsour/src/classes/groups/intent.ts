@@ -1,5 +1,5 @@
 import { Point } from "classes/point"
-import { Tasking } from "classes/taskings/tasking"
+import Tasking from "classes/taskings/tasking"
 
 export interface IntentParams {
   desiredHeading: number

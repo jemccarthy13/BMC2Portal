@@ -1,5 +1,5 @@
 import { PictureCanvasProps, PictureCanvasState } from "canvas/canvastypes"
-import { AircraftGroup } from "../groups/group"
+import { AircraftGroup } from "./group"
 import { Point } from "../point"
 
 import { randomHeading } from "../../utils/psmath"

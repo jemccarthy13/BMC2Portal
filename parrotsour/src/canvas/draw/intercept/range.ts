@@ -1,3 +1,4 @@
+// Classes, interfaces, types
 import {
   FightAxis,
   PictureAnswer,
@@ -5,13 +6,15 @@ import {
   PictureCanvasState,
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
+import { Braaseye } from "../../../classes/braaseye"
+import { AircraftGroup } from "../../../classes/groups/group"
+import { Point } from "../../../classes/point"
+
+// Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { picTrackDir } from "../../../canvas/draw/intercept/picturehelpers"
-import { Braaseye } from "../../../classes/braaseye"
-import { AircraftGroup } from "../../../classes/groups/group"
-import { Point } from "../../../classes/point"
 import { trackDirFromHdg } from "../../../utils/mathutilities"
 import { randomHeading, randomNumber } from "../../../utils/psmath"
 

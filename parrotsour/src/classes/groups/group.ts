@@ -1,11 +1,11 @@
 // Classes & Interfaces
-import { AltStack } from "../interfaces"
 import { SensorType } from "../groups/datatrail"
 import { Point } from "../point"
 import { ACType, Aircraft } from "../groups/aircraft"
 import { IDMatrix } from "../groups/id"
 import { IntentParams } from "../groups/intent"
 
+import { AltStack, getAltStack } from "../altstack"
 // Functions
 import { trackDirFromHdg } from "../../utils/mathutilities"
 import {
@@ -13,99 +13,11 @@ import {
   PIXELS_TO_NM,
   randomNumber,
 } from "../../utils/psmath"
-
-/**
- * Non-exported function to format alt stacks and fill-ins for group altitudes
- *
- * A single group will be no-op (return hard alt + fillin if HIGH)
- * A group without stacks will return single alt + fillin if HIGH)
- * Otherwise, will return highest altitude for each "bucket" and # contacts hi/med/low
- *
- * @param altitudes - group's altitudes for each contact
- * @param format - comm format
- */
-function _getAltStack(altitudes: number[], format: string): AltStack {
-  // convert altitudes to 3-digit flight level and sort low->high
-  const formattedAlts: string[] = altitudes
-    .map((a: number) => ("0" + a).slice(-2) + "0")
-    .sort()
-    .reverse()
-
-  const stackHeights: string[] = []
-  let stackIndexes: number[] = []
-
-  // break out into bins of 10k foot separation between contacts
-  for (let x = formattedAlts.length; x >= 0; x--) {
-    const diff: number =
-      parseInt(formattedAlts[x - 1]) - parseInt(formattedAlts[x])
-    if (diff >= 100) {
-      stackHeights.push(formattedAlts[x])
-      stackIndexes.push(x)
-    }
-  }
-
-  stackIndexes = stackIndexes.reverse()
-
-  // get the highest altitude within each bucket for formatting
-  const stacks: string[][] = []
-  let lastZ = 0
-  for (let z = 0; z < stackIndexes.length; z++) {
-    stacks.push(formattedAlts.slice(lastZ, stackIndexes[z]))
-    lastZ = stackIndexes[z]
-  }
-  stacks.push(formattedAlts.slice(lastZ))
-
-  // format to "##k"
-  let answer = formattedAlts[0].replace(/0$/, "k") + " "
-  let answer2 = ""
-
-  // do formatting
-
-  // if no stack, look for >40k for "HIGH"
-  if (stacks.length <= 1) {
-    altitudes.sort()
-    if (altitudes[altitudes.length - 1] >= 40) {
-      answer2 += " HIGH "
-    }
-    // otherwise, print stacks
-  } else {
-    answer = "STACK "
-    for (let y = 0; y < stacks.length; y++) {
-      // check to add "AND" for alsa, when on last stack alt
-      const AND = y === stacks.length - 1 && format !== "ipe" ? "AND " : ""
-      answer += AND + stacks[y][0].replace(/0$/, "k") + " "
-    }
-
-    // format # hi/med/low when there are at least 3 contacts
-    // if there are 3 contacts and 3 altitudes, 1 hi / 1 med / 1 low is not required
-    // (so skip this)
-    if (
-      altitudes.length > 2 &&
-      !(altitudes.length === stacks.length && stacks.length === 3)
-    ) {
-      switch (stacks.length) {
-        case 2:
-          answer2 += stacks[0].length + " HIGH "
-          answer2 += stacks[1].length + " LOW "
-          break
-        case 3:
-          answer2 += stacks[0].length + " HIGH "
-          answer2 += stacks[1].length + " MEDIUM "
-          answer2 += stacks[2].length + " LOW "
-          break
-      }
-    }
-  }
-
-  // return stack and fillins
-  return {
-    stack: answer,
-    fillIns: answer2,
-  }
-}
+import Tasking from "../taskings/tasking"
 
 export interface GroupParams {
   ctx: CanvasRenderingContext2D
+  dataTrailType: SensorType
   sx?: number
   sy?: number
   nContacts?: number
@@ -113,7 +25,7 @@ export interface GroupParams {
   alts?: number[]
   desiredHdg?: number
   id?: IDMatrix
-  dataTrailType: SensorType
+  type?: ACType
 }
 
 export class AircraftGroup extends Array<Aircraft> {
@@ -138,12 +50,18 @@ export class AircraftGroup extends Array<Aircraft> {
     p.sx = this.startPos.x
     p.sy = this.startPos.y
 
+    p.hdg = p.hdg || 90
+
     // TODO -- user selected max # contacts per group?
     const nContacts = p.nContacts || randomNumber(1, 4)
     for (let contact = 0; contact < nContacts; contact++) {
-      this.push(new Aircraft(p))
+      if (p.alts && p.alts[contact])
+        this.push(new Aircraft({ ...p, alt: p.alts[contact] }))
+      else {
+        this.push(new Aircraft(p))
+      }
 
-      const vectors = headingToRadians(this.getHeading())
+      const vectors = headingToRadians(p.hdg)
 
       p.sx += PIXELS_TO_NM * Math.cos(vectors.offset)
       p.sy += PIXELS_TO_NM * -Math.sin(vectors.offset)
@@ -189,13 +107,12 @@ export class AircraftGroup extends Array<Aircraft> {
     this.forEach((ac) => ac.doNextRouting())
   }
 
-  // TODO -- verify unnecessary
-  // doNextAltitudeChange(): void{
-  //     this.forEach((ac
-  // }
-
   isCapping(): boolean {
-    return false
+    return (
+      this.find((ac) => {
+        return !ac.isCapping()
+      }) === undefined
+    )
   }
 
   getTrackDir(): string | undefined {
@@ -212,7 +129,7 @@ export class AircraftGroup extends Array<Aircraft> {
   }
 
   getAltStack(format: string): AltStack {
-    return _getAltStack(this.getAltitudes(), format) //configuration.format)
+    return getAltStack(this.getAltitudes(), format)
   }
 
   getAltitudes(): number[] {
@@ -271,52 +188,17 @@ export class AircraftGroup extends Array<Aircraft> {
     this.forEach((ac) => ac.doNextAltChange())
   }
 
+  setTasking(task: Tasking): void {
+    this.forEach((ac: Aircraft) => {
+      ac.setTasking(task)
+    })
+  }
+
   isOnTask(): boolean {
-    return this.find((ac) => ac.isTasked) !== undefined
+    return this.find((ac) => ac.isTasked()) !== undefined
   }
 
   getType(): ACType {
     return this[0].getType()
   }
 }
-
-// export class GroupofAC {
-//     private picDir: string | undefined = undefined
-//     private inCap = false
-//     isCapping(): boolean {
-//         return this.inCap
-//     }
-//     setCapping(isCap: boolean): void {
-//         this.inCap = isCap
-//     }
-// ///// TODO -- in move, manage radar and IFF history (similar to vector arrow drawing)
-
-// // if (props.dataStyle==="radar"){
-// //   if (groups[x].radarPoints.length!==0){
-// //     for (let z = 0; z < groups[x].radarPoints.length; z++){
-// //       groups[x].radarPoints[z] = groups[x].radarPoints[z].slice(1)
-// //       groups[x].drawnRadar[z] = groups[x].drawnRadar[z].slice(1)
-// //       const endX = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].x
-// //       const endY = groups[x].radarPoints[z][groups[x].radarPoints[z].length-1].y
-
-// //       const startX = groups[x].radarPoints[z][0].x
-// //       const startY = groups[x].radarPoints[z][0].y
-
-// //       const deltX = endX-startX
-// //       const deltY = endY-startY
-// //       const rng = Math.sqrt(deltX * deltX + deltY * deltY)/3
-
-// //       const newX = endX + (rng*Math.cos(rads+Math.random()/5))
-// //       const newY = endY + (rng*-Math.sin(rads+Math.random()/5))
-// //       groups[x].startX = groups[x].radarPoints[z][0].x
-// //       groups[x].startY = groups[x].radarPoints[z][0].y
-
-// //       const jit = 5
-// //       const drawnX = newX + jit* Math.random()+Math.random()+Math.random()
-// //       const drawnY = newY + jit*Math.random()+Math.random()+Math.random()
-
-// //       groups[x].radarPoints[z].push({x:newX, y:newY})
-// //       groups[x].drawnRadar[z].push({x:drawnX, y: drawnY})
-// //     }
-// //   }
-// // }

@@ -14,8 +14,9 @@ import {
 } from "../../../canvas/draw/intercept/picturehelpers"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { AltStack } from "../../../classes/interfaces"
+import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
+
 import { randomHeading, randomNumber } from "../../../utils/psmath"
 
 export const drawVic: PictureDrawFunction = (

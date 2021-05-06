@@ -1,3 +1,4 @@
+// Classes, interfaces, types
 import {
   BlueInThe,
   PictureAnswer,
@@ -5,22 +6,24 @@ import {
   PictureCanvasState,
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import {
-  isAnchorNorth,
-  picTrackDir,
-} from "../../../canvas/draw/intercept/picturehelpers"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { AltStack } from "../../../classes/interfaces"
+import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
+
+// Functions
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
+import {
+  isAnchorNorth,
+  picTrackDir,
+} from "../../../canvas/draw/intercept/picturehelpers"
+import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
+import { formatGroup } from "../../../canvas/draw/formatutils"
+import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 
 export const drawWall: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
