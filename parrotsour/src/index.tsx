@@ -5,7 +5,7 @@ import ParrotSourHeader from "./pscomponents/parrotsourheader"
 import ParrotSourControls from "./pscomponents/parrotsourcontrols"
 import ParrotSour from "./pscomponents/parrotsour"
 import ParrotSourIntercept from "./intercept/parrotsourintercept"
-import PicTypeSelector from "./intercept/pictypeselector"
+import PicOptionsBar from "./intercept/picoptionsbar"
 import StandardSelector from "./intercept/standardselector"
 
 import ParrotSourProcedural from "./procedural/parrotsourprocedural"
@@ -23,7 +23,7 @@ export {
   DrawingCanvas as Canvas,
   PictureCanvas,
   ParrotSourIntercept,
-  PicTypeSelector,
+  PicOptionsBar as PicTypeSelector,
   StandardSelector,
   ParrotSourProcedural,
   AlsaHelp,
