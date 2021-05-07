@@ -1,7 +1,7 @@
-import { SensorType } from "classes/aircraft/datatrail/datatrail"
-import { AircraftGroup } from "classes/groups/group"
 import { Point } from "classes/point"
 import { FORMAT } from "../classes/supportedformats"
+import { SensorType } from "classes/aircraft/datatrail/datatrail"
+import { AircraftGroup } from "classes/groups/group"
 
 export enum BlueInThe {
   NORTH,
