@@ -1,9 +1,15 @@
-import { Dialog } from "@material-ui/core"
+/* eslint-disable react/forbid-component-props */
+import {
+  Dialog,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+} from "@material-ui/core"
 import React, { ReactElement } from "react"
 import { FORMAT } from "../classes/supportedformats"
 import { AlsaHelp } from "../pscomponents/quicktips/alsahelp"
 
-type StdSelectorProps = {
+export type StdSelectorProps = {
   selectionChanged: (val: FORMAT) => () => void
 }
 
@@ -27,13 +33,6 @@ export default class StandardSelector extends React.PureComponent<
    */
   handleToggleAlsaQT = (): void => {
     this.setState((prevState) => ({ showAlsaQT: !prevState.showAlsaQT }))
-  }
-
-  /**
-   * Called when the ALSA quick tips dialog is closed
-   */
-  handleAlsaQTClose = (): void => {
-    this.setState({ showAlsaQT: false })
   }
 
   render(): ReactElement {
@@ -70,7 +69,7 @@ export default class StandardSelector extends React.PureComponent<
             <button
               style={{ padding: "0px" }}
               className="helpicon"
-              id="btnAlert"
+              id="alsaQTBtn"
               type="button"
               onClick={this.handleToggleAlsaQT}
             >
@@ -79,7 +78,30 @@ export default class StandardSelector extends React.PureComponent<
           </li>
         </ul>
 
-        <Dialog open={showAlsaQT} onClose={this.handleAlsaQTClose}>
+        <Dialog open={showAlsaQT} onClose={this.handleToggleAlsaQT}>
+          <DialogTitle
+            disableTypography
+            style={{ paddingBottom: "5px", borderBottom: "1px solid black" }}
+          >
+            <h2>ALSA</h2>
+            <IconButton
+              onClick={this.handleToggleAlsaQT}
+              style={{
+                position: "absolute",
+                right: "20px",
+                top: "10px",
+                width: "fit-content",
+              }}
+            >
+              X
+            </IconButton>
+            <DialogContentText>
+              Download the pub&nbsp;
+              <a target="_window" href="https://www.alsa.mil/MTTPs/ACC/">
+                here!
+              </a>
+            </DialogContentText>
+          </DialogTitle>
           <AlsaHelp />
         </Dialog>
       </div>
