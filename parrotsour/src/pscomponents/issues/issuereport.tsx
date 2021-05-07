@@ -38,17 +38,11 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
   }
 
   /**
-   * Toggle the issue form display
+   * Toggle the issue form display when the control button is pressed in the header,
+   * or when clickaway happens
    */
   handleToggleIssueForm = (): void => {
     this.setState((prevState) => ({ showIssueForm: !prevState.showIssueForm }))
-  }
-
-  /**
-   * Called when the issue report form is closed
-   */
-  handleIssueClose = (): void => {
-    this.setState({ showIssueForm: false })
   }
 
   onIssueSelChanged = (val: string): (() => void) => {
@@ -109,7 +103,11 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
     this.setState({ submitEnabled: true })
   }
 
-  handleClose = (
+  /**
+   * Handle cancel button click
+   * @param event
+   */
+  handleCancelClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ): void => {
     event.preventDefault()
@@ -131,10 +129,10 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
         <Dialog
           fullScreen={false}
           open={showIssueForm}
-          onClose={this.handleIssueClose}
+          onClose={this.handleToggleIssueForm}
         >
           <DialogContent>
-            {/* TODO - change this to /issues.html and use php to read from reported issues */}
+            {/* TODO - ISSUE_REPORTS -- change this to /issues.html and use php to read from reported issues */}
             See a list of <a href="/#/changelog.html">known issues</a>.
           </DialogContent>
 
@@ -167,10 +165,16 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
             />
             <button type="button" hidden onClick={this.handleSubmit} />
             <DialogActions>
-              <Button onClick={this.handleSubmit} disabled={!submitEnabled}>
+              <Button
+                id="submitIssueReport"
+                onClick={this.handleSubmit}
+                disabled={!submitEnabled}
+              >
                 Submit
               </Button>
-              <Button onClick={this.handleClose}>Cancel</Button>
+              <Button id="cancelIssueReport" onClick={this.handleCancelClick}>
+                Cancel
+              </Button>
             </DialogActions>
           </form>
         </Dialog>
