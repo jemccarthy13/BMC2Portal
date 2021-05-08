@@ -233,7 +233,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
 
   return (
     <div style={{ display: "block", textAlign: "left" }}>
-      <div style={{ display: "grid", position: "relative", height: "600px" }}>
+      <div style={{ display: "grid", position: "relative" }}>
         <canvas
           id="pscanvas"
           {...moveProps}
