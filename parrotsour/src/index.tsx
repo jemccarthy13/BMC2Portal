@@ -35,7 +35,7 @@ export {
   ParrotSourChooser,
 }
 
-ReactDOM.render(
+export default ReactDOM.render(
   <React.StrictMode>
     <Suspense fallback={<div>Loading...</div>}>
       <GlobalSnackbarProvider
