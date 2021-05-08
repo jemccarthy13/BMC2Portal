@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 import DrawingCanvas from "./canvas/drawingcanvas"
 import PictureCanvas from "./canvas/picturecanvas"
 import { ParrotSourChooser } from "./pscomponents/parrotsourchooser"
@@ -35,6 +36,9 @@ export {
   ParrotSourChooser,
 }
 
+import snackActions from "./pscomponents/alert/psalert"
+import { Button } from "@material-ui/core"
+
 export default ReactDOM.render(
   <React.StrictMode>
     <Suspense fallback={<div>Loading...</div>}>
@@ -48,3 +52,25 @@ export default ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 )
+
+// remove after confidence most people have seen new release notification
+snackActions.info("Check out the newest release of ParrotSour!", {
+  autoHideDuration: 10000,
+  preventDuplicate: true,
+  // eslint-disable-next-line react/display-name
+  action: (key) => {
+    return (
+      <>
+        <Button
+          onClick={() => {
+            window.location.href = "#/changelog.html#4.0.0"
+            snackActions.closeSnackbar(key)
+          }}
+        >
+          v4.0.0
+        </Button>
+        <Button onClick={() => snackActions.closeSnackbar(key)}>Dismiss</Button>
+      </>
+    )
+  },
+})
