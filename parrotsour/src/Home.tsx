@@ -10,7 +10,7 @@ import "./css/fonts.css"
 
 const ParrotSour = lazy(() => import("./pscomponents/parrotsour"))
 
-import ChangeLog from "./changelog"
+import ChangeLog from "./changelog/changelog"
 
 /**
  * This is the main entry point into the front-facing application.
