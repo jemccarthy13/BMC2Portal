@@ -169,7 +169,7 @@ export default class ParrotSourProcedural extends React.PureComponent<
           <ParrotSourControls
             handleSliderChange={this.onSliderChange}
             modifyCanvas={this.modifyCanvas}
-            braaChanged={this.onToggleMeasurements}
+            displayFirstChanged={this.onToggleMeasurements}
             startAnimate={this.startAnimate}
             pauseAnimate={this.pauseAnimate}
             handleDataStyleChange={this.onDataStyleChange}

@@ -233,7 +233,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
           <ParrotSourControls
             handleSliderChange={this.onSliderChange}
             modifyCanvas={this.modifyCanvas}
-            braaChanged={this.braaChanged}
+            displayFirstChanged={this.braaChanged}
             startAnimate={this.startAnimate}
             pauseAnimate={this.pauseAnimate}
             handleDataStyleChange={this.onDataStyleChange}
