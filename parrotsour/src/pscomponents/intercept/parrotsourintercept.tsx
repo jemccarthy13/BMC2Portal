@@ -11,7 +11,7 @@ import {
   PictureAnswer,
   CanvasOrient,
 } from "../../canvas/canvastypes"
-import { SensorType } from "../../classes/aircraft/datatrail/datatrail"
+import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 import { FORMAT } from "../../classes/supportedformats"
 
 const PicTypeSelector = lazy(() => import("./picoptionsbar"))

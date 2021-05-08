@@ -184,9 +184,9 @@ export default function VersionHistory(): JSX.Element {
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <div className={classes.column}>
                   <Typography className={classes.heading}>
-                    <div id={vers.version}>
+                    <span id={vers.version}>
                       <b>Release {vers.version}</b>
-                    </div>
+                    </span>
                   </Typography>
                 </div>
                 <div className={classes.column}>
