@@ -53,6 +53,16 @@ export default ReactDOM.render(
   document.getElementById("root")
 )
 
+/**
+ * TODO -- COOKIE -- set cookie on user action of notification
+ * to avoid displaying on refresh.
+ *
+ * versionNotifications.get({versionNum}) is defined, don't display
+ *
+ * Use universal-cookie package?
+ * https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
+ *
+ */
 // remove after confidence most people have seen new release notification
 snackActions.info("Check out the newest release of ParrotSour!", {
   autoHideDuration: 10000,
