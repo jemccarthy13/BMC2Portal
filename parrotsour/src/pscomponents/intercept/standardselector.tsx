@@ -6,8 +6,8 @@ import {
   IconButton,
 } from "@material-ui/core"
 import React, { ReactElement } from "react"
-import { FORMAT } from "../classes/supportedformats"
-import { AlsaHelp } from "../pscomponents/quicktips/alsahelp"
+import { FORMAT } from "../../classes/supportedformats"
+import { AlsaHelp } from "../quicktips/alsahelp"
 
 export type StdSelectorProps = {
   selectionChanged: (val: FORMAT) => () => void

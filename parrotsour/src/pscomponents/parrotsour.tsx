@@ -2,10 +2,10 @@ import React, { lazy, ReactElement, Suspense } from "react"
 import { ParrotSourChooser } from "./parrotsourchooser"
 
 const ParrotSourIntercept = lazy(
-  () => import("../intercept/parrotsourintercept")
+  () => import("./intercept/parrotsourintercept")
 )
 const ParrotSourProcedural = lazy(
-  () => import("../procedural/parrotsourprocedural")
+  () => import("./procedural/parrotsourprocedural")
 )
 
 type PSProps = {

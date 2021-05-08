@@ -1,7 +1,7 @@
-import { ACType } from "../classes/aircraft/aircraft"
-import { PictureAnswer } from "../canvas/canvastypes"
-import { AircraftGroup } from "../classes/groups/group"
-import { Point } from "../classes/point"
+import { ACType } from "../../classes/aircraft/aircraft"
+import { PictureAnswer } from "../../canvas/canvastypes"
+import { AircraftGroup } from "../../classes/groups/group"
+import { Point } from "../../classes/point"
 
 export function getAsset(
   groups: AircraftGroup[],

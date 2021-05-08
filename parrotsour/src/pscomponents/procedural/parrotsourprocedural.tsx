@@ -1,30 +1,31 @@
 import "regenerator-runtime/runtime"
 import React, { lazy, ReactElement, Suspense } from "react"
 
-import "../css/collapsible.css"
-import "../css/select.css"
-import "../css/slider.css"
-import "../css/parrotsour.css"
-import "../css/toggle.css"
-import "../css/togglebuttongroup.css"
+import "../../css/select.css"
+import "../../css/slider.css"
+import "../../css/parrotsour.css"
+import "../../css/toggle.css"
+import "../../css/togglebuttongroup.css"
 
-import { ProceduralQT } from "../pscomponents/quicktips/proceduralQT"
+import { ProceduralQT } from "../quicktips/proceduralQT"
 import DifficultySelector from "./difficultyselector"
 import ChatBox from "./chatbox"
-import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
-import { SensorType } from "../classes/aircraft/datatrail/datatrail"
-import { FORMAT } from "../classes/supportedformats"
+import {
+  BlueInThe,
+  PictureAnswer,
+  CanvasOrient,
+} from "../../canvas/canvastypes"
+import { SensorType } from "../../classes/aircraft/datatrail/datatrail"
+import { FORMAT } from "../../classes/supportedformats"
 
 const ProceduralCanvas = lazy(
-  () => import("../canvas/draw/procedural/proceduralcanvas")
+  () => import("../../canvas/draw/procedural/proceduralcanvas")
 )
 
-const ParrotSourHeader = lazy(() => import("../pscomponents/parrotsourheader"))
-const ParrotSourControls = lazy(
-  () => import("../pscomponents/parrotsourcontrols")
-)
+const ParrotSourHeader = lazy(() => import("../parrotsourheader"))
+const ParrotSourControls = lazy(() => import("../parrotsourcontrols"))
 
-const VersionInfo = lazy(() => import("../versioninfo"))
+const VersionInfo = lazy(() => import("../../versioninfo"))
 
 interface PSPState {
   showMeasurements: boolean

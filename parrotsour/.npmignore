@@ -15,6 +15,7 @@
 /src/__tests__
 /src/__tests__/*
 /src/*.test.*
+/src/pscomponents/procedural/ai.js
 
 # misc
 .DS_Store

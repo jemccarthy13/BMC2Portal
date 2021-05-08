@@ -1,4 +1,5 @@
-import React, { Suspense, lazy } from "react"
+/* eslint-disable react/jsx-no-bind */
+import React, { Suspense, lazy, Fragment } from "react"
 
 import { Route } from "react-router"
 import { HashRouter } from "react-router-dom"
@@ -11,6 +12,9 @@ import "./css/fonts.css"
 const ParrotSour = lazy(() => import("./pscomponents/parrotsour"))
 
 import ChangeLog from "./changelog/changelog"
+
+import snackActions from "./pscomponents/alert/psalert"
+import { Button } from "@material-ui/core"
 
 /**
  * This is the main entry point into the front-facing application.
@@ -54,6 +58,27 @@ export default class Home extends React.PureComponent {
   }
 
   render(): React.ReactElement {
+    snackActions.info("Check out the newest release of ParrotSour!", {
+      autoHideDuration: 10000,
+      preventDuplicate: true,
+      action: (key) => {
+        return (
+          <>
+            <Button
+              onClick={() => {
+                window.location.href = "#/changelog.html#4.0.0"
+                snackActions.closeSnackbar(key)
+              }}
+            >
+              v4.0.0
+            </Button>
+            <Button onClick={() => snackActions.closeSnackbar(key)}>
+              Dismiss
+            </Button>
+          </>
+        )
+      },
+    })
     return (
       <div className="app">
         <div className="body-content" style={{ width: "100%" }}>

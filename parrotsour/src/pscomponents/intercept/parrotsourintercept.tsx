@@ -1,25 +1,26 @@
 import React, { ChangeEvent, lazy, ReactElement, Suspense } from "react"
 
-import "../css/collapsible.css"
-import "../css/select.css"
-import "../css/slider.css"
-import "../css/parrotsour.css"
-import "../css/toggle.css"
+import "../../css/select.css"
+import "../../css/slider.css"
+import "../../css/parrotsour.css"
+import "../../css/toggle.css"
 
-import { InterceptQT } from "../pscomponents/quicktips/interceptQT"
-import { BlueInThe, PictureAnswer, CanvasOrient } from "../canvas/canvastypes"
-import { SensorType } from "../classes/aircraft/datatrail/datatrail"
-import { FORMAT } from "../classes/supportedformats"
+import { InterceptQT } from "../quicktips/interceptQT"
+import {
+  BlueInThe,
+  PictureAnswer,
+  CanvasOrient,
+} from "../../canvas/canvastypes"
+import { SensorType } from "../../classes/aircraft/datatrail/datatrail"
+import { FORMAT } from "../../classes/supportedformats"
 
 const PicTypeSelector = lazy(() => import("./picoptionsbar"))
 const StandardSelector = lazy(() => import("./standardselector"))
-const ParrotSourHeader = lazy(() => import("../pscomponents/parrotsourheader"))
-const ParrotSourControls = lazy(
-  () => import("../pscomponents/parrotsourcontrols")
-)
+const ParrotSourHeader = lazy(() => import("../parrotsourheader"))
+const ParrotSourControls = lazy(() => import("../parrotsourcontrols"))
 
-const PictureCanvas = lazy(() => import("../canvas/picturecanvas"))
-const VersionInfo = lazy(() => import("../versioninfo"))
+const PictureCanvas = lazy(() => import("../../canvas/picturecanvas"))
+const VersionInfo = lazy(() => import("../../versioninfo"))
 
 interface PSIState {
   showAnswer: boolean

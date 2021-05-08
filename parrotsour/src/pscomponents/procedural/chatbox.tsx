@@ -3,11 +3,11 @@ import React, { ReactElement, KeyboardEvent } from "react"
 import { aiProcess } from "./prochelpers"
 import SpeechTextControls from "./speechtext"
 
-import { getTimeStamp } from "../utils/pstime"
+import { getTimeStamp } from "../../utils/pstime"
 
 import nlp from "compromise"
 import sentences from "compromise-sentences"
-import { PictureAnswer } from "../canvas/canvastypes"
+import { PictureAnswer } from "../../canvas/canvastypes"
 
 nlp.extend(sentences)
 // eslint-disable-next-line

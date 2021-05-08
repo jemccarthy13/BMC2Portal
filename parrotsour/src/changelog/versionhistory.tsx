@@ -1,5 +1,5 @@
 /* eslint-disable react/forbid-component-props */
-import React from "react"
+import React, { useEffect } from "react"
 import Accordion from "@material-ui/core/Accordion"
 import { AccordionSummary, List, ListItem, Typography } from "@material-ui/core"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
@@ -21,6 +21,9 @@ type vHistory = {
 type VersionList = vHistory[]
 
 export default function VersionHistory(): JSX.Element {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
   const classes = useStyles()
 
   // All of the version information, manually sorted newest->oldest
@@ -176,65 +179,69 @@ export default function VersionHistory(): JSX.Element {
 
       {versionHistory.map((vers, idx) => {
         return (
-          <Accordion key={vers.version} defaultExpanded={idx === 0}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <div className={classes.column}>
-                <Typography className={classes.heading}>
-                  <b>Release {vers.version}</b>
-                </Typography>
-              </div>
-              <div className={classes.column}>
-                <Typography className={classes.secondaryHeading}>
-                  {vers.date}
-                </Typography>
-              </div>
-            </AccordionSummary>
-            {vers.features.length > 0 && (
-              <List>
-                &#128077; &nbsp;New Features
-                {vers.features.map((vFeat: string) => {
-                  return (
-                    <ListItem
-                      key={vFeat.length + Math.random() * 100}
-                      className={classes.changeLI}
-                    >
-                      {vFeat}
-                    </ListItem>
-                  )
-                })}
-              </List>
-            )}
-            {vers.fixes.length > 0 && (
-              <List>
-                &#10004;&#65039;&nbsp;Fixes
-                {vers.fixes.map((vFix: string) => {
-                  return (
-                    <ListItem
-                      key={vFix.length + Math.random() * 100}
-                      className={classes.changeLI}
-                    >
-                      {vFix}
-                    </ListItem>
-                  )
-                })}
-              </List>
-            )}
-            {vers.improvements.length > 0 && (
-              <List>
-                &#128640;Improvements
-                {vers.improvements.map((vImp: string) => {
-                  return (
-                    <ListItem
-                      key={vImp.length + Math.random() * 100}
-                      className={classes.changeLI}
-                    >
-                      {vImp}
-                    </ListItem>
-                  )
-                })}
-              </List>
-            )}
-          </Accordion>
+          <div key={"div" + vers.version}>
+            <Accordion key={vers.version} defaultExpanded={idx === 0}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <div className={classes.column}>
+                  <Typography className={classes.heading}>
+                    <div id={vers.version}>
+                      <b>Release {vers.version}</b>
+                    </div>
+                  </Typography>
+                </div>
+                <div className={classes.column}>
+                  <Typography className={classes.secondaryHeading}>
+                    {vers.date}
+                  </Typography>
+                </div>
+              </AccordionSummary>
+              {vers.features.length > 0 && (
+                <List>
+                  &#128077; &nbsp;New Features
+                  {vers.features.map((vFeat: string) => {
+                    return (
+                      <ListItem
+                        key={vFeat.length + Math.random() * 100}
+                        className={classes.changeLI}
+                      >
+                        {vFeat}
+                      </ListItem>
+                    )
+                  })}
+                </List>
+              )}
+              {vers.fixes.length > 0 && (
+                <List>
+                  &#10004;&#65039;&nbsp;Fixes
+                  {vers.fixes.map((vFix: string) => {
+                    return (
+                      <ListItem
+                        key={vFix.length + Math.random() * 100}
+                        className={classes.changeLI}
+                      >
+                        {vFix}
+                      </ListItem>
+                    )
+                  })}
+                </List>
+              )}
+              {vers.improvements.length > 0 && (
+                <List>
+                  &#128640;Improvements
+                  {vers.improvements.map((vImp: string) => {
+                    return (
+                      <ListItem
+                        key={vImp.length + Math.random() * 100}
+                        className={classes.changeLI}
+                      >
+                        {vImp}
+                      </ListItem>
+                    )
+                  })}
+                </List>
+              )}
+            </Accordion>
+          </div>
         )
       })}
     </Accordion>

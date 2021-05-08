@@ -1,7 +1,7 @@
 import React from "react"
 import { mount, ReactWrapper } from "enzyme"
 import StandardSelector, { StdSelectorProps } from "./standardselector"
-import { FORMAT } from "../classes/supportedformats"
+import { FORMAT } from "../../classes/supportedformats"
 import { Dialog } from "@material-ui/core"
 
 describe("StandardSelector", () => {

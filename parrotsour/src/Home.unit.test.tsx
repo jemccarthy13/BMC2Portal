@@ -4,8 +4,8 @@ import { mount, shallow } from "enzyme"
 import Home from "./Home"
 import ParrotSour from "./pscomponents/parrotsour"
 import { createHashHistory } from "history"
-import ParrotSourIntercept from "./intercept/parrotsourintercept"
-import ParrotSourProcedural from "./procedural/parrotsourprocedural"
+import ParrotSourIntercept from "./pscomponents/intercept/parrotsourintercept"
+import ParrotSourProcedural from "./pscomponents/procedural/parrotsourprocedural"
 import ParrotSourChooser from "./pscomponents/parrotsourchooser"
 
 describe("Home", () => {
