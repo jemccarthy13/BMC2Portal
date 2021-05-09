@@ -7,7 +7,7 @@ import {
 } from "../../../canvas/canvastypes"
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
   isAnchorNorth,
   picTrackDir,
@@ -17,41 +17,65 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
 
-import { randomHeading, randomNumber } from "../../../utils/psmath"
+import {
+  PIXELS_TO_NM,
+  randomHeading,
+  randomNumber,
+} from "../../../utils/psmath"
 
+/**
+ * Draw a three group vic and return the correct answer.
+ *
+ * @param ctx Current drawing context
+ * @param props Current PictureCanvasProps
+ * @param state Current PictureCanvasState
+ * @param start (Optional) forced start position
+ * @returns DrawAnswer
+ */
 export const drawVic: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
   start?: Point | undefined
 ): PictureAnswer => {
-  const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
   const picture = {
     start,
-    wide: randomNumber(3.5 * incr, 10 * incr),
-    deep: randomNumber(3.5 * incr, 10 * incr),
+    wide: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
+    deep: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
   }
 
-  const startPos = getStartPos(
+  const startPos = getRestrictedStartPos(
     ctx,
     state.blueAir,
     props.orientation.orient,
+    props.dataStyle,
+    45 + picture.deep,
+    200,
     picture
   )
   const startX = startPos.x
   const startY = startPos.y
 
+  const isNS = FightAxis.isNS(props.orientation.orient)
+
+  // start with trail groups (because clamp)
   let heading: number = randomHeading(props.format, state.blueAir.getHeading())
-  //const lg:Group = //
-  const lg = new AircraftGroup({
+
+  const ntg = new AircraftGroup({
     ctx,
     sx: startX,
     sy: startY,
-    hdg: heading,
+    hdg: heading + randomNumber(-10, 10),
   })
-  lg.draw(ctx, props.dataStyle)
-
-  const isNS = FightAxis.isNS(props.orientation.orient)
+  let offsetX = 0
+  let nLbl = "NORTH"
+  let sLbl = "SOUTH"
+  if (isNS) {
+    offsetX = -70
+    nLbl = "WEST"
+    sLbl = "EAST"
+  }
+  ntg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -59,15 +83,15 @@ export const drawVic: PictureDrawFunction = (
   if (isNS) {
     stg = new AircraftGroup({
       ctx,
-      sx: startX + picture.wide / 2,
+      sx: startX,
       sy: startY + picture.deep,
       hdg: heading + randomNumber(-10, 10),
     })
   } else {
     stg = new AircraftGroup({
       ctx,
-      sx: startX - picture.deep,
-      sy: startY + picture.wide / 2,
+      sx: startX,
+      sy: startY + picture.wide,
       hdg: heading + randomNumber(-10, 10),
     })
   }
@@ -75,33 +99,27 @@ export const drawVic: PictureDrawFunction = (
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
-  let ntg: AircraftGroup
-  let offsetX = 0
-  let nLbl = "NORTH"
-  let sLbl = "SOUTH"
+  let lg: AircraftGroup
   if (isNS) {
-    ntg = new AircraftGroup({
+    lg = new AircraftGroup({
       ctx,
-      sx: startX - picture.wide / 2,
+      sx: startX + picture.wide / 2,
       sy: startY + picture.deep,
-      hdg: heading + randomNumber(-10, 10),
+      hdg: heading,
     })
-    offsetX = -70
-    nLbl = "WEST"
-    sLbl = "EAST"
   } else {
-    ntg = new AircraftGroup({
+    lg = new AircraftGroup({
       ctx,
-      sx: startX - picture.deep,
-      sy: startY - picture.wide / 2,
-      hdg: heading + randomNumber(-10, 10),
+      sx: startX + picture.deep,
+      sy: startY + picture.wide / 2,
+      hdg: heading,
     })
   }
-  ntg.draw(ctx, props.dataStyle)
+  lg.draw(ctx, props.dataStyle)
 
-  const ntgPos = ntg.getCenterOfMass()
-  const stgPos = stg.getCenterOfMass()
-  const lgPos = lg.getCenterOfMass()
+  const ntgPos = ntg.getCenterOfMass(props.dataStyle)
+  const stgPos = stg.getCenterOfMass(props.dataStyle)
+  const lgPos = lg.getCenterOfMass(props.dataStyle)
   let realDepth, realWidth
   if (isNS) {
     realDepth = new Point(lgPos.x, stgPos.y).getBR(lgPos).range
@@ -153,17 +171,17 @@ export const drawVic: PictureDrawFunction = (
 
   const lgBraaseye = new Braaseye(
     lgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const stgBraaseye = new Braaseye(
     stgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const ntgBraaseye = new Braaseye(
     ntgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
 
@@ -184,7 +202,7 @@ export const drawVic: PictureDrawFunction = (
     answer += " WEIGHTED " + sLbl + ", "
   }
 
-  //console.log("DETERMINE IF OPENING/CLOSING -- EWI/SPEED TG");
+  // TODO -- SPEED -- Opening/closing pic with range component
 
   answer += picTrackDir(props.format, [ntg, stg, lg])
 
