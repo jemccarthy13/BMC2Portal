@@ -13,7 +13,7 @@ import { AircraftGroup } from "../classes/groups/group"
 import { Point } from "../classes/point"
 
 // Functions
-import { drawBullseye } from "./draw/drawutils"
+import { drawBullseye, drawFullInfo } from "./draw/drawutils"
 import { drawAzimuth } from "../canvas/draw/intercept/azimuth"
 import { drawRange } from "../canvas/draw/intercept/range"
 import { drawLadder } from "../canvas/draw/intercept/ladder"
@@ -85,6 +85,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
         grp.draw(ctx, this.props.dataStyle)
       })
       this.state.blueAir.draw(PaintBrush.getContext(), this.props.dataStyle)
+      drawFullInfo(ctx, this.state, this.props, this.state.answer.groups)
       if (
         this.props.animate === prevProps.animate &&
         prevProps.animate === true
