@@ -5,7 +5,11 @@ import {
   PictureCanvasState,
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
+import {
+  drawAltitudes,
+  drawBullseye,
+  drawMeasurement,
+} from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
@@ -50,7 +54,7 @@ export const drawVic: PictureDrawFunction = (
     props.orientation.orient,
     props.dataStyle,
     45 + picture.deep,
-    200,
+    100,
     picture
   )
   const startX = startPos.x
@@ -76,6 +80,7 @@ export const drawVic: PictureDrawFunction = (
     sLbl = "EAST"
   }
   ntg.draw(ctx, props.dataStyle)
+  drawBullseye(ctx, ntg.getStartPos())
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -83,8 +88,8 @@ export const drawVic: PictureDrawFunction = (
   if (isNS) {
     stg = new AircraftGroup({
       ctx,
-      sx: startX,
-      sy: startY + picture.deep,
+      sx: startX + picture.wide,
+      sy: startY,
       hdg: heading + randomNumber(-10, 10),
     })
   } else {
@@ -104,7 +109,7 @@ export const drawVic: PictureDrawFunction = (
     lg = new AircraftGroup({
       ctx,
       sx: startX + picture.wide / 2,
-      sy: startY + picture.deep,
+      sy: startY - picture.deep,
       hdg: heading,
     })
   } else {

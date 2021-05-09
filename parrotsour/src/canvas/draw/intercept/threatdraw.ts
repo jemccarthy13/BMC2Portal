@@ -4,6 +4,7 @@ import {
   PictureDrawFunction,
   PictureCanvasProps,
   PictureCanvasState,
+  BlueInThe,
 } from "../../../canvas/canvastypes"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Braaseye } from "../../../classes/braaseye"
@@ -13,7 +14,11 @@ import { AltStack } from "../../../classes/altstack"
 // Functions
 import { drawAltitudes } from "../drawutils"
 import { getAspect } from "../../../utils/mathutilities"
-import { randomHeading, randomNumber } from "../../../utils/psmath"
+import {
+  PIXELS_TO_NM,
+  randomHeading,
+  randomNumber,
+} from "../../../utils/psmath"
 
 export const drawThreat: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
@@ -29,10 +34,15 @@ export const drawThreat: PictureDrawFunction = (
 
   const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
 
+  const isNS =
+    props.orientation.orient === BlueInThe.NORTH ||
+    props.orientation.orient === BlueInThe.SOUTH
   if (start === undefined) {
     start = new Point(
-      randomNumber(bPos.x - 100, bPos.x - 40),
-      randomNumber(bPos.y - 100, bPos.y + 40)
+      randomNumber(bPos.x - 25 * PIXELS_TO_NM, bPos.x - 10 * PIXELS_TO_NM),
+      isNS
+        ? randomNumber(bPos.y - 2, bPos.y + 30 * PIXELS_TO_NM)
+        : randomNumber(bPos.y - 25 * PIXELS_TO_NM, bPos.y + 25 * PIXELS_TO_NM)
     )
   }
   if (start && start.y === undefined) {

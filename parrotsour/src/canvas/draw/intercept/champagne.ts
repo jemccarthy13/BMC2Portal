@@ -14,7 +14,7 @@ import { Point } from "../../../classes/point"
 // Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
   isAnchorNorth,
   picTrackDir,
@@ -47,11 +47,13 @@ export const drawChampagne: PictureDrawFunction = (
     depth: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
   }
 
-  const startPos = getStartPos(
+  const startPos = getRestrictedStartPos(
     ctx,
     state.blueAir,
     props.orientation.orient,
     props.dataStyle,
+    45 + picture.depth,
+    100,
     picture
   )
   const startX = startPos.x
