@@ -10,7 +10,7 @@ export class RawDataTrail extends DataTrail {
 
   constructor(startPos: Point, heading: number) {
     super(startPos)
-    this.iffDataTrail = new IFFDataTrail(startPos)
+    this.iffDataTrail = new IFFDataTrail(startPos, heading)
     this.rdrDataTrail = new RadarDataTrail(startPos, heading)
   }
 

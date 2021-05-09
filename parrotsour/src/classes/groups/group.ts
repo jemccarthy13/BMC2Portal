@@ -80,8 +80,8 @@ export class AircraftGroup extends Array<Aircraft> {
       // Compute start position offset for follow-on groups (calculated from
       // 90 deg perpendicular)
       const vectors = headingToRadians(p.hdg)
-      p.sx += 1.5 * PIXELS_TO_NM * Math.cos(vectors.offset)
-      p.sy += 1.5 * PIXELS_TO_NM * -Math.sin(vectors.offset)
+      p.sx += 2 * PIXELS_TO_NM * Math.cos(vectors.offset)
+      p.sy += 2 * PIXELS_TO_NM * -Math.sin(vectors.offset)
     }
 
     // TODO -- MANEUVER -- % chance of 2 maneuvers (i.e. flank turn back hot)

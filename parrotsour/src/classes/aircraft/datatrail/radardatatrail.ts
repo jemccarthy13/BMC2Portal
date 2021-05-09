@@ -82,12 +82,16 @@ export class RadarDataTrail extends DataTrail {
     })
 
     this._drawSymbology(ctx, id)
+    this._drawVectorStick(ctx, heading)
   }
 
   public getDataTrail(): Point[] {
     return this.radarPoints
   }
 
+  /**
+   * @returns One anticipated data plot in front of the track
+   */
   _getOnePlotAhead(): Point {
     const cPt = this.radarPoints[this.radarPoints.length - 1]
     const pPt = this.radarPoints[this.radarPoints.length - 2]
@@ -98,6 +102,11 @@ export class RadarDataTrail extends DataTrail {
     return new Point(cPt.x + deltX, cPt.y + deltY)
   }
 
+  /**
+   * Draw Symbology for the track at the 'head' of the data trail
+   * @param ctx Current drawing context
+   * @param id ID for symbology (HOS/NEU/SUS/etc)
+   */
   _drawSymbology(ctx: CanvasRenderingContext2D, id: IDMatrix): void {
     const plotAhead = this._getOnePlotAhead()
 
@@ -132,5 +141,13 @@ export class RadarDataTrail extends DataTrail {
       ctx.stroke()
       ctx.stroke()
     }
+  }
+
+  /**
+   * Draw the vector stick based on current heading.
+   * @param heading Current heading of data trail
+   */
+  _drawVectorStick(ctx: CanvasRenderingContext2D, heading: number): void {
+    // console.log("draw vector")
   }
 }

@@ -154,7 +154,7 @@ export abstract class AnimationHandler {
     let speed = props.sliderSpeed
     if (slider && slider.value) speed = parseInt(slider.value)
 
-    // delay is proportion of 500ms based on current slider setting
+    // delay is proportion of 5000ms based on current slider setting
     const delay = 5000 * ((100 - speed) / 100)
 
     // use the sleep utility to create a new Promise with an animation function call
