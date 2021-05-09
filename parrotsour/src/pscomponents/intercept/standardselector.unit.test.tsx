@@ -30,6 +30,12 @@ describe("StandardSelector", () => {
   })
 
   it("handles_toggle_alsa_tips", () => {
+    console.warn(
+      "05/07/2021- Surpressing external usage of console.error\r\n" +
+        "Use '(test command) --silent' to turn off all console messages."
+    )
+    jest.spyOn(console, "error").mockImplementation()
+
     const dialog = wrapper.find(Dialog)
     expect(dialog.prop("open")).toEqual(false)
 

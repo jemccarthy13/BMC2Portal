@@ -253,7 +253,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
           <div
             className="content"
             id="answerDiv"
-            style={{ color: "black", padding: "20px" }}
+            style={{ color: "black", padding: "20px", whiteSpace: "pre-wrap" }}
           >
             {answer ? answer.pic : <div />}
           </div>

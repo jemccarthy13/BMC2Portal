@@ -26,7 +26,6 @@ describe("PicOptionsBar", () => {
     jest
       .spyOn(fakeProps, "handleChangePicType")
       .mockImplementationOnce((val) => {
-        console.log(val)
         myVal = val.target.value as string
       })
     sel.simulate("change", { target: { value: "wall" } })
