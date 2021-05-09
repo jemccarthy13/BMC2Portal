@@ -6,6 +6,7 @@ import { PIXELS_TO_NM } from "../../../utils/psmath"
 
 import { _howFarOut } from "./pictureclamp"
 import { AircraftGroup } from "../../../classes/groups/group"
+import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 
 const TEN_NM = PIXELS_TO_NM * 10
 
@@ -201,14 +202,18 @@ describe("getRestrictedStartPos", () => {
       ctx,
       blueAir,
       BlueInThe.NORTH,
+      SensorType.ARROW,
       45,
       50,
       {
         wide: TEN_NM,
       }
     )
-    expect("").toEqual("this test not implemented")
-    //expect(startPos.getBR(new Point(100, 100)).range).toBeGreaterThan(45)
-    //expect(startPos.getBR(new Point(100, 100)).range).toBeLessThan(50)
+    expect(
+      startPos.getBR(blueAir.getCenterOfMass(SensorType.ARROW)).range
+    ).toBeGreaterThan(45)
+    expect(
+      startPos.getBR(blueAir.getCenterOfMass(SensorType.ARROW)).range
+    ).toBeLessThan(50)
   })
 })

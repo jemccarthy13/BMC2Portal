@@ -10,6 +10,7 @@ import { drawLine } from "./draw/drawutils"
 import { DrawCanvasProps } from "./canvastypes"
 import { Braaseye } from "../classes/braaseye"
 import { Point } from "../classes/point"
+import { PaintBrush } from "./draw/paintbrush"
 
 interface CanvasMouseEvent {
   clientX: number
@@ -25,6 +26,15 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
   const canvasRef: React.RefObject<HTMLCanvasElement> = useRef<HTMLCanvasElement>(
     null
   )
+
+  /**
+   * Every time the canvas changes, update the PaintBrush current drawing context
+   * When a context is undefined in helper functions, the PaintBrush context is used.
+   */
+  useEffect(() => {
+    PaintBrush.use(canvasRef.current?.getContext("2d"))
+  }, [canvasRef])
+
   const mouseCanvasRef: React.RefObject<HTMLCanvasElement> = useRef<HTMLCanvasElement>(
     null
   )
@@ -46,7 +56,6 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     showMeasurements,
     isHardMode,
     newPic,
-    dataStyle,
   } = props
 
   // useEffect is a React hook called when any of the trigger props changes
@@ -83,7 +92,6 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     showMeasurements,
     newPic,
     isHardMode,
-    dataStyle,
   ])
 
   /**

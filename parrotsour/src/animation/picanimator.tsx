@@ -4,6 +4,7 @@ import { PictureCanvasState } from "../canvas/canvastypes"
 
 import { randomNumber } from "../utils/psmath"
 import { drawAltitudes } from "../canvas/draw/drawutils"
+import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 
 /**
  * This Handler implements applyLogic to drive towards a desired point
@@ -18,15 +19,17 @@ export class PicAnimationHandler extends AnimationHandler {
    *
    * @param blueAir The blue aircraft group
    * @param groups The rest of the aircraft groups
+   * @param dataStyle SensorType for data trail
    * @param _ctx Current drawing context (unused for this handler)
    */
   applyBlueLogic(
     blueAir: AircraftGroup,
     groups: AircraftGroup[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _ctx?: CanvasRenderingContext2D
+    dataStyle: SensorType
   ): void {
-    const brToRed = blueAir.getCenterOfMass().getBR(groups[0].getCenterOfMass())
+    const brToRed = blueAir
+      .getCenterOfMass(dataStyle)
+      .getBR(groups[0].getCenterOfMass(dataStyle))
     blueAir.updateIntent({
       desiredHeading: brToRed.bearingNum,
     })
@@ -39,15 +42,20 @@ export class PicAnimationHandler extends AnimationHandler {
    *
    * @param grp Group to check intent for
    * @param state Current state of canvas
+   * @param dataStyle Current DataTrail style
+   * @param resetCallback (Optional) call back to perform on animate pause
+   * @param ctx (Optional) current drawing context. If undefined,
+   * uses curRef from Canvas
    */
   applyLogic(
     grp: AircraftGroup,
     state: PictureCanvasState,
+    dataStyle: SensorType,
     resetCallback?: () => void,
     ctx?: CanvasRenderingContext2D
   ): void {
-    const bluePos = state.blueAir.getCenterOfMass()
-    const startPos = grp.getCenterOfMass()
+    const bluePos = state.blueAir.getCenterOfMass(dataStyle)
+    const startPos = grp.getCenterOfMass(dataStyle)
 
     // if red is close enough to blue, stop the animation
     if (startPos.getBR(bluePos).range < 30 && resetCallback) {
@@ -82,10 +90,10 @@ export class PicAnimationHandler extends AnimationHandler {
 
     // draw altitudes during the animation
     if (ctx && this.continueAnimate) {
-      const grpPos = grp.getCenterOfMass()
+      const grpPos = grp.getCenterOfMass(dataStyle)
       drawAltitudes(ctx, grpPos, grp.getAltitudes())
 
-      if (this._isNearBounds(ctx, grp)) {
+      if (this._isNearBounds(ctx, grp, dataStyle)) {
         grp.updateIntent({
           desiredHeading: grpPos.getBR(bluePos).bearingNum,
         })

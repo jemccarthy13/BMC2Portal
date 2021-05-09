@@ -13,10 +13,14 @@ import { Point } from "../../../classes/point"
 // Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { picTrackDir } from "../../../canvas/draw/intercept/picturehelpers"
 import { trackDirFromHdg } from "../../../utils/mathutilities"
-import { randomHeading, randomNumber } from "../../../utils/psmath"
+import {
+  PIXELS_TO_NM,
+  randomHeading,
+  randomNumber,
+} from "../../../utils/psmath"
 
 /**
  * Draw two groups in range and return the correct answer.
@@ -33,18 +37,20 @@ export const drawRange: PictureDrawFunction = (
   state: PictureCanvasState,
   start?: Point
 ): PictureAnswer => {
-  const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
-  const drawDistance: number = randomNumber(3.5 * incr, 10 * incr)
+  const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)
 
   const picture = {
     start,
     deep: drawDistance,
   }
 
-  const startPos = getStartPos(
+  const startPos = getRestrictedStartPos(
     ctx,
     state.blueAir,
     props.orientation.orient,
+    props.dataStyle,
+    45 + drawDistance / PIXELS_TO_NM,
+    200,
     picture
   )
   const startX = startPos.x
@@ -70,7 +76,7 @@ export const drawRange: PictureDrawFunction = (
   let offsetX2 = 0
   let offsetY2 = 0
 
-  const tgPos = tg.getCenterOfMass()
+  const tgPos = tg.getCenterOfMass(props.dataStyle)
 
   const isNS = FightAxis.isNS(props.orientation.orient)
   if (isNS) {
@@ -81,7 +87,7 @@ export const drawRange: PictureDrawFunction = (
       hdg: heading,
     })
     lg.draw(ctx, props.dataStyle)
-    m2 = new Point(tgPos.x, lg.getCenterOfMass().y)
+    m2 = new Point(tgPos.x, lg.getCenterOfMass(props.dataStyle).y)
   } else {
     lg = new AircraftGroup({
       ctx,
@@ -90,14 +96,14 @@ export const drawRange: PictureDrawFunction = (
       hdg: heading,
     })
     lg.draw(ctx, props.dataStyle)
-    m2 = new Point(lg.getCenterOfMass().x, tgPos.y)
+    m2 = new Point(lg.getCenterOfMass(props.dataStyle).x, tgPos.y)
     offsetX = -10
     offsetY = 40
     offsetX2 = -60
     offsetY2 = 40
   }
 
-  const lgPos = lg.getCenterOfMass()
+  const lgPos = lg.getCenterOfMass(props.dataStyle)
 
   const range = m2.getBR(tgPos).range
   drawMeasurement(
@@ -118,12 +124,12 @@ export const drawRange: PictureDrawFunction = (
 
   const lgBraaseye = new Braaseye(
     lgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const tgBraaseye = new Braaseye(
     tgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
 

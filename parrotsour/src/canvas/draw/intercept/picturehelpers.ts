@@ -1,4 +1,5 @@
 import { BlueInThe, FightAxis } from "../../../canvas/canvastypes"
+import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
@@ -41,13 +42,14 @@ export const isAnchorNorth = (
 
 export const isEchelon = (
   orientation: BlueInThe,
+  dataStyle: SensorType,
   ngBraaseye: Braaseye,
   sgBraaseye: Braaseye,
   ng: AircraftGroup,
   sg: AircraftGroup
 ): string => {
-  const nPos = ng.getCenterOfMass()
-  const sPos = sg.getCenterOfMass()
+  const nPos = ng.getCenterOfMass(dataStyle)
+  const sPos = sg.getCenterOfMass(dataStyle)
 
   const isNS = FightAxis.isNS(orientation)
   const isEchX = !isNS && nPos.getBR(new Point(sPos.x, nPos.y)).range > 5

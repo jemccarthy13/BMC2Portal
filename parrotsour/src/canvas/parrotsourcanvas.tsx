@@ -44,11 +44,15 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
    * @param prevProps - previous set of PicCanvasProps
    */
   componentDidUpdate = (prevProps: PictureCanvasProps): void => {
+    this.checkAnimate(prevProps)
+  }
+
+  checkAnimate = (prevProps: PictureCanvasProps): void => {
     const oldAnimate = prevProps.animate
     const { animate } = this.props
 
     if (oldAnimate !== animate) {
-      const { animate, showMeasurements, braaFirst, resetCallback } = this.props
+      const { animate, resetCallback } = this.props
       const { ctx, animateCanvas, answer } = this.state
       if (ctx) {
         if (animate) {
@@ -65,17 +69,16 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
           }
         } else {
           const callback = () =>
-            drawFullInfo(
-              ctx,
-              this.state,
-              braaFirst,
-              showMeasurements,
-              answer.groups
-            )
+            drawFullInfo(ctx, this.state, this.props, answer.groups)
           this.animationHandler.pauseFight(callback)
         }
       }
     }
+  }
+
+  // Expose lifecycle to subclass
+  _componentDidUpdate = (prevProps: PictureCanvasProps): void => {
+    this.checkAnimate(prevProps)
   }
 
   animationHandler: AnimationHandler

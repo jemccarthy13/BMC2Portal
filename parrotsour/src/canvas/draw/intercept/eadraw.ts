@@ -15,6 +15,7 @@ import { getAspect, trackDirFromHdg } from "../../../utils/mathutilities"
 import { drawText } from "../drawutils"
 import { randomNumber } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
+import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 
 /**
  * Contains required info for resposne to EA
@@ -101,7 +102,7 @@ function formatMusic(
     trkDir = trkDir || ""
     answer += grp.isCapping() ? " CAP " : ", TRACK " + trkDir
   }
-  answer += ", HOSTILE, "
+  answer += ", HOSTILE "
 
   // apply fill-in for # contacts
   const numContacts = grp.getStrength()
@@ -112,7 +113,9 @@ function formatMusic(
   // apply fill-ins (HI/FAST/etc)
   answer += " " + altStack.fillIns
 
-  answer += " LINE ABREAST 3 "
+  if (numContacts > 1) {
+    answer += " LINE ABREAST 3 "
+  }
 
   return answer
 }
@@ -128,13 +131,19 @@ function formatMusic(
  * @returns Object containing closest group, closest braa, query
  * text, strobe range, and group matching the query
  */
-function getEAInfo(groups: AircraftGroup[], blueAir: AircraftGroup): EAInfo {
+function getEAInfo(
+  groups: AircraftGroup[],
+  blueAir: AircraftGroup,
+  dataStyle: SensorType
+): EAInfo {
   // find the closest group
   let closestGrp: AircraftGroup = groups[0]
   let closestRng = 9999
   let braa = new BRAA(0, 0)
   for (let x = 0; x < groups.length; x++) {
-    const tmpBraa = blueAir.getCenterOfMass().getBR(groups[x].getCenterOfMass())
+    const tmpBraa = blueAir
+      .getCenterOfMass(dataStyle)
+      .getBR(groups[x].getCenterOfMass(dataStyle))
     if (braa.range < closestRng) {
       braa = tmpBraa
       closestRng = braa.range
@@ -142,9 +151,12 @@ function getEAInfo(groups: AircraftGroup[], blueAir: AircraftGroup): EAInfo {
     }
   }
 
+  console.log(blueAir)
   // pick a random group if not using closest (i.e. not a BRAA request)
-  const grp: AircraftGroup = groups[randomNumber(0, groups.length)]
-  const strBR = blueAir.getCenterOfMass().getBR(grp.getCenterOfMass())
+  const grp: AircraftGroup = groups[randomNumber(0, groups.length - 1)]
+  const strBR = blueAir
+    .getCenterOfMass(dataStyle)
+    .getBR(grp.getCenterOfMass(dataStyle))
 
   const info = {
     braa,
@@ -192,14 +204,16 @@ export const drawEA: PictureDrawFunction = (
     start.x = randomNumber(ctx.canvas.width * 0.6, ctx.canvas.width * 0.65)
   }
 
+  console.log(state.blueAir)
   /**
    * TODO -- using Partial<GroupParams>, set the start point and a logical heading
    * for groups to perform EA (i.e. no cold pictures)
    */
   const answer = state.reDraw(ctx, true, start)
 
+  console.log(state.blueAir)
   // get info needed for EA response
-  const eaInfo = getEAInfo(answer.groups, state.blueAir)
+  const eaInfo = getEAInfo(answer.groups, state.blueAir, props.dataStyle)
   eaInfo.altStack = eaInfo.closestGrp.getAltStack(props.format)
 
   const finalAnswer = {
@@ -213,19 +227,23 @@ export const drawEA: PictureDrawFunction = (
     case 0:
       request = '"EAGLE01, BOGEY DOPE NEAREST GRP"'
       eaInfo.altStack = eaInfo.closestGrp.getAltStack(props.format)
-      eaInfo.aspectH = getAspect(state.blueAir, eaInfo.closestGrp)
+      eaInfo.aspectH = getAspect(
+        state.blueAir,
+        eaInfo.closestGrp,
+        props.dataStyle
+      )
       finalAnswer.pic = formatBRAA(eaInfo)
       break
     case 1:
       request = '"EAGLE01 STROBE ' + eaInfo.query + '"'
       eaInfo.altStack = eaInfo.grp.getAltStack(props.format)
-      eaInfo.aspectH = getAspect(state.blueAir, eaInfo.grp)
+      eaInfo.aspectH = getAspect(state.blueAir, eaInfo.grp, props.dataStyle)
       finalAnswer.pic = formatStrobe(eaInfo)
       break
     default:
       finalAnswer.pic = formatMusic(
         eaInfo.grp,
-        state.bullseye.getBR(eaInfo.grp.getCenterOfMass()),
+        state.bullseye.getBR(eaInfo.grp.getCenterOfMass(props.dataStyle)),
         eaInfo.altStack,
         props.format
       )

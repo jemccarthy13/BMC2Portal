@@ -24,18 +24,16 @@ export const drawPOD: PictureDrawFunction = (
   }
   const numGrps: number = randomNumber(3, 11)
 
-  const bPos = state.blueAir.getCenterOfMass()
+  const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
 
   drawText(ctx, '"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
-
-  const groups2: AircraftGroup[] = []
 
   const groups: AircraftGroup[] = []
   for (let x = 0; x <= numGrps; x++) {
     groups.push(GroupFactory.randomGroup(ctx, props, state))
     groups[x].draw(ctx, props.dataStyle)
 
-    const grpPos = groups[x].getCenterOfMass()
+    const grpPos = groups[x].getCenterOfMass(props.dataStyle)
     drawLine(
       ctx,
       state.bullseye.x,
@@ -44,17 +42,18 @@ export const drawPOD: PictureDrawFunction = (
       state.bullseye.y - 2
     )
 
-    new Braaseye(grpPos, state.blueAir.getCenterOfMass(), state.bullseye).draw(
-      ctx,
-      props.showMeasurements,
-      props.braaFirst
-    )
+    new Braaseye(
+      grpPos,
+      state.blueAir.getCenterOfMass(props.dataStyle),
+      state.bullseye
+    ).draw(ctx, props.showMeasurements, props.braaFirst)
     drawAltitudes(ctx, grpPos, groups[x].getAltitudes())
   }
 
   function sortFun(a: AircraftGroup, b: AircraftGroup) {
-    const aBR = state.blueAir.getCenterOfMass().getBR(a.getCenterOfMass())
-    const bBR = state.blueAir.getCenterOfMass().getBR(b.getCenterOfMass())
+    const bluePos = state.blueAir.getCenterOfMass(props.dataStyle)
+    const aBR = bluePos.getBR(a.getCenterOfMass(props.dataStyle))
+    const bBR = bluePos.getBR(b.getCenterOfMass(props.dataStyle))
     return aBR.range > bBR.range ? 1 : -1
   }
 
@@ -64,8 +63,8 @@ export const drawPOD: PictureDrawFunction = (
 
   for (let z = 0; z < closestGroups.length; z++) {
     const braaseye = new Braaseye(
-      closestGroups[z].getCenterOfMass(),
-      state.blueAir.getCenterOfMass(),
+      closestGroups[z].getCenterOfMass(props.dataStyle),
+      state.blueAir.getCenterOfMass(props.dataStyle),
       state.bullseye
     )
     response += formatGroup(
@@ -78,8 +77,10 @@ export const drawPOD: PictureDrawFunction = (
     )
   }
 
+  response +=
+    "\r\n\r\nNote: This is core; there may be a better answer, but POD is intended to get you thinking about 'what would you say if you saw...'"
   return {
     pic: response,
-    groups: groups2,
+    groups: closestGroups,
   }
 }

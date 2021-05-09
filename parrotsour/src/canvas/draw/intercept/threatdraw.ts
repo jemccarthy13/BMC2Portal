@@ -27,7 +27,7 @@ export const drawThreat: PictureDrawFunction = (
 
   const offsetDeg1: number = randomNumber(-10, 10)
 
-  const bPos = state.blueAir.getCenterOfMass()
+  const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
 
   if (start === undefined) {
     start = new Point(
@@ -54,7 +54,7 @@ export const drawThreat: PictureDrawFunction = (
     hdg: heading + offsetDeg1,
   })
   sg.draw(ctx, props.dataStyle)
-  const sgPos = sg.getCenterOfMass()
+  const sgPos = sg.getCenterOfMass(props.dataStyle)
 
   drawAltitudes(ctx, sgPos, sg.getAltitudes())
 
@@ -62,14 +62,14 @@ export const drawThreat: PictureDrawFunction = (
 
   const closestBraaseye = new Braaseye(
     sgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   closestBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
 
   const closestGrp: AircraftGroup = sg
 
-  const aspectH = getAspect(state.blueAir, sg)
+  const aspectH = getAspect(state.blueAir, sg, props.dataStyle)
   const trackDir = sg.getTrackDir()
 
   let answer: string =

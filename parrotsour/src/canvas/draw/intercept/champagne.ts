@@ -19,26 +19,39 @@ import {
   isAnchorNorth,
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
-import { randomHeading, randomNumber } from "../../../utils/psmath"
+import {
+  PIXELS_TO_NM,
+  randomHeading,
+  randomNumber,
+} from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
 
+/**
+ * Draw a three group champagne and return the correct answer.
+ *
+ * @param ctx Current drawing context
+ * @param props PicCanvasProps for the canvas
+ * @param state PicCanvasState of the current canvas
+ * @param start (Optional) Forced starting location for the picture
+ * @returns DrawAnswer with the correct answer for this picture
+ */
 export const drawChampagne: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
   start?: Point | undefined
 ): PictureAnswer => {
-  const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
   const picture = {
     start,
-    width: randomNumber(3.5 * incr, 10 * incr),
-    depth: randomNumber(3.5 * incr, 10 * incr),
+    width: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
+    depth: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
   }
 
   const startPos = getStartPos(
     ctx,
     state.blueAir,
     props.orientation.orient,
+    props.dataStyle,
     picture
   )
   const startX = startPos.x
@@ -107,9 +120,9 @@ export const drawChampagne: PictureDrawFunction = (
   slg.draw(ctx, props.dataStyle)
 
   let realDepth, realWidth
-  const nlgPos = nlg.getCenterOfMass()
-  const slgPos = slg.getCenterOfMass()
-  const tgPos = tg.getCenterOfMass()
+  const nlgPos = nlg.getCenterOfMass(props.dataStyle)
+  const slgPos = slg.getCenterOfMass(props.dataStyle)
+  const tgPos = tg.getCenterOfMass(props.dataStyle)
   if (isNS) {
     realWidth = new Point(slgPos.x, nlgPos.y).getBR(nlgPos).range
     realDepth = new Point(tgPos.x, nlgPos.y).getBR(tgPos).range
@@ -160,17 +173,17 @@ export const drawChampagne: PictureDrawFunction = (
 
   const tgBraaseye = new Braaseye(
     tgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const nlgBraaseye = new Braaseye(
     nlgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const slgBraaseye = new Braaseye(
     slgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
 
@@ -182,6 +195,7 @@ export const drawChampagne: PictureDrawFunction = (
   const nlgAlts: AltStack = nlg.getAltStack(props.format)
   const slgAlts: AltStack = slg.getAltStack(props.format)
 
+  // TODO -- CHAMP ANSWER -- cleanup
   let answer =
     "THREE GROUP CHAMPAGNE " + realWidth + " WIDE, " + realDepth + " DEEP, "
 
@@ -196,7 +210,6 @@ export const drawChampagne: PictureDrawFunction = (
 
   const includeBull = realWidth >= 10 && props.format !== FORMAT.IPE
 
-  // TODO -- anchoring priorities for LE of champagne
   const anchorN = isAnchorNorth(nlgBraaseye, slgBraaseye, nlg, slg)
   if (anchorN) {
     answer +=

@@ -5,6 +5,7 @@
 import { Braaseye } from "../../classes/braaseye"
 import { AircraftGroup } from "../../classes/groups/group"
 import { AltStack } from "../../classes/altstack"
+import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 
 type RangeBack = {
   label: string
@@ -82,10 +83,11 @@ export function formatGroup(
  */
 export function getGroupOpenClose(
   fg: AircraftGroup,
-  sg: AircraftGroup
+  sg: AircraftGroup,
+  dataStyle: SensorType
 ): string {
-  const fgPos = fg.getCenterOfMass()
-  const sgPos = sg.getCenterOfMass()
+  const fgPos = fg.getCenterOfMass(dataStyle)
+  const sgPos = sg.getCenterOfMass(dataStyle)
   const fgStartPos = fg.getStartPos()
   const sgStartPos = sg.getStartPos()
 

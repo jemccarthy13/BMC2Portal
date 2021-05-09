@@ -26,6 +26,9 @@ import { FORMAT } from "../../../classes/supportedformats"
  * group.draw() to draw caps, and this function wraps
  * drawRandomPic with establishing random group.setCapping(true)
  *
+ * See other description in picture canvas (maybe the better answer)
+ * BL: Somehow if CAP is selected, 1+ groups CAP instead of TRK
+ *
  * @param context the current drawing context
  * @param props PicCanvasProps with settings from the controls
  * @param state PicCanvasState current state of canvas
@@ -41,10 +44,16 @@ export const drawCap: PictureDrawFunction = (
   const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
   const drawDist: number = randomNumber(3.5 * incr, 10 * incr)
 
-  start = getStartPos(ctx, state.blueAir, props.orientation.orient, {
-    start,
-    wide: drawDist,
-  })
+  start = getStartPos(
+    ctx,
+    state.blueAir,
+    props.orientation.orient,
+    props.dataStyle,
+    {
+      start,
+      wide: drawDist,
+    }
+  )
 
   // TODO -- this will be replaced with CAP in group draw/format logic??
   const capCheck = randomNumber(0, 100)
@@ -102,8 +111,8 @@ export const drawCap: PictureDrawFunction = (
 
   let realWidth: number
 
-  const ngPos = ng.getCenterOfMass()
-  const sgPos = sg.getCenterOfMass()
+  const ngPos = ng.getCenterOfMass(props.dataStyle)
+  const sgPos = sg.getCenterOfMass(props.dataStyle)
   // TODO -- CLAMP
   if (isNS) {
     realWidth = new Point(sgPos.x - sOffset, ngPos.y).getBR(
@@ -140,12 +149,12 @@ export const drawCap: PictureDrawFunction = (
 
   const ngBraaseye: Braaseye = new Braaseye(
     ngPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const sgBraaseye: Braaseye = new Braaseye(
     sgPos,
-    state.blueAir.getCenterOfMass(),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
 

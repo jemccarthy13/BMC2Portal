@@ -14,7 +14,7 @@ import { Point } from "../../../classes/point"
 // Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { picTrackDir } from "../../../canvas/draw/intercept/picturehelpers"
 import {
   PIXELS_TO_NM,
@@ -35,16 +35,31 @@ export const drawLadder: PictureDrawFunction = (
 
   const numGroups = randomNumber(3, 5)
 
-  /**
-   * TODO -- CLAMP -- need to know how deep the ladder will
-   * be in order to clamp to canvas w/getStartPos.
-   *
-   * This means calculating offset per group / depth ahead of time,
-   * then creating / drawing groups later
-   */
-  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
-    start,
-  })
+  // calculate group separations ahead of time
+  // to allow clamp logic
+  const seps = [0]
+  let totalDepth = 0
+  for (let x = 1; x < numGroups; x++) {
+    const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
+    seps.push(nextSep)
+    totalDepth += nextSep
+  }
+
+  // use restricted to ensure lead group has min sep from blue
+  // the argument (45 + totalDepth / PIXELS_TO_NM) pushes the picture
+  // further away based on ladder depth
+  const startPos = getRestrictedStartPos(
+    ctx,
+    state.blueAir,
+    props.orientation.orient,
+    props.dataStyle,
+    45 + totalDepth / PIXELS_TO_NM,
+    200,
+    {
+      start,
+      deep: totalDepth,
+    }
+  )
   const startX = startPos.x
   const startY = startPos.y
 
@@ -56,7 +71,7 @@ export const drawLadder: PictureDrawFunction = (
 
   for (let x = 0; x < numGroups; x++) {
     const offsetHeading = randomNumber(-5, 5)
-    totalArrowOffset += x === 0 ? 0 : randomNumber(30, 80)
+    totalArrowOffset += seps[x]
 
     heading = !props.isHardMode
       ? heading
@@ -86,12 +101,12 @@ export const drawLadder: PictureDrawFunction = (
       offsetY = -20 + -11 * (numGroups - x)
     }
 
-    const gPos = groups[x].getCenterOfMass()
+    const gPos = groups[x].getCenterOfMass(props.dataStyle)
     drawAltitudes(ctx, gPos, groups[x].getAltitudes(), offsetX, offsetY)
 
     const grpBraaseye = new Braaseye(
       gPos,
-      state.blueAir.getCenterOfMass(),
+      state.blueAir.getCenterOfMass(props.dataStyle),
       state.bullseye
     )
     grpBraaseye.draw(
@@ -107,8 +122,8 @@ export const drawLadder: PictureDrawFunction = (
   }
 
   let deep
-  const prevGpPos = groups[groups.length - 1].getCenterOfMass()
-  const gpPos = groups[0].getCenterOfMass()
+  const prevGpPos = groups[groups.length - 1].getCenterOfMass(props.dataStyle)
+  const gpPos = groups[0].getCenterOfMass(props.dataStyle)
   if (isNS) {
     deep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
     drawMeasurement(
@@ -163,8 +178,8 @@ export const drawLadder: PictureDrawFunction = (
   const rangeBack = {
     label: props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
     range: groups[groups.length - 2]
-      .getCenterOfMass()
-      .getBR(groups[groups.length - 1].getCenterOfMass()).range,
+      .getCenterOfMass(props.dataStyle)
+      .getBR(groups[groups.length - 1].getCenterOfMass(props.dataStyle)).range,
   }
 
   for (let g = groups.length - 1; g >= 0; g--) {

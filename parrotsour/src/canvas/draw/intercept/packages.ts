@@ -7,6 +7,7 @@ import {
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
 import { drawBullseye } from "../../../canvas/draw/drawutils"
+import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
@@ -15,23 +16,24 @@ const _getPicBull = (
   isRange: boolean,
   orientation: BlueInThe,
   blueAir: AircraftGroup,
-  groups: AircraftGroup[]
+  groups: AircraftGroup[],
+  dataStyle: SensorType
 ): Point => {
   let closestGroup = groups[0]
 
   let closestRng = 9999
   let sum = 0
-  const bPos = blueAir.getCenterOfMass()
+  const bPos = blueAir.getCenterOfMass(dataStyle)
 
   const isNS = FightAxis.isNS(orientation)
   for (let x = 0; x < groups.length; x++) {
-    const BRAA = bPos.getBR(groups[x].getCenterOfMass())
+    const BRAA = bPos.getBR(groups[x].getCenterOfMass(dataStyle))
     if (BRAA.range < closestRng) {
       closestGroup = groups[x]
       closestRng = BRAA.range
     }
 
-    const gPos = groups[x].getCenterOfMass()
+    const gPos = groups[x].getCenterOfMass(dataStyle)
     if (isNS) {
       sum += gPos.x
     } else {
@@ -41,9 +43,15 @@ const _getPicBull = (
 
   // if it's wide (az) get center of mass
   // it it's deep (rng) get lead pos (depends on orientation)
-  let retVal = new Point(sum / groups.length, closestGroup.getCenterOfMass().y)
+  let retVal = new Point(
+    sum / groups.length,
+    closestGroup.getCenterOfMass(dataStyle).y
+  )
   if (isNS === isRange) {
-    retVal = new Point(closestGroup.getCenterOfMass().x, sum / groups.length)
+    retVal = new Point(
+      closestGroup.getCenterOfMass(dataStyle).x,
+      sum / groups.length
+    )
   }
   return retVal
 }
@@ -79,6 +87,16 @@ const _getAnchorPkg = (
   return anchorLead
 }
 
+/**
+ * Draw two packages in az or range.
+ *
+ * TODO -- PACKAGE -- Npkg wall + spkg wall won't have min separation
+ * @param ctx
+ * @param props
+ * @param state
+ * @param start
+ * @returns
+ */
 export const drawPackage: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
@@ -154,13 +172,15 @@ export const drawPackage: PictureDrawFunction = (
     isRange,
     props.orientation.orient,
     state.blueAir,
-    groups1
+    groups1,
+    props.dataStyle
   )
   const bull2 = _getPicBull(
     isRange,
     props.orientation.orient,
     state.blueAir,
-    groups2
+    groups2,
+    props.dataStyle
   )
 
   const leadPackage = state.bullseye.getBR(bull1)
@@ -208,7 +228,7 @@ export const drawPackage: PictureDrawFunction = (
       state.blueAir.draw(ctx, props.dataStyle)
       finalAnswer = drawPackage(ctx, props, state, start)
     } else {
-      const bPos = state.blueAir.getCenterOfMass()
+      const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
       const leadBR = bPos.getBR(bull1).range
       const trailBR = bPos.getBR(bull2).range
       const anchorLead = _getAnchorPkg(leadBR, trailBR, groups1, groups2)

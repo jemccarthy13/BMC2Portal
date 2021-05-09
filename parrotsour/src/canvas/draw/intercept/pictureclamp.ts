@@ -1,5 +1,5 @@
 import { BlueInThe, FightAxis } from "../../../canvas/canvastypes"
-import { drawBullseye, drawLine } from "../../../canvas/draw/drawutils"
+import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
@@ -65,11 +65,12 @@ export const getRestrictedStartPos = (
   ctx: CanvasRenderingContext2D,
   blueAir: AircraftGroup,
   orientation: BlueInThe,
+  dataStyle: SensorType,
   minNMFromBlue: number,
   maxNMFromBlue: number,
   pInfo?: PictureInfo
 ): Point => {
-  const blueLoc = blueAir.getCenterOfMass()
+  const blueLoc = blueAir.getCenterOfMass(dataStyle)
 
   let limitLine = blueLoc.x
   let canvasSize = ctx.canvas.width
@@ -101,7 +102,6 @@ export const getRestrictedStartPos = (
     orientation === BlueInThe.NORTH || orientation === BlueInThe.SOUTH
 
   let mults = { lowX: lBound, hiX: uBound, lowY: 0.2, hiY: 0.8 }
-
   if (isNS) {
     mults = { lowX: 0.2, hiX: 0.8, lowY: lBound, hiY: uBound }
   }
@@ -128,19 +128,6 @@ export const getRestrictedStartPos = (
 
   const point = _clampPictureInContext(ctx, pInfo, orientation)
 
-  let fromX = startX
-  let fromY = 0
-  let toX = startX
-  let toY = ctx.canvas.height
-  if (isNS) {
-    fromX = 0
-    fromY = startY
-    toX = ctx.canvas.width
-    toY = startY
-  }
-  drawLine(ctx, fromX, fromY, toX, toY)
-
-  drawBullseye(ctx, point, "green")
   return point
 }
 
@@ -148,6 +135,7 @@ export const getStartPos = (
   ctx: CanvasRenderingContext2D,
   blueAir: AircraftGroup,
   orientation: BlueInThe,
+  dataStyle: SensorType,
   pInfo?: PictureInfo
 ): Point => {
   let canvasSize = ctx.canvas.width
@@ -155,5 +143,13 @@ export const getStartPos = (
     canvasSize = ctx.canvas.height
   }
   const maxMiles = canvasSize / PIXELS_TO_NM
-  return getRestrictedStartPos(ctx, blueAir, orientation, 45, maxMiles, pInfo)
+  return getRestrictedStartPos(
+    ctx,
+    blueAir,
+    orientation,
+    dataStyle,
+    45,
+    maxMiles,
+    pInfo
+  )
 }

@@ -8,6 +8,7 @@ import { AircraftGroup } from "../../classes/groups/group"
 import {
   BlueInThe,
   FightAxis,
+  PictureCanvasProps,
   PictureCanvasState,
 } from "../../canvas/canvastypes"
 import { Point } from "../../classes/point"
@@ -15,7 +16,7 @@ import { Braaseye } from "../../classes/braaseye"
 
 // Utility functions
 import { formatAlt } from "./formatutils"
-import { randomNumber, toRadians } from "../../utils/psmath"
+import { PIXELS_TO_NM, randomNumber, toRadians } from "../../utils/psmath"
 
 /**
  * 'Clamp' the location to the confines of the drawing context
@@ -251,16 +252,23 @@ export function drawBullseye(
     : randomNumber(context.canvas.height * 0.33, context.canvas.height * 0.66)
 
   context.beginPath()
-  context.arc(centerPointX, centerPointY, 2, 0, 2 * Math.PI, true)
+  context.arc(
+    centerPointX,
+    centerPointY,
+    PIXELS_TO_NM / 2,
+    0,
+    2 * Math.PI,
+    true
+  )
   context.stroke()
   context.fill()
 
-  context.moveTo(centerPointX, centerPointY + 6)
-  context.lineTo(centerPointX, centerPointY - 6)
+  context.moveTo(centerPointX, centerPointY + PIXELS_TO_NM * 2)
+  context.lineTo(centerPointX, centerPointY - PIXELS_TO_NM * 2)
   context.stroke()
 
-  context.moveTo(centerPointX + 6, centerPointY)
-  context.lineTo(centerPointX - 6, centerPointY)
+  context.moveTo(centerPointX + PIXELS_TO_NM * 2, centerPointY)
+  context.lineTo(centerPointX - PIXELS_TO_NM * 2, centerPointY)
   context.stroke()
 
   return new Point(centerPointX, centerPointY)
@@ -269,18 +277,17 @@ export function drawBullseye(
 export function drawFullInfo(
   ctx: CanvasRenderingContext2D,
   state: PictureCanvasState,
-  braaFirst: boolean,
-  showMeasurements: boolean,
+  props: PictureCanvasProps,
   groups: AircraftGroup[]
 ): void {
   for (let y = 0; y < groups.length; y++) {
-    const grpPos = groups[y].getCenterOfMass()
-    if (showMeasurements) {
+    const grpPos = groups[y].getCenterOfMass(props.dataStyle)
+    if (props.showMeasurements) {
       new Braaseye(
         grpPos,
-        state.blueAir.getCenterOfMass(),
+        state.blueAir.getCenterOfMass(props.dataStyle),
         state.bullseye
-      ).draw(ctx, true, braaFirst)
+      ).draw(ctx, true, props.braaFirst)
     }
     drawAltitudes(ctx, grpPos, groups[y].getAltitudes())
   }

@@ -5,7 +5,7 @@ import {
   PictureCanvasProps,
   PictureCanvasState,
   PictureDrawFunction,
-} from "../../../canvas/canvastypes"
+} from "../../canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
@@ -23,7 +23,11 @@ import {
   isEchelon,
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
-import { randomHeading, randomNumber } from "../../../utils/psmath"
+import {
+  PIXELS_TO_NM,
+  randomHeading,
+  randomNumber,
+} from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
 
 /**
@@ -41,13 +45,19 @@ export const drawAzimuth: PictureDrawFunction = (
   state: PictureCanvasState,
   start?: Point
 ): PictureAnswer => {
-  const incr: number = ctx.canvas.width / (ctx.canvas.width / 10)
-  const drawDistance: number = randomNumber(3.5 * incr, 10 * incr)
+  // Min distance apart = 5 nm, max = 40
+  const drawDistance = randomNumber(5, 40) * PIXELS_TO_NM
 
-  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
-    wide: drawDistance,
-    start,
-  })
+  const startPos = getStartPos(
+    ctx,
+    state.blueAir,
+    props.orientation.orient,
+    props.dataStyle,
+    {
+      wide: drawDistance,
+      start,
+    }
+  )
 
   // Create the first group
   const ng = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
@@ -79,9 +89,9 @@ export const drawAzimuth: PictureDrawFunction = (
   let offsetY2 = 0
   let m2: Point
 
-  const nPos = ng.getCenterOfMass()
+  const nPos = ng.getCenterOfMass(props.dataStyle)
   if (isNS) {
-    m2 = new Point(sg.getCenterOfMass().x, nPos.y)
+    m2 = new Point(sg.getCenterOfMass(props.dataStyle).x, nPos.y)
     offsetX = -60
     offsetY = 40
     offsetX2 = 10
@@ -89,7 +99,7 @@ export const drawAzimuth: PictureDrawFunction = (
     ng.setLabel("WEST GROUP")
     sg.setLabel("EAST GROUP")
   } else {
-    m2 = new Point(nPos.x, sg.getCenterOfMass().y)
+    m2 = new Point(nPos.x, sg.getCenterOfMass(props.dataStyle).y)
     ng.setLabel("NORTH GROUP")
     sg.setLabel("SOUTH GROUP")
   }
@@ -109,20 +119,20 @@ export const drawAzimuth: PictureDrawFunction = (
   drawAltitudes(ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
   drawAltitudes(
     ctx,
-    sg.getCenterOfMass(),
+    sg.getCenterOfMass(props.dataStyle),
     sg.getAltitudes(),
     offsetX2,
     offsetY2
   )
 
   const ngBraaseye = new Braaseye(
-    ng.getCenterOfMass(),
-    state.blueAir.getCenterOfMass(),
+    ng.getCenterOfMass(props.dataStyle),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
   const sgBraaseye = new Braaseye(
-    sg.getCenterOfMass(),
-    state.blueAir.getCenterOfMass(),
+    sg.getCenterOfMass(props.dataStyle),
+    state.blueAir.getCenterOfMass(props.dataStyle),
     state.bullseye
   )
 
@@ -149,14 +159,23 @@ export const drawAzimuth: PictureDrawFunction = (
 
   let answer = "TWO GROUPS AZIMUTH " + width + " "
 
-  answer += getGroupOpenClose(ng, sg) + " "
+  answer += getGroupOpenClose(ng, sg, props.dataStyle) + " "
 
-  answer += isEchelon(props.orientation.orient, ngBraaseye, sgBraaseye, ng, sg)
+  answer += isEchelon(
+    props.orientation.orient,
+    props.dataStyle,
+    ngBraaseye,
+    sgBraaseye,
+    ng,
+    sg
+  )
 
   answer += picTrackDir(props.format, [ng, sg])
 
   const anchorN = isAnchorNorth(ngBraaseye, sgBraaseye, ng, sg)
 
+  // TODO -- ANSWER CLEANUP -- reformat for reduced
+  // duplication of code
   if (!anchorN) {
     if (isNS) {
       answer += formatGroup(

@@ -1,7 +1,9 @@
-// Data structure definitions
+// Classes & Interfaces
 import { AircraftGroup } from "../classes/groups/group"
 import { PictureCanvasProps, PictureCanvasState } from "../canvas/canvastypes"
+import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 
+// Functions
 import { sleep } from "../utils/pstime"
 
 /**
@@ -30,12 +32,12 @@ export abstract class AnimationHandler {
 
   /**
    * Pause the fight by canceling the sleep timeout.
-   * This kills the pseudo-recusion found in doAnimation,
+   * This kills the pseudo-recursion found in doAnimation,
    * and the pauseCallback() call performs any post-pause
    * processing (i.e. drawing BRAASEYE for intercept canvas)
    * @param pauseCallback Function to call after the animation has been cancelled
    */
-  pauseFight(pauseCallback: undefined | (() => void)): void {
+  pauseFight(pauseCallback?: () => void): void {
     this.sleepPromiseCancel()
     if (pauseCallback) {
       pauseCallback()
@@ -49,14 +51,16 @@ export abstract class AnimationHandler {
    * Used to change group logic when approaching the edge of the canvas
    * @param ctx The current drawing context
    * @param group The group to check against boundaries
+   * @param dataStyle The current DataTrail type
    */
   public _isNearBounds(
     ctx: CanvasRenderingContext2D,
-    group: AircraftGroup
+    group: AircraftGroup,
+    dataStyle: SensorType
   ): boolean {
     const buffer = 40
-    const sX = group.getCenterOfMass().x
-    const sY = group.getCenterOfMass().y
+    const sX = group.getCenterOfMass(dataStyle).x
+    const sY = group.getCenterOfMass(dataStyle).y
     return (
       sX < buffer ||
       sX > ctx.canvas.width - buffer ||
@@ -70,10 +74,12 @@ export abstract class AnimationHandler {
    *
    * @param grp Group to check intent for
    * @param state Current state of canvas
+   * @param dataStyle Current DataTrail type
    */
   abstract applyBlueLogic(
     blueAir: AircraftGroup,
     groups: AircraftGroup[],
+    dataStyle: SensorType,
     ctx?: CanvasRenderingContext2D
   ): void
 
@@ -88,10 +94,12 @@ export abstract class AnimationHandler {
    *
    * @param grp Group to check intent for
    * @param state Current state of canvas
+   * @param dataStyle Current DataTrail type
    */
   abstract applyLogic(
     grp: AircraftGroup,
     state: PictureCanvasState,
+    dataStyle: SensorType,
     resetCallback?: () => void,
     ctx?: CanvasRenderingContext2D
   ): void
@@ -130,17 +138,13 @@ export abstract class AnimationHandler {
     for (let x = 0; x < groups.length; x++) {
       const grp = groups[x]
 
-      /*****  TODO --- in group.move, manage radar and IFF history  ******* */
       grp.move()
-
-      /** TODO -- verify after .move() is ok  */
       grp.draw(context, props.dataStyle)
-
-      this.applyLogic(grp, state, resetCallback, context)
+      this.applyLogic(grp, state, props.dataStyle, resetCallback, context)
     }
 
     state.blueAir.move()
-    this.applyBlueLogic(state.blueAir, groups, context)
+    this.applyBlueLogic(state.blueAir, groups, props.dataStyle, context)
     state.blueAir.draw(context, props.dataStyle)
 
     // get slider speed/default speed
