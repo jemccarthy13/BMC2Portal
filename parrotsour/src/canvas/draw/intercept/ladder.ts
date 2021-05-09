@@ -150,22 +150,22 @@ export const drawLadder: PictureDrawFunction = (
 
   switch (numGroups) {
     case 3:
-      groups[0].setLabel("TRAIL GROUP")
-      groups[1].setLabel("MIDDLE GROUP")
-      groups[2].setLabel("LEAD GROUP")
+      groups[0].setLabel("TRAIL")
+      groups[1].setLabel("MIDDLE")
+      groups[2].setLabel("LEAD")
       break
     case 4:
-      groups[0].setLabel("TRAIL GROUP")
-      groups[1].setLabel("3RD GROUP")
-      groups[2].setLabel("2ND GROUP")
-      groups[3].setLabel("LEAD GROUP")
+      groups[0].setLabel("TRAIL")
+      groups[1].setLabel("3RD")
+      groups[2].setLabel("2ND")
+      groups[3].setLabel("LEAD")
       break
     case 5:
-      groups[0].setLabel("TRAIL GROUP")
-      groups[1].setLabel("4TH GROUP")
-      groups[2].setLabel("3RD GROUP")
-      groups[3].setLabel("2ND GROUP")
-      groups[4].setLabel("LEAD GROUP")
+      groups[0].setLabel("TRAIL")
+      groups[1].setLabel("4TH")
+      groups[2].setLabel("3RD")
+      groups[3].setLabel("2ND")
+      groups[4].setLabel("LEAD")
       break
   }
 
@@ -186,7 +186,7 @@ export const drawLadder: PictureDrawFunction = (
     const label = groups[g].getLabel()
     answer +=
       formatGroup(
-        label.replace(/GROUP/, ""),
+        label,
         braaseyes[g],
         altstacks[g],
         groups[g].getStrength(),
