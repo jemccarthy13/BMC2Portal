@@ -1,10 +1,10 @@
 import React from "react"
 import { shallow } from "enzyme"
-import DrawingCanvas from "../canvas/drawingcanvas"
+import DrawingCanvas from "./drawingcanvas"
 
 import { Point } from "../classes/point"
-import { BlueInThe } from "../canvas/canvastypes"
-import { SensorType } from "../classes/aircraft/datatrail/datatrail"
+import { BlueInThe } from "./canvastypes"
+import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function emptyFunc() {}
