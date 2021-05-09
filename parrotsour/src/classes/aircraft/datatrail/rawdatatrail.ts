@@ -14,8 +14,8 @@ export class RawDataTrail extends DataTrail {
     this.rdrDataTrail = new RadarDataTrail(startPos, heading)
   }
 
-  getCenterOfMass(heading: number): Point {
-    return this.rdrDataTrail.getCenterOfMass(heading)
+  getCenterOfMass(): Point {
+    return this.rdrDataTrail.getCenterOfMass()
   }
 
   move(heading: number): void {

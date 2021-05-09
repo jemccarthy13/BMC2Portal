@@ -1,5 +1,3 @@
-import { drawBullseye } from "../../../canvas/draw/drawutils"
-import { PaintBrush } from "../../../canvas/draw/paintbrush"
 import {
   headingToRadians,
   PIXELS_TO_NM,
@@ -42,7 +40,7 @@ export class RadarDataTrail extends DataTrail {
     }
   }
 
-  getCenterOfMass(heading: number): Point {
+  getCenterOfMass(): Point {
     return this._getOnePlotAhead()
   }
 
