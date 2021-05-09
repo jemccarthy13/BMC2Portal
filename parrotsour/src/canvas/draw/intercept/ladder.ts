@@ -23,6 +23,15 @@ import {
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
 
+/**
+ * Draw a 3-5 group ladder and return the correct answer.
+ *
+ * @param ctx Current drawing context
+ * @param props Current PictureCanvasProps
+ * @param state Current PictureCanvasState
+ * @param start (Optional) forced start position
+ * @returns DrawAnswer
+ */
 export const drawLadder: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,

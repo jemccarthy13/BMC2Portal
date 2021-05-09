@@ -26,6 +26,15 @@ import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { FORMAT } from "../../../classes/supportedformats"
 
+/**
+ * Draw a 3-5 group wall and return the correctly formatted answer.
+ *
+ * @param ctx Current drawing context
+ * @param props Current PictureCanvasProps
+ * @param state Current PictureCanvasState
+ * @param start (Optional) forced start position
+ * @returns DrawAnswer
+ */
 export const drawWall: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
@@ -34,18 +43,28 @@ export const drawWall: PictureDrawFunction = (
 ): PictureAnswer => {
   const isNS = props.orientation.orient === BlueInThe.NORTH
 
-  /**
-   * TODO -- CLAMP -- same as ladder, need to know how deep the wall will
-   * be in order to clamp to canvas w/getStartPos.
-   *
-   * This means calculating offset per group / depth ahead of time,
-   * then creating / drawing groups later
-   */
   const numGroups = randomNumber(3, 5)
-  // const startPos = getStartPos(ctx, props.orientation.orient, boundaries, start)
-  const startPos = getStartPos(ctx, state.blueAir, props.orientation.orient, {
-    start,
-  })
+
+  // calculate group separations ahead of time
+  // to allow clamp logic
+  const seps = [0]
+  let totalDepth = 0
+  for (let x = 1; x < numGroups; x++) {
+    const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
+    seps.push(nextSep)
+    totalDepth += nextSep
+  }
+
+  const startPos = getStartPos(
+    ctx,
+    state.blueAir,
+    props.orientation.orient,
+    props.dataStyle,
+    {
+      start,
+      wide: totalDepth + 5 * PIXELS_TO_NM,
+    }
+  )
   const startX = startPos.x
   const startY = startPos.y
 
@@ -58,8 +77,7 @@ export const drawWall: PictureDrawFunction = (
   const groups: AircraftGroup[] = []
   for (let x = 0; x < numGroups; x++) {
     const offsetHeading = randomNumber(-10, 10)
-    const arrowOffsetY = x === 0 ? 0 : randomNumber(40, 60)
-    totalArrowOffset += arrowOffsetY
+    totalArrowOffset += seps[x]
 
     let altOffsetX = 30
     let altOffsetY = 0
@@ -90,12 +108,12 @@ export const drawWall: PictureDrawFunction = (
     }
 
     const grp = groups[x]
-    const grpPos = grp.getCenterOfMass()
+    const grpPos = grp.getCenterOfMass(props.dataStyle)
     drawAltitudes(ctx, grpPos, grp.getAltitudes(), altOffsetX, altOffsetY)
 
     const grpBraaseye = new Braaseye(
       grpPos,
-      state.blueAir.getCenterOfMass(),
+      state.blueAir.getCenterOfMass(props.dataStyle),
       state.bullseye
     )
     grpBraaseye.draw(
@@ -113,8 +131,8 @@ export const drawWall: PictureDrawFunction = (
   let nLbl = "WEST"
   let sLbl = "EAST"
 
-  const prevGpPos = groups[groups.length - 1].getCenterOfMass()
-  const gpPos = groups[0].getCenterOfMass()
+  const prevGpPos = groups[groups.length - 1].getCenterOfMass(props.dataStyle)
+  const gpPos = groups[0].getCenterOfMass(props.dataStyle)
 
   if (isNS) {
     width = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
@@ -144,22 +162,22 @@ export const drawWall: PictureDrawFunction = (
 
   switch (numGroups) {
     case 3:
-      groups[0].setLabel(nLbl + " GROUP")
-      groups[1].setLabel("MIDDLE GROUP")
-      groups[2].setLabel(sLbl + " GROUP")
+      groups[0].setLabel(nLbl)
+      groups[1].setLabel("MIDDLE")
+      groups[2].setLabel(sLbl)
       break
     case 4:
-      groups[0].setLabel(nLbl + " GROUP")
-      groups[1].setLabel(nLbl + " MIDDLE GROUP")
-      groups[2].setLabel(sLbl + " MIDDLE GROUP")
-      groups[3].setLabel(sLbl + " GROUP")
+      groups[0].setLabel(nLbl)
+      groups[1].setLabel(nLbl + " MIDDLE")
+      groups[2].setLabel(sLbl + " MIDDLE")
+      groups[3].setLabel(sLbl)
       break
     case 5:
-      groups[0].setLabel(nLbl + " GROUP")
-      groups[1].setLabel(nLbl + " MIDDLE GROUP")
-      groups[2].setLabel("MIDDLE GROUP")
-      groups[3].setLabel(sLbl + " MIDDLE GROUP")
-      groups[4].setLabel(sLbl + " GROUP")
+      groups[0].setLabel(nLbl)
+      groups[1].setLabel(nLbl + " MIDDLE")
+      groups[2].setLabel("MIDDLE")
+      groups[3].setLabel(sLbl + " MIDDLE")
+      groups[4].setLabel(sLbl)
       break
   }
 
@@ -174,7 +192,8 @@ export const drawWall: PictureDrawFunction = (
     groups[groups.length - 1]
   )
 
-  //console.log("DETERMINE IF WEIGHTED WALL");
+  // TODO -- WEIGHTED WALL
+  // since we have all the seps[], we could check if any are within weighted criteria
 
   const includeBull = width > 10 && props.format !== FORMAT.IPE
 
@@ -182,7 +201,7 @@ export const drawWall: PictureDrawFunction = (
     const idx: number = anchorNorth ? g : numGroups - 1 - g
     answer +=
       formatGroup(
-        (groups[idx].getLabel() + "").replace(/GROUP/, ""),
+        groups[idx].getLabel(),
         braaseyes[idx],
         altStacks[idx],
         groups[idx].getStrength(),
