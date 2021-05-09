@@ -63,6 +63,7 @@ export const drawWall: PictureDrawFunction = (
     {
       start,
       wide: totalDepth + 5 * PIXELS_TO_NM,
+      deep: 20 * PIXELS_TO_NM, // to ensure measurements can be drawn behind wall
     }
   )
   const startX = startPos.x
