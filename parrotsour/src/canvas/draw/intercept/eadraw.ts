@@ -151,7 +151,6 @@ function getEAInfo(
     }
   }
 
-  console.log(blueAir)
   // pick a random group if not using closest (i.e. not a BRAA request)
   const grp: AircraftGroup = groups[randomNumber(0, groups.length - 1)]
   const strBR = blueAir
@@ -204,14 +203,12 @@ export const drawEA: PictureDrawFunction = (
     start.x = randomNumber(ctx.canvas.width * 0.6, ctx.canvas.width * 0.65)
   }
 
-  console.log(state.blueAir)
   /**
    * TODO -- using Partial<GroupParams>, set the start point and a logical heading
    * for groups to perform EA (i.e. no cold pictures)
    */
   const answer = state.reDraw(ctx, true, start)
 
-  console.log(state.blueAir)
   // get info needed for EA response
   const eaInfo = getEAInfo(answer.groups, state.blueAir, props.dataStyle)
   eaInfo.altStack = eaInfo.closestGrp.getAltStack(props.format)
