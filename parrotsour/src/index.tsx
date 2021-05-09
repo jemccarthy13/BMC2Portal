@@ -1,3 +1,4 @@
+/* eslint-disable react/forbid-component-props */
 /* eslint-disable react/jsx-no-bind */
 import DrawingCanvas from "./canvas/drawingcanvas"
 import PictureCanvas from "./canvas/picturecanvas"
@@ -19,6 +20,8 @@ import React, { Suspense } from "react"
 import Home from "./Home"
 
 import GlobalSnackbarProvider from "./pscomponents/alert/globalalertprovider"
+
+import CookieConsent, { Cookies } from "react-cookie-consent"
 
 export {
   DrawingCanvas as Canvas,
@@ -49,38 +52,53 @@ export default ReactDOM.render(
         <Home />
       </GlobalSnackbarProvider>
     </Suspense>
+    <CookieConsent
+      location="top"
+      style={{ backgroundColor: "#a0a1a0", border: "2px solid grey" }}
+    >
+      This website uses cookies to enhance the user experience. To learn more,
+      please see the release notes.
+    </CookieConsent>
   </React.StrictMode>,
   document.getElementById("root")
 )
 
 /**
- * TODO -- COOKIE -- set cookie on user action of notification
- * to avoid displaying on refresh.
- *
- * versionNotifications.get({versionNum}) is defined, don't display
- *
- * Use universal-cookie package?
- * https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
  *
  */
+const version = "4.0.0"
+const cookieIsNotSet =
+  Cookies.get(version + "Notify") === undefined ||
+  Cookies.get(version + "Notify") === false
+
 // remove after confidence most people have seen new release notification
-snackActions.info("Check out the newest release of ParrotSour!", {
-  autoHideDuration: 10000,
-  preventDuplicate: true,
-  // eslint-disable-next-line react/display-name
-  action: (key) => {
-    return (
-      <>
-        <Button
-          onClick={() => {
-            window.location.href = "#/changelog.html#4.0.0"
-            snackActions.closeSnackbar(key)
-          }}
-        >
-          v4.0.0
-        </Button>
-        <Button onClick={() => snackActions.closeSnackbar(key)}>Dismiss</Button>
-      </>
-    )
-  },
-})
+if (cookieIsNotSet) {
+  snackActions.info("Check out the newest release of ParrotSour!", {
+    autoHideDuration: 10000,
+    preventDuplicate: true,
+    // eslint-disable-next-line react/display-name
+    action: (key) => {
+      return (
+        <>
+          <Button
+            onClick={() => {
+              window.location.href = "#/changelog.html#4.0.0"
+              Cookies.set(version + "Notify", true, { expires: 365 })
+              snackActions.closeSnackbar(key)
+            }}
+          >
+            {version}
+          </Button>
+          <Button
+            onClick={() => {
+              Cookies.set(version + "Notify", true, { expires: 365 })
+              snackActions.closeSnackbar(key)
+            }}
+          >
+            Dismiss
+          </Button>
+        </>
+      )
+    },
+  })
+}

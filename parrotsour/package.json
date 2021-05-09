@@ -29,6 +29,7 @@
     "jsdom-canvas-2": "^11.6.3-alpha.0",
     "notistack": "^1.0.6",
     "react": "^17.0.2",
+    "react-cookie-consent": "^6.2.3",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
