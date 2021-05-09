@@ -24,7 +24,7 @@ export class IFFDataTrail extends DataTrail {
     const iPts: Point[] = []
     // draw the radar trail
     if (!this.iffPoints || this.iffPoints.length === 0) {
-      for (let mult = 0; mult < 6; mult++) {
+      for (let mult = 0; mult < 5; mult++) {
         xPos = startx + offsetX * mult + offsetX * 0.5
         yPos = starty + offsetY * mult + offsetY * 0.5
         iPts.push(new Point(xPos, yPos))

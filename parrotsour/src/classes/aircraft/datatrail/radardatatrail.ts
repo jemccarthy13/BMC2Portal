@@ -81,8 +81,7 @@ export class RadarDataTrail extends DataTrail {
       ctx.stroke()
     })
 
-    this._drawSymbology(ctx, id)
-    this._drawVectorStick(ctx, heading)
+    this._drawSymbology(ctx, heading, id)
   }
 
   public getDataTrail(): Point[] {
@@ -107,7 +106,11 @@ export class RadarDataTrail extends DataTrail {
    * @param ctx Current drawing context
    * @param id ID for symbology (HOS/NEU/SUS/etc)
    */
-  _drawSymbology(ctx: CanvasRenderingContext2D, id: IDMatrix): void {
+  _drawSymbology(
+    ctx: CanvasRenderingContext2D,
+    heading: number,
+    id: IDMatrix
+  ): void {
     const plotAhead = this._getOnePlotAhead()
 
     ctx.strokeStyle = id
@@ -141,13 +144,18 @@ export class RadarDataTrail extends DataTrail {
       ctx.stroke()
       ctx.stroke()
     }
-  }
 
-  /**
-   * Draw the vector stick based on current heading.
-   * @param heading Current heading of data trail
-   */
-  _drawVectorStick(ctx: CanvasRenderingContext2D, heading: number): void {
-    // console.log("draw vector")
+    // Draw vector stick
+    ctx.strokeStyle = "black"
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+
+    const vector = headingToRadians(heading)
+    const deltX = 3 * PIXELS_TO_NM * Math.cos(vector.radians)
+    const deltY = 3 * PIXELS_TO_NM * -Math.sin(vector.radians)
+    ctx.moveTo(plotAhead.x - 2.5, plotAhead.y - 2.5)
+    ctx.lineTo(plotAhead.x - 2.5 + 1.2 * deltX, plotAhead.y - 2.5 + 1.2 * deltY)
+    ctx.stroke()
+    ctx.stroke()
   }
 }
