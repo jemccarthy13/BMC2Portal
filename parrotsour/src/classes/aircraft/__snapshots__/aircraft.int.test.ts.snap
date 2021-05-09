@@ -2,7 +2,7 @@
 
 exports[`Aircraft draws_id_matrix assume_friend 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAApUlEQVQ4jWNgGM5AsIjvn2AR3z90cSZiDRhVODwUVgcr7VwVqq2CTyELAwMDQ4fmQzfZ90K38NnAxMDAwBB1V/HVA5HXjK0BSlNxKWSEMTgrOP4z/2NiYP3D8p+BgYHhfd8nFNPhnKrbssu+cH1j+ML1nZEBC0ARlMoT+vdM8B2j4Ge+/zhNZGBgYGh6LmmBy40YwDFB4Se2PIMVBMUqfyLaZNoDANZrK4UBkSJ0AAAAAElFTkSuQmCC"
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAqklEQVQ4jWNgGM5AsIjvn2AR3z90cSZiDRhVOKgVzvDViCSoMChW+VOm0c1lq0K1VfAqXLf4Lh/jf0aGMrFXtwhaHX1b6dUDkdeMrQFKU3EpZIQxOCs4/jP/Y2Jg/cPyn4GBgeF93ycUj8I5NTekpn3h+sbwhes7IwMWgCIolSf075ngO0bBz3z/cZrIwMDA0PRc0gKfh1CAY4LCT2x5BisIilX+RLTJtAcA2qQwxZj4tV0AAAAASUVORK5CYII="
   height="30"
   width="10"
 />
@@ -10,7 +10,7 @@ exports[`Aircraft draws_id_matrix assume_friend 1`] = `
 
 exports[`Aircraft draws_id_matrix hostile 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAe0lEQVQ4je3TsQ3CUAxF0RM6KlZgByQKBmApWuZgH2oWyASRaEAIiUfzCxSR/DQ0Ea+y7KvrxmbOCW1o+/3FVMEfnAcY9mFZpcMjnEs9ej0HbMNmSNZ8WDs8cS+D9dD6XUi4fVvdhy8FroKr8Kq+QsMVp1Fbz3ycDP8+b4G2KENdAA1tAAAAAElFTkSuQmCC"
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAfklEQVQ4je3TMQrCUBBF0RM7K3sr9xBwb/ZZh/uxdgOB9IKNFgGfTQoJJj+NIOKrhpnLnWaGX05oQzvur5YK/uBXg2FbBEODLqyL2tCH01DPXs8B+1BPyaoX6wU97sNgN7W+Dgm3d6vH8HmAi+AmPIqvUHHFcdY2MjeL4c/nCeVSKnb9wiaSAAAAAElFTkSuQmCC"
   height="30"
   width="10"
 />
@@ -18,7 +18,7 @@ exports[`Aircraft draws_id_matrix hostile 1`] = `
 
 exports[`Aircraft draws_id_matrix neutral 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAnklEQVQ4jWNgGM5gglDBvwlCBf/QxZmINWBU4fBQeNzUYt5jS0tpggr3nHdJ3P5I9xFBhRY6p68/eyrJdNLCpBqXQkYYo4Or/D8T818GNtY//xkYGBgK3k1AcT+c46x7oPvbZx6Gr194GBmwALhC05Mny8TEX///9YsZtxthwFXhjA4jVvPQFKqePHlNV+PqRxz+wQTb9L0fE62Y9gAA5OstCQQiAdYAAAAASUVORK5CYII="
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAArUlEQVQ4jWNgGM5gglDBvwlCBf/QxZmINWBU4aBWeMXMzJ2gwm363o/Xnvbc8djSUhqvQq+LW2UZmf4zbH+k+4ig1Za6J68/eyrJdNLCpBqXQkYYo4Or/D8T818GNtY//xkYGBgK3k1A8Sic46i3t+bbZx6Gr194GBmwALhC8xNnWsXEX///9YsZtxthwFXhjA4jVvPQFKqePHlNV+PqRxz+wQTb9L0fE62Y9gAAjX4yCb+HuNMAAAAASUVORK5CYII="
   height="30"
   width="10"
 />
@@ -26,7 +26,7 @@ exports[`Aircraft draws_id_matrix neutral 1`] = `
 
 exports[`Aircraft draws_id_matrix suspect 1`] = `
 <canvas
-  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAmUlEQVQ4jWNgGM7g/2SGP/8nM/xBF2ci1oBRhcND4f9Ehsr/oQxChE10ZGhjMGF4RFjhcYatDNIM3P/jGKJwKWSEMf7PZvjH8JfhP8Nvhv8MDAwMjLkMLJgmMjAwMBxjyGTgZWBi4GVgxm01AwMD43yGmQzPGX4wsOJzIwwcZFDH7xmYqZsZHjFcZriJSzEG+F/AcIRoxbQHABATH4G/PExqAAAAAElFTkSuQmCC"
+  data-snapshot-image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAeCAYAAAAVdY8wAAAABmJLR0QA/wD/AP+gvaeTAAAAoUlEQVQ4je2PMQrCQBBF30atJI2tB7AXSw/gBdJI8AaBHEVIaWfhBcQDiMHOKpVtGq8gmPittjHsJo0g4quG4fHnD/wyyqiUUb3vg64Bf/GrRcVMW0Wl5Cy4KGLkFc2aOQJmlO0dzxwYM9SKpUs0dtCGJzXigQBMQr+ZCHAiJiQgpOc+DZgtO27cGfg6Wo5M/M/Y1D0lBVeX3EApeWf587wAxwYjgckWlJgAAAAASUVORK5CYII="
   height="30"
   width="10"
 />

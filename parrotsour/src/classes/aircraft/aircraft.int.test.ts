@@ -1,6 +1,6 @@
 import { Point } from "../point"
 import { ACType, Aircraft } from "./aircraft"
-import { SensorType } from "./datatrail/datatrail"
+import { SensorType } from "./datatrail/sensortype"
 import { IDMatrix } from "./id"
 import Tasking from "../taskings/tasking"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -60,7 +60,11 @@ describe("Aircraft", () => {
     })
     it("computes_for_rawdata", () => {
       const acft = new Aircraft({ sx: 50, sy: 50, hdg: 90 })
-      expect(acft.getCenterOfMass(SensorType.RAW)).toEqual(new Point(10, 10))
+      const centMass = acft.getCenterOfMass(SensorType.RAW)
+      expect(centMass.x).toBeGreaterThanOrEqual(80)
+      expect(centMass.x).toBeLessThanOrEqual(100)
+      expect(centMass.y).toBeGreaterThanOrEqual(45)
+      expect(centMass.y).toBeLessThanOrEqual(55)
     })
   })
 
@@ -172,13 +176,13 @@ describe("Aircraft", () => {
       // heading is easier to expect)
       const acft = new Aircraft({
         sx: 25,
-        sy: 38,
+        sy: 26,
         hdg: 180,
       })
       acft.addRoutingPoint(new Point(50, 50))
       acft.turnToTarget()
       expect(acft.getHeading()).toEqual(180 - 90 / 15)
-      expect(acft.getStartPos()).toEqual(new Point(25, 38))
+      expect(acft.getStartPos()).toEqual(new Point(25, 26))
     })
 
     it("doesnt_turn_at_target", () => {
@@ -239,8 +243,8 @@ describe("Aircraft", () => {
         sy: 30,
         hdg: 90,
       })
-      acft.addRoutingPoint(new Point(30, 30))
-      acft.addRoutingPoint(new Point(40, 30))
+      acft.addRoutingPoint(new Point(34, 30))
+      acft.addRoutingPoint(new Point(56, 30))
       acft.doNextRouting()
       expect(acft.isCapping()).toEqual(false)
       expect(acft.atFinalDestination()).toEqual(false)

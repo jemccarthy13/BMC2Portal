@@ -3,7 +3,7 @@ import * as AltStackHelper from "../altstack"
 import { AircraftGroup } from "./group"
 import { ACType, Aircraft } from "../aircraft/aircraft"
 import { IDMatrix } from "../aircraft/id"
-import { SensorType } from "../aircraft/datatrail/datatrail"
+import { SensorType } from "../aircraft/datatrail/sensortype"
 import Tasking from "../taskings/tasking"
 import { FORMAT } from "../supportedformats"
 

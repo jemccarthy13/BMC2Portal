@@ -1,5 +1,5 @@
 // Classes & Interfaces
-import { SensorType } from "../aircraft/datatrail/datatrail"
+import { SensorType } from "../aircraft/datatrail/sensortype"
 import { Point } from "../point"
 import { ACType, Aircraft } from "../aircraft/aircraft"
 import { IDMatrix } from "../aircraft/id"
@@ -80,8 +80,8 @@ export class AircraftGroup extends Array<Aircraft> {
       // Compute start position offset for follow-on groups (calculated from
       // 90 deg perpendicular)
       const vectors = headingToRadians(p.hdg)
-      p.sx += PIXELS_TO_NM * Math.cos(vectors.offset)
-      p.sy += PIXELS_TO_NM * -Math.sin(vectors.offset)
+      p.sx += 1.5 * PIXELS_TO_NM * Math.cos(vectors.offset)
+      p.sy += 1.5 * PIXELS_TO_NM * -Math.sin(vectors.offset)
     }
 
     // TODO -- MANEUVER -- % chance of 2 maneuvers (i.e. flank turn back hot)
@@ -109,11 +109,11 @@ export class AircraftGroup extends Array<Aircraft> {
    * @returns The "center of mass" for this group, which is the average of each
    * Aircraft's center of mass.
    */
-  getCenterOfMass(): Point {
+  getCenterOfMass(dataStyle: SensorType): Point {
     let x = 0
     let y = 0
     for (let idx = 0; idx < this.getStrength(); idx++) {
-      const acPos = this[idx].getCenterOfMass()
+      const acPos = this[idx].getCenterOfMass(dataStyle)
       x += acPos.x
       y += acPos.y
     }
@@ -236,6 +236,16 @@ export class AircraftGroup extends Array<Aircraft> {
    */
   setLabel(newLbl: string): void {
     this.label = newLbl
+  }
+
+  /**
+   * Update group ID
+   * @param newID
+   */
+  setID(newID: IDMatrix): void {
+    this.forEach((ac) => {
+      ac.setIDMatrix(newID)
+    })
   }
 
   /*************************************************************************

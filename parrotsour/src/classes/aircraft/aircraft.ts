@@ -1,12 +1,11 @@
 // Classes and interfaces
-import { DataTrail, SensorType } from "./datatrail/datatrail"
+import { DataTrail } from "./datatrail/datatrail"
+import { SensorType } from "./datatrail/sensortype"
 import { GroupParams } from "../groups/group"
 import { IDMatrix } from "./id"
 import { AircraftIntent, IntentParams } from "./intent"
 import { Point } from "../point"
 import Tasking from "../taskings/tasking"
-
-import { PaintBrush } from "../../canvas/draw/paintbrush"
 
 // Functions
 import {
@@ -14,6 +13,7 @@ import {
   headingToRadians,
   randomNumber,
 } from "../../utils/psmath"
+import { DataTrailFactory } from "./datatrail/datatrailfactory"
 
 /*
  * TODO -- EWI -- for fill-ins, implement more AC types?
@@ -49,7 +49,7 @@ export class Aircraft {
 
   // TODO -- implement radar/iff data
   // See constructor.
-  private dataTrail: DataTrail
+  private dataTrail: Map<number, DataTrail>
 
   private type: ACType
 
@@ -63,11 +63,6 @@ export class Aircraft {
 
   constructor(p?: Partial<AircraftParams>) {
     if (!p) p = {}
-    // TODO -- DATATRAIL -- store a map of SensorType -> DataTrail
-    // here, so it has both kinds of data trails available.
-    // Then, in the PSControls, toggling data trail types only
-    // triggers a redraw of existing groups' data trails (via .draw())
-    this.dataTrail = new DataTrail()
 
     // Take given heading/ID/EWI or use default
     this.heading = p.hdg || 90
@@ -77,6 +72,24 @@ export class Aircraft {
     // Set current position
     this.startPos.x = p.sx || randomNumber(1, 100)
     this.startPos.y = p.sy || randomNumber(1, 100)
+
+    // TODO -- DATATRAIL -- store a map of SensorType -> DataTrail
+    // here, so it has both kinds of data trails available.
+    // Then, in the PSControls, toggling data trail types only
+    // triggers a redraw of existing groups' data trails (via .draw())
+    this.dataTrail = new Map<number, DataTrail>()
+
+    for (const type in SensorType) {
+      if (!Number.isNaN(Number(type)))
+        this.dataTrail.set(
+          Number(type),
+          DataTrailFactory.create(
+            Number(type),
+            this.startPos,
+            this.getHeading()
+          )
+        )
+    }
 
     // Set current altitude
     let low = 15
@@ -106,29 +119,6 @@ export class Aircraft {
   }
 
   /**
-   * The center of mass for ARROW DataTrails is one projected data plot ahead
-   * of the Aircraft, on it's current heading.
-   *
-   * TODO -- DATATRAIL -- implement DataTrail as an abstract parent class,
-   * add DataTrailArrow as a subclass, and move this logic to there
-   * --- same for radar/iff
-   */
-  private _getCenterOfMassArrow(ctx?: CanvasRenderingContext2D): Point {
-    const vector = headingToRadians(this.getHeading())
-    let dist = 10
-
-    const context = ctx || this.ctx
-    if (context) {
-      dist = Math.floor(context.canvas.width / (context.canvas.width / 20))
-    }
-
-    return new Point(
-      Math.floor(this.startPos.x + 1.2 * dist * Math.cos(vector.radians)),
-      Math.floor(this.startPos.y + 1.2 * dist * -Math.sin(vector.radians))
-    )
-  }
-
-  /**
    * Get the center of mass position for this group.
    *
    * The type of data trail dictates where the center of mass is.
@@ -138,19 +128,12 @@ export class Aircraft {
    *                  anything other than arrows
    * @param ctx Current drawing context
    */
-  getCenterOfMass(
-    dataStyle?: SensorType,
-    ctx?: CanvasRenderingContext2D
-  ): Point {
-    dataStyle = dataStyle || SensorType.ARROW
-    // TODO -- DataTrail -- Replace with:
-    // const dStyle = dataStyle || SensorType.ARROW
-    // this.dataTrailMap.get(dStyle).getCenterOfMass()
-    if (dataStyle === SensorType.ARROW) {
-      return this._getCenterOfMassArrow(ctx)
+  getCenterOfMass(dataStyle?: SensorType): Point {
+    dataStyle = dataStyle === undefined ? SensorType.ARROW : dataStyle
+    const dataTrail = this.dataTrail.get(dataStyle)
+    if (dataTrail) {
+      return dataTrail.getCenterOfMass(this.getHeading())
     } else {
-      console.warn("DataTrails not supported. TODO -- DATATRAIL")
-      // return this.dataTrail.present(dataStyle)
       return new Point(-1, -1)
     }
   }
@@ -227,18 +210,11 @@ export class Aircraft {
    * @param context  Current drawing style
    * @param dataStyle The SensorType of the DataTrail
    */
-  draw(context: CanvasRenderingContext2D, dataStyle: SensorType): void {
-    // TODO -- DATATRAIL -- replace with: optional datastyle and
-    // const dStyle = dataStyle || SensorType.ARROW
-    // this.dataTrailMap.get(dStyle).draw()
-    // where the subclass of DataTrail handles ARROW|Radar&IFF
-    const brush: PaintBrush = new PaintBrush(context)
-    brush.drawAircraftSensorData(
-      this,
-      this.startPos.x,
-      this.startPos.y,
-      dataStyle
-    )
+  draw(ctx: CanvasRenderingContext2D, dataStyle: SensorType): void {
+    const dataTrail = this.dataTrail.get(dataStyle)
+    if (dataTrail) {
+      dataTrail.draw(ctx, this.getHeading(), this.getIDMatrix())
+    }
   }
 
   /**
@@ -253,6 +229,10 @@ export class Aircraft {
       const offsetY: number = -7 * Math.sin(rads)
       this.startPos.x += offsetX
       this.startPos.y += offsetY
+
+      this.dataTrail.forEach((value: DataTrail) => {
+        value.move(this.getHeading())
+      })
 
       // apply a turn as required
       this.turnToTarget()

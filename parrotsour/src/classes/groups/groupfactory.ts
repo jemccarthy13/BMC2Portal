@@ -29,7 +29,12 @@ export class GroupFactory {
     state: PictureCanvasState,
     heading?: number
   ): AircraftGroup {
-    const startLoc = getStartPos(ctx, state.blueAir, props.orientation.orient)
+    const startLoc = getStartPos(
+      ctx,
+      state.blueAir,
+      props.orientation.orient,
+      props.dataStyle
+    )
     return this.randomGroupAtLoc(ctx, props, state, startLoc, heading)
   }
 }

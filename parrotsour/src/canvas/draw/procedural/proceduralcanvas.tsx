@@ -92,10 +92,12 @@ export default class ProceduralCanvas extends React.PureComponent<
     forced?: boolean,
     start?: Point
   ): PictureAnswer => {
-    const { orientation } = this.props
+    const { orientation, dataStyle } = this.props
     const { blueAir } = this.state
 
-    const startPos = getStartPos(ctx, blueAir, orientation.orient, { start })
+    const startPos = getStartPos(ctx, blueAir, orientation.orient, dataStyle, {
+      start,
+    })
 
     const grp = drawGroupCap(
       ctx,
@@ -108,7 +110,7 @@ export default class ProceduralCanvas extends React.PureComponent<
     grp.addRoutingPoint(startPos)
     grp.setLabel("VR01")
 
-    const grpPos = grp.getCenterOfMass()
+    const grpPos = grp.getCenterOfMass(dataStyle)
 
     drawText(ctx, grp.getLabel(), grpPos.x, grpPos.y + 35, 12)
     return {

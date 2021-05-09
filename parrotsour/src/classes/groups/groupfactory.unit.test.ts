@@ -3,7 +3,7 @@ import {
   PictureCanvasProps,
   PictureCanvasState,
 } from "../../canvas/canvastypes"
-import { SensorType } from "../aircraft/datatrail/datatrail"
+import { SensorType } from "../aircraft/datatrail/sensortype"
 import { Point } from "../point"
 import { FORMAT } from "../supportedformats"
 import { AircraftGroup } from "./group"
