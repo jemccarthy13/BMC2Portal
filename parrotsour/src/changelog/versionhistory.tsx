@@ -34,6 +34,9 @@ export default function VersionHistory(): JSX.Element {
       date: "15 May 2021",
       features: [
         "Blue air animates and attempts to intercept red air",
+        "New picture during animation functions to stop animation and generate a new picture",
+        "Toggling DataTrail style (between RADAR/ARROW) will redraw the current picture. This is limited " +
+          "and can't redraw measurements (yet), but allows radar toggling at any point (including during animation) ",
         "A new ChangeLog page - featuring detailed Release Notes for major/minor versions",
         "Regression testing was added internally so future changes don't break existing logic",
       ],
@@ -41,11 +44,13 @@ export default function VersionHistory(): JSX.Element {
         "Animation doesn't pause on measure (due to internal improvements this became possible)",
         "Animation no longer interferes with other internal processing (bull on cursor display became " +
           "more responsive during animation)",
+        "Anchoring priorities verified for WAL/CHAMP. All pictures should now anchor correctly",
         "Lowest value for speed slider adjusted slower due to lack of pause on measure",
         "Pictures should no longer draw off canvas",
         "With the new clamp to canvas logic, pictures such as lead edge/packages are smarter with where they draw. " +
           "Previously, leading edge would fake <= 40 nm follow-on. Pictures can now be specified in terms of " +
           "'min and/or max distance from blue'",
+        "Leading edge was redesigned to function a little smarter. Intended for less possible overlap between packages",
         "Measurements bug fixed due to new internal DataTrail usage; measurements and braa/bull displays " +
           "are now based on 'center of mass'. Previous logic tended to base measurements on draw offset location " +
           "rather than truth data",
