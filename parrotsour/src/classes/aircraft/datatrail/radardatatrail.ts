@@ -71,11 +71,12 @@ export class RadarDataTrail extends DataTrail {
   draw(ctx: CanvasRenderingContext2D, heading: number, id: IDMatrix): void {
     // Draw radar dots
     ctx.strokeStyle = "#FF8C00"
+    ctx.lineWidth = 2
     ctx.beginPath()
     this.radarPoints.forEach((pt) => {
       ctx.beginPath()
       ctx.moveTo(pt.x, pt.y)
-      ctx.lineTo(pt.x - 3, pt.y - 3)
+      ctx.lineTo(pt.x - 4, pt.y - 4)
       ctx.stroke()
       ctx.stroke()
     })
@@ -119,13 +120,13 @@ export class RadarDataTrail extends DataTrail {
       const headX = plotAhead.x - 3
       const headY = plotAhead.y - 3
 
-      const leftX = headX + 5 * Math.cos(toRadians(240))
-      const leftY = headY + 5 - Math.sin(toRadians(240))
+      const leftX = headX + 2 * PIXELS_TO_NM * Math.cos(toRadians(240))
+      const leftY = headY + 2 * PIXELS_TO_NM - Math.sin(toRadians(240))
       ctx.moveTo(headX, headY)
       ctx.lineTo(leftX, leftY)
 
-      const rightX = headX + 5 * Math.cos(toRadians(300))
-      const rightY = headY + 5 - Math.sin(toRadians(300))
+      const rightX = headX + 2 * PIXELS_TO_NM * Math.cos(toRadians(300))
+      const rightY = headY + 2 * PIXELS_TO_NM - Math.sin(toRadians(300))
       ctx.moveTo(headX, headY)
       ctx.lineTo(rightX, rightY)
       ctx.stroke()

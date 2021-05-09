@@ -2,7 +2,7 @@
 import { SensorType } from "../aircraft/datatrail/sensortype"
 import { Point } from "../point"
 import { ACType, Aircraft } from "../aircraft/aircraft"
-import { IDMatrix } from "../aircraft/id"
+import { getMostRestrictiveID, IDMatrix } from "../aircraft/id"
 import { IntentParams } from "../aircraft/intent"
 import Tasking from "../taskings/tasking"
 import { FORMAT } from "../supportedformats"
@@ -242,10 +242,22 @@ export class AircraftGroup extends Array<Aircraft> {
    * Update group ID
    * @param newID
    */
-  setID(newID: IDMatrix): void {
+  setIDMatrix(newID: IDMatrix): void {
     this.forEach((ac) => {
       ac.setIDMatrix(newID)
     })
+  }
+
+  /**
+   * TODO -- IDMATRIX -- this should maybe not be in group?
+   * @returns The most restrictive ID of child Aircraft
+   */
+  getIDMatrix(): IDMatrix {
+    const ids: IDMatrix[] = []
+    this.forEach((ac) => {
+      ids.push(ac.getIDMatrix())
+    })
+    return getMostRestrictiveID(ids)
   }
 
   /*************************************************************************

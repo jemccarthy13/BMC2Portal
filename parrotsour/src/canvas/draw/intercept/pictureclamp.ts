@@ -93,7 +93,7 @@ export const getRestrictedStartPos = (
   // I can get hard X/Y from the math here.
   let lBound = (limitLine + maxNMFromBlue * PIXELS_TO_NM) / canvasSize
   let uBound = (limitLine + minNMFromBlue * PIXELS_TO_NM) / canvasSize
-  if (orientation === BlueInThe.NORTH || orientation === BlueInThe.EAST) {
+  if (orientation === BlueInThe.SOUTH || orientation === BlueInThe.EAST) {
     lBound = (limitLine - maxNMFromBlue * PIXELS_TO_NM) / canvasSize
     uBound = (limitLine - minNMFromBlue * PIXELS_TO_NM) / canvasSize
   }
