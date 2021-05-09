@@ -46,7 +46,7 @@ export const drawAzimuth: PictureDrawFunction = (
   start?: Point
 ): PictureAnswer => {
   // Min distance apart = 5 nm, max = 40
-  const drawDistance = randomNumber(5, 40) * PIXELS_TO_NM
+  const drawDistance = randomNumber(7, 40) * PIXELS_TO_NM
 
   const startPos = getStartPos(
     ctx,
@@ -186,16 +186,14 @@ export const drawAzimuth: PictureDrawFunction = (
         true,
         sg.getTrackDir()
       )
-      answer +=
-        " " +
-        formatGroup(
-          "WEST",
-          ngBraaseye,
-          ngAlts,
-          ng.getStrength(),
-          includeBull,
-          ng.getTrackDir()
-        )
+      answer += formatGroup(
+        "WEST",
+        ngBraaseye,
+        ngAlts,
+        ng.getStrength(),
+        includeBull,
+        ng.getTrackDir()
+      )
     } else {
       answer += formatGroup(
         "SOUTH",
@@ -205,16 +203,14 @@ export const drawAzimuth: PictureDrawFunction = (
         true,
         sg.getTrackDir()
       )
-      answer +=
-        " " +
-        formatGroup(
-          "NORTH",
-          ngBraaseye,
-          ngAlts,
-          ng.getStrength(),
-          includeBull,
-          ng.getTrackDir()
-        )
+      answer += formatGroup(
+        "NORTH",
+        ngBraaseye,
+        ngAlts,
+        ng.getStrength(),
+        includeBull,
+        ng.getTrackDir()
+      )
     }
   } else {
     if (isNS) {
@@ -226,16 +222,14 @@ export const drawAzimuth: PictureDrawFunction = (
         true,
         ng.getTrackDir()
       )
-      answer +=
-        " " +
-        formatGroup(
-          "EAST",
-          sgBraaseye,
-          sgAlts,
-          sg.getStrength(),
-          includeBull,
-          sg.getTrackDir()
-        )
+      answer += formatGroup(
+        "EAST",
+        sgBraaseye,
+        sgAlts,
+        sg.getStrength(),
+        includeBull,
+        sg.getTrackDir()
+      )
     } else {
       answer += formatGroup(
         "NORTH",
@@ -245,16 +239,14 @@ export const drawAzimuth: PictureDrawFunction = (
         true,
         ng.getTrackDir()
       )
-      answer +=
-        " " +
-        formatGroup(
-          "SOUTH",
-          sgBraaseye,
-          sgAlts,
-          sg.getStrength(),
-          includeBull,
-          sg.getTrackDir()
-        )
+      answer += formatGroup(
+        "SOUTH",
+        sgBraaseye,
+        sgAlts,
+        sg.getStrength(),
+        includeBull,
+        sg.getTrackDir()
+      )
     }
   }
 

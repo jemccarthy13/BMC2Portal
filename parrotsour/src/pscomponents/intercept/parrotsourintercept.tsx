@@ -162,8 +162,8 @@ export default class ParrotSourIntercept extends React.PureComponent<
      * TODO -- CLAMP -- add support for BlueInThe.N/S/E/W
      */
     let newConfig: CanvasOrient = {
-      height: 700,
-      width: 600,
+      height: 600,
+      width: 700,
       orient: BlueInThe.NORTH,
     }
     if (orient == BlueInThe.NORTH) {

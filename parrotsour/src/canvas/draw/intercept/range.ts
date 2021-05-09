@@ -50,7 +50,7 @@ export const drawRange: PictureDrawFunction = (
     props.orientation.orient,
     props.dataStyle,
     45 + drawDistance / PIXELS_TO_NM,
-    200,
+    100,
     picture
   )
   const startX = startPos.x
