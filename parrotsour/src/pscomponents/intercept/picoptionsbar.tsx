@@ -43,6 +43,7 @@ const PicOptionsBar = (props: POBSelProps): ReactElement => {
           <MenuItem value="threat">THREAT</MenuItem>
           <MenuItem value="ea">EA / BOGEY DOPE</MenuItem>
           <MenuItem value="pod">PICTURE OF THE DAY</MenuItem>
+          {false && <MenuItem value="singlegroup">SINGLE</MenuItem>}
         </Select>
       </div>
       <button
