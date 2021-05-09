@@ -32,36 +32,66 @@ describe("AircraftGroup", () => {
       expect(grp.hasRouting()).toEqual(true)
     })
 
-    it("group_altitudes", () => {
-      const grp = new AircraftGroup({
-        nContacts: 2,
-        alts: [100, 200],
-      })
-      expect(grp.getAltitude()).toEqual(200)
-      expect(grp.getAltitudes()).toEqual([100, 200])
+    describe("location", () => {
+      let counter = 0
+      jest
+        .spyOn(Aircraft.prototype, "getCenterOfMass")
+        .mockImplementation(() => {
+          counter += 10
+          return new Point(50, 50 + counter)
+        })
+      const grp = new AircraftGroup({ nContacts: 2 })
+      expect(grp.getCenterOfMass(SensorType.ARROW)).toEqual(new Point(50, 65))
     })
 
-    it("alt_stack", () => {
-      const grp = new AircraftGroup({
-        nContacts: 2,
-        alts: [100, 200],
+    describe("altitude", () => {
+      it("group_altitudes", () => {
+        const grp = new AircraftGroup({
+          nContacts: 2,
+          alts: [100, 200],
+        })
+        expect(grp.getAltitude()).toEqual(200)
+        expect(grp.getAltitudes()).toEqual([100, 200])
       })
 
-      expect(grp.getAltitude()).toEqual(200)
-      expect(grp.getAltitudes()).toEqual([100, 200])
+      it("alt_stack", () => {
+        const grp = new AircraftGroup({
+          nContacts: 2,
+          alts: [100, 200],
+        })
 
-      const myMock = jest
-        .spyOn(AltStackHelper, "getAltStack")
-        .mockImplementationOnce(jest.fn())
-      grp.getAltStack(FORMAT.ALSA)
-      expect(myMock).toHaveBeenCalled()
+        expect(grp.getAltitude()).toEqual(200)
+        expect(grp.getAltitudes()).toEqual([100, 200])
+
+        const myMock = jest
+          .spyOn(AltStackHelper, "getAltStack")
+          .mockImplementationOnce(jest.fn())
+        grp.getAltStack(FORMAT.ALSA)
+        expect(myMock).toHaveBeenCalled()
+      })
     })
 
-    it("allows_labeling", () => {
-      const grp = new AircraftGroup()
-      expect(grp.getLabel()).toEqual("GROUP")
-      grp.setLabel("WEST")
-      expect(grp.getLabel()).toEqual("WEST")
+    describe("id_and_labeling", () => {
+      it("allows_labeling", () => {
+        const grp = new AircraftGroup()
+        expect(grp.getLabel()).toEqual("GROUP")
+        grp.setLabel("WEST")
+        expect(grp.getLabel()).toEqual("WEST")
+      })
+
+      it("tracks_id_matrix", () => {
+        const grp = new AircraftGroup({
+          nContacts: 4,
+        })
+        grp.setIDMatrix(IDMatrix.HOSTILE)
+        expect(grp.getIDMatrix()).toEqual(IDMatrix.HOSTILE)
+        grp[1].setIDMatrix(IDMatrix.SUSPECT)
+        expect(grp.getIDMatrix()).toEqual(IDMatrix.SUSPECT)
+        grp[2].setIDMatrix(IDMatrix.ASSUME_FRIEND)
+        expect(grp.getIDMatrix()).toEqual(IDMatrix.ASSUME_FRIEND)
+        grp[2].setIDMatrix(IDMatrix.NEUTRAL)
+        expect(grp.getIDMatrix()).toEqual(IDMatrix.NEUTRAL)
+      })
     })
 
     it("track_dir_functions", () => {
