@@ -4,24 +4,12 @@ import { DataTrail } from "./datatrail"
 import { RawDataTrail } from "./rawdatatrail"
 import { SensorType } from "./sensortype"
 
-class defaultDataTrail extends DataTrail {
-  create(startPos: Point) {
-    return new defaultDataTrail(startPos)
-  }
-  getCenterOfMass(): Point {
-    throw new Error("Method not implemented.")
-  }
-  draw(): void {
-    throw new Error("Method not implemented.")
-  }
-}
-
+/**
+ * Abstracts DataTrails from Aircraft - if a new DataTrail is added, it'll
+ * add a new SensorType, a new constructor here, and implement the
+ * required methods. Aircraft will automatically know to create that kind of trail.
+ */
 export class DataTrailFactory {
-  private static trailMap = new Map<
-    SensorType,
-    (startPos: Point) => DataTrail
-  >()
-
   // TODO - DATATRAIL -- self-registering DataTrail child classes, if possible
   // static function register(type, createFunction)
   // each child has create(startPos) => return new [subtype]DataTrail
