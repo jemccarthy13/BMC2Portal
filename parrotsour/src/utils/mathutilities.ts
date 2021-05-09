@@ -4,6 +4,7 @@
  */
 
 import { BRAA } from "classes/braa"
+import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup } from "../classes/groups/group"
 
 /**
@@ -30,11 +31,12 @@ export function lpad(value: number, padding: number): string {
  */
 export function getAspect(
   group1: AircraftGroup,
-  group2: AircraftGroup
+  group2: AircraftGroup,
+  dataStyle: SensorType
 ): string {
   const recipBrg: BRAA = group2
-    .getCenterOfMass()
-    .getBR(group1.getCenterOfMass())
+    .getCenterOfMass(dataStyle)
+    .getBR(group1.getCenterOfMass(dataStyle))
 
   let dist = (group2.getHeading() - parseInt(recipBrg.bearing) + 360) % 360
   if (dist > 180) dist = 360 - dist

@@ -2,6 +2,7 @@ import { ACType } from "../../classes/aircraft/aircraft"
 import { PictureAnswer } from "../../canvas/canvastypes"
 import { AircraftGroup } from "../../classes/groups/group"
 import { Point } from "../../classes/point"
+import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 
 export function getAsset(
   groups: AircraftGroup[],
@@ -228,7 +229,8 @@ export function aiProcess(
       thing === "positive" ||
       thing === "cwas"
     ) {
-      const assetSPos = asset.getCenterOfMass()
+      // confirm arrow is the only stlye used in procedural? probably....
+      const assetSPos = asset.getCenterOfMass(SensorType.ARROW)
       if (asset.isCapping()) {
         sendResponse(
           callsign,
