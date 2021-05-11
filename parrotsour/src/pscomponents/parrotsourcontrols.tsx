@@ -1,6 +1,7 @@
 import React, { ChangeEvent, ReactElement } from "react"
 
 import { Dialog, DialogContent, DialogContentText } from "@material-ui/core"
+import { Cookies } from "react-cookie-consent"
 
 export interface PSCProps {
   handleSliderChange: { (val: number): void }
@@ -32,8 +33,12 @@ export default class ParrotSourControls extends React.PureComponent<
 > {
   constructor(props: PSCProps) {
     super(props)
+    let savedSliderVal = parseInt(Cookies.get("SavedSpeedSlider"))
+    if (Number.isNaN(savedSliderVal)) {
+      savedSliderVal = 50
+    }
     this.state = {
-      speedSliderValue: 50,
+      speedSliderValue: savedSliderVal,
       showHelpText: false,
       showHelpArrowText: false,
     }
@@ -49,6 +54,11 @@ export default class ParrotSourControls extends React.PureComponent<
 
     const { handleSliderChange } = this.props
     handleSliderChange(val)
+  }
+
+  handleSliderMouseUp = (): void => {
+    const { speedSliderValue } = this.state
+    Cookies.set("SavedSpeedSlider", speedSliderValue)
   }
 
   /**
@@ -130,6 +140,7 @@ export default class ParrotSourControls extends React.PureComponent<
               className="slider-color"
               id="speedSlider"
               onChange={this.handleSliderChange}
+              onMouseUp={this.handleSliderMouseUp}
             />
           </div>
         </div>
@@ -164,7 +175,6 @@ export default class ParrotSourControls extends React.PureComponent<
                 <input
                   type="checkbox"
                   id="cursordispToggle"
-                  defaultChecked
                   onChange={displayFirstChanged}
                 />
                 <span className="slider round">

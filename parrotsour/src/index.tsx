@@ -69,7 +69,7 @@ export default ReactDOM.render(
 const version = "4.0.0"
 const cookieIsNotSet =
   Cookies.get(version + "Notify") === undefined ||
-  Cookies.get(version + "Notify") === false
+  Cookies.get(version + "Notify") === "false"
 
 // remove after confidence most people have seen new release notification
 if (cookieIsNotSet) {

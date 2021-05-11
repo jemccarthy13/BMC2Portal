@@ -199,13 +199,8 @@ export default class ParrotSourIntercept extends React.PureComponent<
   render(): ReactElement {
     const { showAnswer, answer, picType, dataStyle } = this.state
     const { canvasConfig, braaFirst, format } = this.state
-    const {
-      showMeasurements,
-      isHardMode,
-      animate,
-      newPic,
-      speedSliderValue,
-    } = this.state
+    const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } =
+      this.state
 
     return (
       <div>
