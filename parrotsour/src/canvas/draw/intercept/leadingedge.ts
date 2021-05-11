@@ -60,7 +60,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   // and should be rngBack (distStraightNM).. if lead edge is in front return (neg?)
   // and clamp; if lead edge is behind, make sure it's at least 5 nm.
   //
-  // What a pain.
+
   const pic2StartPos = getRestrictedStartPos(
     ctx,
     furthestPic1Group,

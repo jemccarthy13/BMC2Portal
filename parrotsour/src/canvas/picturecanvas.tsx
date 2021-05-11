@@ -46,15 +46,15 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * not allowed in lead edge/pkg due to separation requirement)
    */
   getRandomPicType = (leadingEdge: boolean): string => {
-    const numType = randomNumber(0, leadingEdge ? 5 : 8)
+    const numType = randomNumber(0, leadingEdge ? 4 : 8)
     const types = [
       "azimuth",
       "range",
       "vic",
-      "ladder",
       "champagne",
       "cap",
       "wall",
+      "ladder",
       "leading edge",
       "package",
       "singlegroup",

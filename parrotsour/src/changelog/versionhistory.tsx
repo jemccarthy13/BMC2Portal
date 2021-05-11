@@ -33,10 +33,13 @@ export default function VersionHistory(): JSX.Element {
       version: "4.0.0",
       date: "15 May 2021",
       features: [
+        "Notifications are now a one-time thing with the use of cookies. Cookies also allow some of " +
+          "your selected preferences (i.e. hard mode, 'I want to measure', animation speed) " +
+          "to be saved between sessions.",
         "Blue air animates and attempts to intercept red air",
         "New picture during animation functions to stop animation and generate a new picture",
-        "Toggling DataTrail style (between RADAR/ARROW) will redraw the current picture. This is limited " +
-          "and can't redraw measurements (yet), but allows radar toggling at any point (including during animation) ",
+        "Toggling DataTrail style (between RADAR/ARROW) will redraw the current picture. This allows " +
+          "radar toggling at any point (including during animation) ",
         "A new ChangeLog page - featuring detailed Release Notes for major/minor versions",
         "Regression testing was added internally so future changes don't break existing logic",
       ],
@@ -48,20 +51,21 @@ export default function VersionHistory(): JSX.Element {
         "Lowest value for speed slider adjusted slower due to lack of pause on measure",
         "Pictures should no longer draw off canvas",
         "With the new clamp to canvas logic, pictures such as lead edge/packages are smarter with where they draw. " +
-          "Previously, leading edge would fake <= 40 nm follow-on. Pictures can now be specified in terms of " +
+          "Previously, leading edge would fake <= 40 nm follow-on. Internally pictures can now be specified in terms of " +
           "'min and/or max distance from blue'",
-        "Leading edge was redesigned to function a little smarter. Intended for less possible overlap between packages",
+        "Leading edge was redesigned to function a little smarter. Intended for less possible overlap between pictures",
         "Measurements bug fixed due to new internal DataTrail usage; measurements and braa/bull displays " +
           "are now based on 'center of mass'. Previous logic tended to base measurements on draw offset location " +
           "rather than truth data",
         "Clicking the New Pic button mid-animation functions correctly by stopping animation and generating a new picture",
+        "On the backend, issue reporting now sends the correct message and doesn't include images with a feature request",
       ],
       improvements: [
         "Refactor of existing components and utils should provide much better stability throughout " +
           "and provide support for future functionality",
         "Intent was introduced internally as a concept. Intent allows for aircraft/groups to 'want' " +
           "to go to a specific heading or location. The animation logic tries to get each aircraft " +
-          "to their desired location or heading. For intercepts, red air goes to the nearest 90 degree increment" +
+          "to their desired location or heading. For intercepts, red air goes to the nearest 90 degree increment " +
           "towards blue. Blue will update it's heading towards red.",
         "Group/Aircraft internal API was overhauled. Aircraft are now stored at the singular level, " +
           "to allow each Aircraft it's own intent",

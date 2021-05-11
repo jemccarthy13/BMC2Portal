@@ -4,7 +4,7 @@ import { IDMatrix } from "../id"
 import { DataTrail } from "./datatrail"
 
 export class ArrowDataTrail extends DataTrail {
-  private ARROW_SIZE_NM = 7
+  private ARROW_SIZE_NM = 5
   getCenterOfMass(heading: number): Point {
     const vector = headingToRadians(heading)
 
