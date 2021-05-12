@@ -95,6 +95,7 @@ export default class IssueReport extends React.PureComponent<IRProps, IRState> {
 
       if (response.ok) {
         Snackbar.success("Submitted!")
+        this.handleToggleIssueForm()
       } else {
         Snackbar.error("Issue report failed.\nTry again later.")
       }
