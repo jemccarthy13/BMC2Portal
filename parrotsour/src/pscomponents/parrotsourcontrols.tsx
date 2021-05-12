@@ -207,16 +207,6 @@ export default class ParrotSourControls extends React.PureComponent<
             >
               {isOrientNS ? "N/S" : "E/W"}
             </div>
-            {/* <label style={{ float: "left", paddingRight: "10px" }}>
-              Orientation:
-            </label>
-            <label className="switch">
-              <input type="checkbox" id="orientation" onChange={modifyCanvas} />
-              <span className="slider round">
-                <span className="on">N/S</span>
-                <span className="off">E/W</span>
-              </span>
-            </label> */}
           </div>
           <div style={{ display: "inline-flex" }}>
             <FormControlLabel
