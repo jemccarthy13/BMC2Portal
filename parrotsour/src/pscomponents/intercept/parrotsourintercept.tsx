@@ -13,7 +13,7 @@ import {
 } from "../../canvas/canvastypes"
 import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 import { FORMAT } from "../../classes/supportedformats"
-import { Cookies } from "react-cookie-consent"
+import PSCookies from "../../utils/pscookies"
 
 const PicTypeSelector = lazy(() => import("./picoptionsbar"))
 const StandardSelector = lazy(() => import("./standardselector"))
@@ -47,23 +47,25 @@ export default class ParrotSourIntercept extends React.PureComponent<
 > {
   constructor(props: Record<string, unknown>) {
     super(props)
-    const savedHardMode = Cookies.get("UserWantHardMode")
-    let hardMode = false
-    if (savedHardMode === "true") {
-      hardMode = true
-    }
+
     this.state = {
       showAnswer: false,
-      showMeasurements: true,
-      isHardMode: hardMode,
+      showMeasurements: !PSCookies.getWantMeasure(),
+      isHardMode: PSCookies.getHardMode(),
       format: FORMAT.ALSA,
       speedSliderValue: 50,
-      canvasConfig: {
-        height: 500,
-        width: 800,
-        orient: BlueInThe.EAST,
-      },
-      braaFirst: true,
+      canvasConfig: PSCookies.getOrientNS()
+        ? {
+            height: 600,
+            width: 700,
+            orient: BlueInThe.NORTH,
+          }
+        : {
+            height: 500,
+            width: 800,
+            orient: BlueInThe.EAST,
+          },
+      braaFirst: PSCookies.getBraaFirst(),
       picType: "random",
       answer: {
         pic: "",
@@ -71,7 +73,9 @@ export default class ParrotSourIntercept extends React.PureComponent<
       },
       newPic: false,
       animate: false,
-      dataStyle: SensorType.ARROW,
+      dataStyle: PSCookies.getDataStyleIsRadar()
+        ? SensorType.RAW
+        : SensorType.ARROW,
     }
     this.dummyCallback = this.pauseAnimate.bind(this)
   }
@@ -165,7 +169,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
     const { orient } = canvasConfig
 
     /**
-     * TODO -- CLAMP -- add support for BlueInThe.N/S/E/W
+     * TODO -- ORIENT -- add support for BlueInThe.N/S/E/W
      */
     let newConfig: CanvasOrient = {
       height: 600,

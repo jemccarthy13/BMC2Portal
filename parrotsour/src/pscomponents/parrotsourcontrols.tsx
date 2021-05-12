@@ -1,7 +1,13 @@
 import React, { ChangeEvent, ReactElement } from "react"
 
-import { Dialog, DialogContent, DialogContentText } from "@material-ui/core"
-import { Cookies } from "react-cookie-consent"
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  FormControlLabel,
+} from "@material-ui/core"
+import { IOSSwitch } from "./iosswitch"
+import PSCookies from "../utils/pscookies"
 
 export interface PSCProps {
   handleSliderChange: { (val: number): void }
@@ -16,10 +22,15 @@ interface PSCState {
   speedSliderValue: number
   showHelpText: boolean
   showHelpArrowText: boolean
+  isBraaFirst: boolean
+  dataStyleIsRadar: boolean
+  isOrientNS: boolean
 }
 
 /**
  * 'Basic' controls for the ParrotSour pictures.
+ *
+ * TODO -- CONTROLS -- Consider breaking this file into smaller components
  *
  * Includes:
  * - Play/Pause
@@ -33,14 +44,14 @@ export default class ParrotSourControls extends React.PureComponent<
 > {
   constructor(props: PSCProps) {
     super(props)
-    let savedSliderVal = parseInt(Cookies.get("SavedSpeedSlider"))
-    if (Number.isNaN(savedSliderVal)) {
-      savedSliderVal = 50
-    }
+
     this.state = {
-      speedSliderValue: savedSliderVal,
+      speedSliderValue: PSCookies.getSliderValue(),
       showHelpText: false,
       showHelpArrowText: false,
+      isBraaFirst: PSCookies.getBraaFirst(),
+      dataStyleIsRadar: PSCookies.getDataStyleIsRadar(),
+      isOrientNS: PSCookies.getOrientNS(),
     }
   }
 
@@ -58,7 +69,7 @@ export default class ParrotSourControls extends React.PureComponent<
 
   handleSliderMouseUp = (): void => {
     const { speedSliderValue } = this.state
-    Cookies.set("SavedSpeedSlider", speedSliderValue)
+    PSCookies.setSliderValue(speedSliderValue)
   }
 
   /**
@@ -97,13 +108,38 @@ export default class ParrotSourControls extends React.PureComponent<
    * Handle data trail toggle
    */
   handleDataStyleChange = (): void => {
+    const { dataStyleIsRadar } = this.state
+    this.setState({ dataStyleIsRadar: !dataStyleIsRadar })
+    PSCookies.setDataStyleIsRadar(!dataStyleIsRadar)
     const { handleDataStyleChange } = this.props
     handleDataStyleChange()
   }
 
+  handleDisplayFirstChanged = (): void => {
+    const { isBraaFirst } = this.state
+    this.setState({ isBraaFirst: !isBraaFirst })
+    PSCookies.setBraaFirst(!isBraaFirst)
+    const { displayFirstChanged } = this.props
+    displayFirstChanged()
+  }
+
+  handleOrientationChange = (): void => {
+    const { isOrientNS } = this.state
+    this.setState({ isOrientNS: !isOrientNS })
+    PSCookies.setOrientNS(!isOrientNS)
+    const { modifyCanvas } = this.props
+    modifyCanvas()
+  }
+
   render(): ReactElement {
-    const { speedSliderValue, showHelpText, showHelpArrowText } = this.state
-    const { modifyCanvas, displayFirstChanged } = this.props
+    const {
+      speedSliderValue,
+      showHelpText,
+      showHelpArrowText,
+      isBraaFirst,
+      dataStyleIsRadar,
+      isOrientNS,
+    } = this.state
     return (
       <div>
         <div style={{ display: "inline" }}>
@@ -148,8 +184,30 @@ export default class ParrotSourControls extends React.PureComponent<
         <br />
 
         <div style={{ display: "inline-flex", marginBottom: "10px" }}>
-          <div>
-            <label style={{ float: "left", paddingRight: "10px" }}>
+          <div style={{ display: "flex" }}>
+            {/** TODO -- ORIENTATION -- Support 'blue in the' N/S/E/W */}
+            <FormControlLabel
+              control={
+                <IOSSwitch
+                  checked={isOrientNS}
+                  onChange={this.handleOrientationChange}
+                  name="Orientation"
+                />
+              }
+              label="Orientation:"
+              labelPlacement="start"
+            />
+            <div
+              style={{
+                width: "50px",
+                margin: "auto",
+                marginLeft: "15px",
+                textAlign: "center",
+              }}
+            >
+              {isOrientNS ? "N/S" : "E/W"}
+            </div>
+            {/* <label style={{ float: "left", paddingRight: "10px" }}>
               Orientation:
             </label>
             <label className="switch">
@@ -158,98 +216,97 @@ export default class ParrotSourControls extends React.PureComponent<
                 <span className="on">N/S</span>
                 <span className="off">E/W</span>
               </span>
-            </label>
+            </label> */}
           </div>
           <div style={{ display: "inline-flex" }}>
-            <div style={{ display: "inline-flex" }}>
-              <label
-                style={{
-                  float: "left",
-                  paddingLeft: "75px",
-                  paddingRight: "10px",
-                }}
-              >
-                Display first:
-              </label>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  id="cursordispToggle"
-                  onChange={displayFirstChanged}
+            <FormControlLabel
+              control={
+                <IOSSwitch
+                  checked={isBraaFirst}
+                  onChange={this.handleDisplayFirstChanged}
+                  name="BRAA"
                 />
-                <span className="slider round">
-                  <span className="on"> BRAA </span>
-                  <span className="off"> BULL </span>
-                </span>
-              </label>
-              <button
-                style={{ padding: "0px", margin: "5px", float: "right" }}
-                className="helpicon"
-                id="btnDisplayFirstHelp"
-                type="button"
-                onClick={this.handleToggleHelp}
-              >
-                ?
-              </button>
-              <Dialog
-                id="dispFirstHelpDialog"
-                open={showHelpText}
-                onClose={this.handleToggleHelp}
-              >
-                <DialogContent>
-                  <DialogContentText>
-                    The BULL/BRAA toggle will change the order of the bullseye
-                    and braa measurements on screen.
-                  </DialogContentText>
-                  <DialogContentText>BULL = ALT, BULL, BRAA</DialogContentText>
-                  <DialogContentText>BRAA = ALT, BRAA, BULL</DialogContentText>
-                </DialogContent>
-              </Dialog>
+              }
+              label="Display First:"
+              labelPlacement="start"
+            />
+            <div
+              style={{
+                width: "50px",
+                margin: "auto",
+                marginLeft: "15px",
+                textAlign: "center",
+              }}
+            >
+              {isBraaFirst ? "BRAA" : "BULL"}
             </div>
-            <div>
-              <label
-                style={{
-                  float: "left",
-                  paddingLeft: "75px",
-                  paddingRight: "10px",
-                }}
-              >
-                Data Trail:
-              </label>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  id="dataTrailToggle"
-                  defaultChecked
+            <button
+              style={{ padding: "0px", margin: "5px", float: "right" }}
+              className="helpicon"
+              id="btnDisplayFirstHelp"
+              type="button"
+              onClick={this.handleToggleHelp}
+            >
+              ?
+            </button>
+            <Dialog
+              id="dispFirstHelpDialog"
+              open={showHelpText}
+              onClose={this.handleToggleHelp}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  The BULL/BRAA toggle will change the order of the bullseye and
+                  braa measurements on screen.
+                </DialogContentText>
+                <DialogContentText>BULL = ALT, BULL, BRAA</DialogContentText>
+                <DialogContentText>BRAA = ALT, BRAA, BULL</DialogContentText>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div style={{ display: "inline-flex", marginLeft: "50px" }}>
+            <FormControlLabel
+              control={
+                <IOSSwitch
+                  checked={dataStyleIsRadar}
                   onChange={this.handleDataStyleChange}
+                  name="DataTrail"
                 />
-                <span className="slider round">
-                  <span className="on"> Arrow </span>
-                  <span className="off"> Radar </span>
-                </span>
-              </label>
-              <button
-                style={{ padding: "0px", margin: "5px", float: "right" }}
-                className="helpicon"
-                id="btnDisplayDatatrailHelp"
-                type="button"
-                onClick={this.handleToggleArrowHelp}
-              >
-                ?
-              </button>
-              <Dialog
-                id="datatrailHelpDialog"
-                open={showHelpArrowText}
-                onClose={this.handleToggleArrowHelp}
-              >
-                <DialogContent>
-                  <DialogContentText>
-                    The ARROW/RADAR toggle changes the picture from arrows to
-                    radar trails.
-                  </DialogContentText>
-                </DialogContent>
-              </Dialog>
+              }
+              label="Data Trail:"
+              labelPlacement="start"
+            />
+            <div
+              style={{
+                width: "50px",
+                margin: "auto",
+                marginLeft: "15px",
+                textAlign: "center",
+              }}
+            >
+              {dataStyleIsRadar ? "Radar" : "Arrow"}
             </div>
+            <button
+              style={{ padding: "0px", margin: "5px", float: "right" }}
+              className="helpicon"
+              id="btnDisplayDatatrailHelp"
+              type="button"
+              onClick={this.handleToggleArrowHelp}
+            >
+              ?
+            </button>
+            <Dialog
+              id="datatrailHelpDialog"
+              open={showHelpArrowText}
+              onClose={this.handleToggleArrowHelp}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  The ARROW/RADAR toggle changes the picture from arrows to
+                  radar trails.
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
