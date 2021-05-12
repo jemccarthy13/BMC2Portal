@@ -13,6 +13,7 @@ import {
 } from "../../canvas/canvastypes"
 import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 import { FORMAT } from "../../classes/supportedformats"
+import { Cookies } from "react-cookie-consent"
 
 const PicTypeSelector = lazy(() => import("./picoptionsbar"))
 const StandardSelector = lazy(() => import("./standardselector"))
@@ -46,10 +47,15 @@ export default class ParrotSourIntercept extends React.PureComponent<
 > {
   constructor(props: Record<string, unknown>) {
     super(props)
+    const savedHardMode = Cookies.get("UserWantHardMode")
+    let hardMode = false
+    if (savedHardMode === "true") {
+      hardMode = true
+    }
     this.state = {
       showAnswer: false,
       showMeasurements: true,
-      isHardMode: false,
+      isHardMode: hardMode,
       format: FORMAT.ALSA,
       speedSliderValue: 50,
       canvasConfig: {

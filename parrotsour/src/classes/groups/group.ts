@@ -67,6 +67,8 @@ export class AircraftGroup extends Array<Aircraft> {
     p.sy = this.startPos.y
     p.hdg = p.hdg || 90
 
+    this.startPos = new Point(p.sx, p.sy)
+
     // Create nContacts number of Aircraft and add to this collection
     // TODO -- CUSTOMIZE -- user selected max # contacts per group?
     const nContacts = p.nContacts || randomNumber(1, 4)
