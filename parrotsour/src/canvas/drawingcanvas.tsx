@@ -11,10 +11,12 @@ import { DrawCanvasProps } from "./canvastypes"
 import { Braaseye } from "../classes/braaseye"
 import { Point } from "../classes/point"
 import { PaintBrush } from "./draw/paintbrush"
+import { PIXELS_TO_NM } from "../utils/psmath"
 
 interface CanvasMouseEvent {
   clientX: number
   clientY: number
+  getModifierState: (key: string) => boolean
 }
 
 /**
@@ -23,9 +25,8 @@ interface CanvasMouseEvent {
  */
 export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
   // Refs that store References to the current DOM elements
-  const canvasRef: React.RefObject<HTMLCanvasElement> = useRef<HTMLCanvasElement>(
-    null
-  )
+  const canvasRef: React.RefObject<HTMLCanvasElement> =
+    useRef<HTMLCanvasElement>(null)
 
   /**
    * Every time the canvas changes, update the PaintBrush current drawing context
@@ -35,12 +36,10 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     PaintBrush.use(canvasRef.current?.getContext("2d"))
   }, [canvasRef])
 
-  const mouseCanvasRef: React.RefObject<HTMLCanvasElement> = useRef<HTMLCanvasElement>(
-    null
-  )
-  const mouseCvCtx: React.MutableRefObject<CanvasRenderingContext2D | null> = useRef(
-    null
-  )
+  const mouseCanvasRef: React.RefObject<HTMLCanvasElement> =
+    useRef<HTMLCanvasElement>(null)
+  const mouseCvCtx: React.MutableRefObject<CanvasRenderingContext2D | null> =
+    useRef(null)
 
   // State variables are used to track mouse position
   const [mouseStart, setStart] = useState(Point.DEFAULT)
@@ -121,9 +120,6 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     if (mousePressed && mouseCvCtx.current) {
       drawLine(mouseCvCtx.current, start.x, start.y, end.x, end.y)
     }
-    // TODO -- alt stack boot. if (shift pressed){
-    // draw circle?
-    // }
 
     const b = new Braaseye(end, start, bullseye)
 
@@ -190,7 +186,35 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
         mouseCanvasRef.current.height
       )
     }
+    let isCapsLock = false
+    if (e) {
+      isCapsLock = e.getModifierState("CapsLock") || e.getModifierState("Shift")
+    }
     drawMouse(mouseStart, mousePos)
+
+    //
+    // TODO -- alt stack boot.
+    //
+    // Will probably need a static class. Call the 'AltBoot' method
+    // which notifies subscribers of the alt boot start end
+    // ..dang.
+    //
+    if (isCapsLock && mouseCvCtx.current && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect()
+      if (rect) {
+        mouseCvCtx.current.strokeStyle = "green"
+        mouseCvCtx.current.lineWidth = 1
+        mouseCvCtx.current.beginPath()
+        mouseCvCtx.current.arc(
+          mousePos.x + 50,
+          mousePos.y,
+          5 * PIXELS_TO_NM,
+          0,
+          360
+        )
+        mouseCvCtx.current.stroke()
+      }
+    }
   }
 
   /**
@@ -208,7 +232,11 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
    */
   const canvasTouchStart = (e: TouchEvent) => {
     const touch = e.changedTouches[0]
-    canvasMouseDown({ clientX: touch.clientX, clientY: touch.clientY })
+    canvasMouseDown({
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      getModifierState: () => false,
+    })
   }
 
   /**
@@ -218,7 +246,20 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
    */
   const canvasTouchMove = (e: TouchEvent) => {
     const touch = e.changedTouches[0]
-    canvasMouseMove({ clientX: touch.clientX, clientY: touch.clientY })
+    canvasMouseMove({
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      getModifierState: () => false,
+    })
+  }
+
+  /**
+   * Called when a TouchEvent (end) is registered on canvas
+   * Converts TouchEvent to MouseEvent for processing
+   * @param e TouchEvent containing touch location
+   */
+  const canvasTouchEnd = () => {
+    setMousePressed(false)
   }
 
   const style = {
@@ -235,7 +276,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     onMouseUp: canvasMouseUp,
     onTouchStart: canvasTouchStart,
     onTouchMove: canvasTouchMove,
-    onTouchEnd: canvasMouseUp,
+    onTouchEnd: canvasTouchEnd,
     onMouseLeave: onMouseLeave,
   }
 
