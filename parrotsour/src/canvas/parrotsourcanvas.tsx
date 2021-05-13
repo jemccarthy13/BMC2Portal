@@ -107,9 +107,10 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
       animate,
       dataStyle,
     } = this.props
-    const { bullseye } = this.state
+    const { bullseye, answer } = this.state
     return (
       <DrawingCanvas
+        answer={answer}
         draw={this.draw}
         orientation={orientation}
         braaFirst={braaFirst}

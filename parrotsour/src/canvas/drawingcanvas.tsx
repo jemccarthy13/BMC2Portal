@@ -6,12 +6,13 @@ import React, {
   TouchEvent,
 } from "react"
 
-import { drawLine } from "./draw/drawutils"
+import { drawLine, drawText } from "./draw/drawutils"
 import { DrawCanvasProps } from "./canvastypes"
 import { Braaseye } from "../classes/braaseye"
 import { Point } from "../classes/point"
 import { PaintBrush } from "./draw/paintbrush"
 import { PIXELS_TO_NM } from "../utils/psmath"
+import { formatAlt } from "./draw/formatutils"
 
 interface CanvasMouseEvent {
   clientX: number
@@ -155,6 +156,47 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
   }
 
   /**
+   * When shift is down or caps lock is on, aircraft
+   * inside a certain radius around the mouse cursor
+   * will have their altitudes displayed inside a 'boot'
+   * in the lower left hand corner.
+   *
+   * TODO -- Add amplifying data and 'EWI' to the boot
+   *
+   * @param mousePos Current mouse position in the canvas
+   */
+  const drawBoot = (mousePos: Point) => {
+    const { answer } = props
+
+    let alts: number[] = []
+    answer.groups.forEach((grp) => {
+      grp.forEach((ac) => {
+        if (
+          ac
+            .getCenterOfMass(props.dataStyle)
+            .getBR(new Point(mousePos.x + 50, mousePos.y)).range < 5
+        ) {
+          alts.push(ac.getAltitude())
+        }
+      })
+    })
+    alts = alts.sort().reverse()
+    const ctx = mouseCvCtx.current
+
+    if (ctx) {
+      ctx.fillStyle = "white"
+      const startY = 120
+      const bootStartY = ctx.canvas.height - startY
+      ctx.fillRect(0, bootStartY, 50, startY)
+      drawLine(ctx, 0, bootStartY, 50, bootStartY)
+      drawLine(ctx, 50, bootStartY, 50, ctx.canvas.height)
+      alts.forEach((alt, idx) => {
+        drawText(ctx, formatAlt(alt), 10, bootStartY + 20 + 20 * idx)
+      })
+    }
+  }
+
+  /**
    * Called when the mouse moves on the canvas.
    * Draws the appropriate information on the canvas.
    * @param e CanvasMouseEvent containing mouse position
@@ -196,6 +238,8 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
           360
         )
         mouseCvCtx.current.stroke()
+
+        drawBoot(mousePos)
       }
     }
   }

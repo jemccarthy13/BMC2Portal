@@ -51,6 +51,7 @@ export interface CanvasDrawFunction {
 export interface DrawCanvasProps extends CanvasProps {
   draw: CanvasDrawFunction
   bullseye: Point
+  answer: PictureAnswer
 }
 
 export interface PictureCanvasProps extends CanvasProps {
