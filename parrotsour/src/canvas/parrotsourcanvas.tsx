@@ -14,7 +14,6 @@ import { AircraftGroup } from "../classes/groups/group"
 import { AnimationHandler } from "../animation/animationhandler"
 
 // Functions
-import { drawFullInfo } from "../canvas/draw/drawutils"
 import { Point } from "../classes/point"
 
 /**
@@ -68,9 +67,14 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
             )
           }
         } else {
-          const callback = () =>
-            drawFullInfo(ctx, this.state, this.props, answer.groups)
-          this.animationHandler.pauseFight(callback)
+          // const callback = undefined
+          // //const { isHardMode } = this.props
+          // // callback = () =>
+          // //   drawFullInfo(ctx, this.state, this.props, answer.groups)
+
+          // TODO -- PAUSE -- Figure out how to draw full info
+          // when the pause button is pressed?
+          this.animationHandler.pauseFight()
         }
       }
     }

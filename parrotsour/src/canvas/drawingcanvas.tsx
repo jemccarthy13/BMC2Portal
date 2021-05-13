@@ -46,16 +46,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
   const [mousePressed, setMousePressed] = useState(false)
 
   // These values are watched by useEffect to trigger a 'draw'
-  const {
-    draw,
-    orientation,
-    braaFirst,
-    bullseye,
-    picType,
-    showMeasurements,
-    isHardMode,
-    newPic,
-  } = props
+  const { draw, orientation, bullseye, picType, isHardMode, newPic } = props
 
   // useEffect is a React hook called when any of the trigger props changes
   useEffect(() => {
@@ -83,15 +74,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
 
       render()
     }
-  }, [
-    draw,
-    orientation,
-    braaFirst,
-    picType,
-    showMeasurements,
-    newPic,
-    isHardMode,
-  ])
+  }, [draw, orientation, picType, newPic, isHardMode])
 
   /**
    * Get the mouse position given the event relative to canvas

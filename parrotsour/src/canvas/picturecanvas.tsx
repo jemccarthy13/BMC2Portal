@@ -69,7 +69,19 @@ export default class PictureCanvas extends ParrotSourCanvas {
     this._componentDidUpdate(prevProps)
     let animateImage = undefined
     const ctx = PaintBrush.getContext()
-    if (prevProps.dataStyle != this.props.dataStyle) {
+    if (
+      prevProps.isHardMode !== this.props.isHardMode ||
+      prevProps.orientation !== this.props.orientation ||
+      prevProps.picType !== this.props.picType
+    ) {
+      if (this.props.resetCallback) this.props.resetCallback()
+    }
+    if (
+      prevProps.dataStyle !== this.props.dataStyle ||
+      prevProps.showMeasurements !== this.props.showMeasurements ||
+      prevProps.orientation !== this.props.orientation ||
+      prevProps.braaFirst !== this.props.braaFirst
+    ) {
       if (
         this.props.animate === prevProps.animate &&
         prevProps.animate === true
@@ -103,8 +115,6 @@ export default class PictureCanvas extends ParrotSourCanvas {
   }
 
   /**
-   * TODO -- Pictue Draw functions.... have internal _clampToFrame to prevent draw offscreen
-   * by moving the picture perp. to axis as required
    *
    * TODO -- CAP MORE PICS -- when "cap" is selected, behave like maneuvers. 1+ groups CAP,
    * handle formatting in group.getTrackDir (if group.isCapping(), "CAP" instead of "TRK W")
