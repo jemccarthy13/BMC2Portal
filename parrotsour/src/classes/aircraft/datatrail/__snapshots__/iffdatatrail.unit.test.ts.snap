@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IFFDataTrail doesnt_draw_hos_sus 1`] = `<canvas />`;
+
+exports[`IFFDataTrail draws_correctly 1`] = `<canvas />`;

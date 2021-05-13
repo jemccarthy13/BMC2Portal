@@ -6,14 +6,14 @@ describe("FormatUtils", () => {
   it("openclose_opening", () => {
     const grp1 = new AircraftGroup({
       sx: 50,
-      sy: 50,
-      hdg: 80,
+      sy: 25,
+      hdg: 1,
     })
 
     const grp2 = new AircraftGroup({
       sx: 50,
-      sy: 75,
-      hdg: 100,
+      sy: 100,
+      hdg: 180,
     })
 
     expect(getGroupOpenClose(grp1, grp2, SensorType.ARROW)).toEqual("OPENING")

@@ -212,6 +212,7 @@ export default class ParrotSourControls extends React.PureComponent<
             <FormControlLabel
               control={
                 <IOSSwitch
+                  id="cursordispToggle"
                   checked={isBraaFirst}
                   onChange={this.handleDisplayFirstChanged}
                   name="BRAA"
@@ -258,6 +259,7 @@ export default class ParrotSourControls extends React.PureComponent<
             <FormControlLabel
               control={
                 <IOSSwitch
+                  id="dataTrailToggle"
                   checked={dataStyleIsRadar}
                   onChange={this.handleDataStyleChange}
                   name="DataTrail"

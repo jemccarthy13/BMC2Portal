@@ -46,7 +46,7 @@ describe("ParrotSourControls", () => {
   })
 
   it("alerts_parent_datastyle_change", () => {
-    const dsToggle = wrapper.find("#dataTrailToggle")
+    const dsToggle = wrapper.find("#dataTrailToggle").find("input")
     expect(dsToggle).toHaveLength(1)
     const dsChangeSpy = jest.spyOn(fakeProps, "handleDataStyleChange")
     dsToggle.simulate("change", dsToggle)
@@ -54,7 +54,7 @@ describe("ParrotSourControls", () => {
   })
 
   it("alerts_parent_displayfirst_change", () => {
-    const disFirstToggle = wrapper.find("#cursordispToggle")
+    const disFirstToggle = wrapper.find("#cursordispToggle").find("input")
     expect(disFirstToggle).toHaveLength(1)
     const disFirstSpy = jest.spyOn(fakeProps, "displayFirstChanged")
     disFirstToggle.simulate("change", disFirstToggle)
