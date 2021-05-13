@@ -33,7 +33,7 @@ export default function VersionHistory(): JSX.Element {
       version: "4.0.0",
       date: "15 May 2021",
       features: [
-        "Try out the new stack feature (Shift/CapsLock over red air)!",
+        "Try out the new stack feature (Shift/CapsLock over red air)",
         "Notifications are now a one-time thing with the use of cookies. Cookies also allow some of " +
           "your selected preferences (i.e. hard mode, 'I want to measure', animation speed) " +
           "to be saved between sessions.",
