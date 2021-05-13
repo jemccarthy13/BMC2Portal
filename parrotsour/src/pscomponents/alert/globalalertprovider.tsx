@@ -1,29 +1,33 @@
-import React from "react"
+import React, { CSSProperties } from "react"
 
-import { Button } from "@material-ui/core"
 import { SnackbarKey, SnackbarProvider } from "notistack"
 
-import _snackActions, { SnackbarUtilsConfigurator } from "./psalert"
+import snackActions, { SnackbarUtilsConfigurator } from "./psalert"
+
+const transparentBtnStyle: CSSProperties = {
+  height: "100%",
+  left: 0,
+  position: "absolute",
+  top: 0,
+  width: "100%",
+  backgroundColor: "Transparent",
+  backgroundRepeat: "no-repeat",
+  outline: "none",
+}
 
 export default class GlobalAlertProvider extends SnackbarProvider {
   dismissNotification = (key: SnackbarKey): (() => void) => {
     return () => {
-      _snackActions.closeSnackbar(key)
+      snackActions.closeSnackbar(key)
     }
   }
 
   dismissAction = (key: SnackbarKey): React.ReactElement => {
     return (
-      <Button
+      <button
+        type="button"
         onClick={this.dismissNotification(key)}
-        // eslint-disable-next-line react/forbid-component-props
-        style={{
-          height: "100%",
-          left: 0,
-          position: "absolute",
-          top: 0,
-          width: "100%",
-        }}
+        style={transparentBtnStyle}
       />
     )
   }
