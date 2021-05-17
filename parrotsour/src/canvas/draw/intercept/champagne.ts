@@ -13,7 +13,10 @@ import { Point } from "../../../classes/point"
 
 // Functions
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
+import {
+  formatGroup,
+  getGroupOpenClose,
+} from "../../../canvas/draw/formatutils"
 import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
   isAnchorNorth,
@@ -203,8 +206,16 @@ export const drawChampagne: PictureDrawFunction = (
   const slgAlts: AltStack = slg.getAltStack(props.format)
 
   // TODO -- CHAMP ANSWER -- cleanup
+  const openClose = getGroupOpenClose(nlg, slg, props.dataStyle)
+
   let answer =
-    "THREE GROUP CHAMPAGNE " + realWidth + " WIDE, " + realDepth + " DEEP, "
+    "THREE GROUP CHAMPAGNE " +
+    realWidth +
+    " WIDE " +
+    openClose +
+    " " +
+    realDepth +
+    " DEEP, "
 
   // determine if weighted
   if (new Point(nlgPos.x, tgPos.y).getBR(nlgPos).range < realWidth / 3) {
