@@ -30,10 +30,12 @@ export default function VersionHistory(): JSX.Element {
   // the order in this list === display order
   const versionHistory: VersionList = [
     {
-      version: "4.0.0",
+      version: "4.0.3",
       date: "15 May 2021",
       features: [
-        "Try out the new stack feature (Shift/CapsLock over red air)",
+        "CAP picture select now supports multiple picture types.",
+        "Cursor over red air displays info in the top left corner (rudimentary first draft).",
+        "Shift/CapsLock over red air displays the stack/alt boot feature.",
         "Notifications are now a one-time thing with the use of cookies. Cookies also allow some of " +
           "your selected preferences (i.e. hard mode, 'I want to measure', animation speed) " +
           "to be saved between sessions.",
