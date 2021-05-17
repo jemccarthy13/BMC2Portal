@@ -4,6 +4,7 @@ import { IFFDataTrail } from "./iffdatatrail"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unused-vars
 const canvasSerializer = require("jest-canvas-snapshot-serializer")
+expect.addSnapshotSerializer(canvasSerializer)
 
 const canvas = document.createElement("canvas")
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

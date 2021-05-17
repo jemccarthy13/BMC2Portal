@@ -5,6 +5,7 @@ import { IDMatrix } from "./id"
 import Tasking from "../taskings/tasking"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const canvasSerializer = require("jest-canvas-snapshot-serializer")
+expect.addSnapshotSerializer(canvasSerializer)
 
 /**
  * Integration tests for Aircraft.
@@ -16,7 +17,6 @@ const canvasSerializer = require("jest-canvas-snapshot-serializer")
  * This means if the underlying unit tests (like Point) were to fail,
  * there's a high likelihood this test will also fail.
  */
-expect.addSnapshotSerializer(canvasSerializer)
 describe("Aircraft", () => {
   const canvas = document.createElement("canvas")
   canvas.width = 10
