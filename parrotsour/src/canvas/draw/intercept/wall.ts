@@ -128,7 +128,7 @@ export const drawWall: PictureDrawFunction = (
     altStacks.push(grp.getAltStack(props.format))
   }
 
-  checkCaps(groups)
+  checkCaps(hasCaps, groups)
 
   groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
 

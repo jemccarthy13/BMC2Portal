@@ -102,7 +102,7 @@ export const drawRange: PictureDrawFunction = (
     offsetY2 = 40
   }
 
-  checkCaps([lg, tg])
+  checkCaps(hasCaps, [lg, tg])
 
   lg.draw(ctx, props.dataStyle)
   tg.draw(ctx, props.dataStyle)

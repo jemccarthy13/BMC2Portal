@@ -130,7 +130,7 @@ export const drawLadder: PictureDrawFunction = (
     altstacks[x] = groups[x].getAltStack(props.format)
   }
 
-  checkCaps(groups)
+  checkCaps(hasCaps, groups)
 
   groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
 

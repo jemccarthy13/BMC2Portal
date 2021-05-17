@@ -120,8 +120,7 @@ export const drawChampagne: PictureDrawFunction = (
     offsetX = -70
   }
 
-  checkCaps([tg, nlg, slg])
-  console.log(tg.isCapping(), nlg.isCapping(), slg.isCapping())
+  checkCaps(hasCaps, [tg, nlg, slg])
 
   tg.draw(ctx, props.dataStyle)
   nlg.draw(ctx, props.dataStyle)

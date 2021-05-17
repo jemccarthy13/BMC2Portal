@@ -97,7 +97,7 @@ export const drawVic: PictureDrawFunction = (
     })
   }
 
-  checkCaps([ntg, stg])
+  checkCaps(hasCaps, [ntg, stg])
 
   ntg.draw(ctx, props.dataStyle)
   stg.draw(ctx, props.dataStyle)

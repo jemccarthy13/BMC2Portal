@@ -82,10 +82,7 @@ export const drawAzimuth: PictureDrawFunction = (
     dataTrailType: props.dataStyle,
   })
 
-  if (hasCaps) {
-    checkCaps([ng, sg])
-  }
-  console.log(ng.isCapping(), sg.isCapping())
+  checkCaps(hasCaps, [ng, sg])
 
   ng.draw(ctx, props.dataStyle)
   sg.draw(ctx, props.dataStyle)

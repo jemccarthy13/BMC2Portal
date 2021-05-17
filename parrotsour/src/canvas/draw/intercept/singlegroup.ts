@@ -48,7 +48,7 @@ export const drawSingleGroup: PictureDrawFunction = (
 
   // Create the first group
   const sg = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
-  checkCaps([sg])
+  checkCaps(hasCaps, [sg])
   sg.setLabel("SINGLE GROUP")
   sg.draw(ctx, props.dataStyle)
 
