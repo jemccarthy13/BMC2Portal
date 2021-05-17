@@ -25,6 +25,7 @@ import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { FORMAT } from "../../../classes/supportedformats"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw a 3-5 group wall and return the correctly formatted answer.
@@ -39,6 +40,7 @@ export const drawWall: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   const isNS = props.orientation.orient === BlueInThe.NORTH
@@ -93,7 +95,6 @@ export const drawWall: PictureDrawFunction = (
         sy: startY,
         hdg: heading + offsetHeading,
       })
-      grp.draw(ctx, props.dataStyle)
       groups.push(grp)
       altOffsetX = -15 * (numGroups - x)
       altOffsetY = 40 + 11 * (numGroups - (numGroups - x))
@@ -104,7 +105,6 @@ export const drawWall: PictureDrawFunction = (
         sy: startY + totalArrowOffset,
         hdg: heading + offsetHeading,
       })
-      grp.draw(ctx, props.dataStyle)
       groups.push(grp)
     }
 
@@ -127,6 +127,10 @@ export const drawWall: PictureDrawFunction = (
     braaseyes.push(grpBraaseye)
     altStacks.push(grp.getAltStack(props.format))
   }
+
+  checkCaps(groups)
+
+  groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
 
   let width = 0
   let nLbl = "WEST"

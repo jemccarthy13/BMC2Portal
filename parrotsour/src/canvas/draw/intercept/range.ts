@@ -21,6 +21,7 @@ import {
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw two groups in range and return the correct answer.
@@ -35,6 +36,7 @@ export const drawRange: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point
 ): PictureAnswer => {
   const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)
@@ -64,7 +66,6 @@ export const drawRange: PictureDrawFunction = (
     sy: startY,
     hdg: heading,
   })
-  tg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -86,7 +87,6 @@ export const drawRange: PictureDrawFunction = (
       sy: startY + drawDistance,
       hdg: heading,
     })
-    lg.draw(ctx, props.dataStyle)
     m2 = new Point(tgPos.x, lg.getCenterOfMass(props.dataStyle).y)
   } else {
     lg = new AircraftGroup({
@@ -95,13 +95,17 @@ export const drawRange: PictureDrawFunction = (
       sy: startY,
       hdg: heading,
     })
-    lg.draw(ctx, props.dataStyle)
     m2 = new Point(lg.getCenterOfMass(props.dataStyle).x, tgPos.y)
     offsetX = -10
     offsetY = 40
     offsetX2 = -60
     offsetY2 = 40
   }
+
+  checkCaps([lg, tg])
+
+  lg.draw(ctx, props.dataStyle)
+  tg.draw(ctx, props.dataStyle)
 
   const lgPos = lg.getCenterOfMass(props.dataStyle)
 

@@ -23,7 +23,6 @@ import { drawChampagne } from "../canvas/draw/intercept/champagne"
 import { drawPackage } from "../canvas/draw/intercept/packages"
 import { drawLeadEdge } from "./draw/intercept/leadingedge"
 import { drawThreat } from "./draw/intercept/threatdraw"
-import { drawCap } from "./draw/intercept/capdraw"
 import { drawEA } from "./draw/intercept/eadraw"
 import { drawPOD } from "./draw/intercept/poddraw"
 import { drawSingleGroup } from "./draw/intercept/singlegroup"
@@ -139,13 +138,22 @@ export default class PictureCanvas extends ParrotSourCanvas {
     if (forced) {
       type = this.getRandomPicType(true)
     } else {
-      type = picType === "random" ? this.getRandomPicType(isLeadEdge) : picType
+      type =
+        picType === "random" || picType === "cap"
+          ? this.getRandomPicType(isLeadEdge)
+          : picType
     }
 
     let drawFunc: PictureDrawFunction = this.functions[type]
     if (drawFunc === undefined) drawFunc = drawAzimuth
 
-    const answer = drawFunc(context, this.props, this.state, start)
+    const answer = drawFunc(
+      context,
+      this.props,
+      this.state,
+      picType === "cap",
+      start
+    )
 
     const { blueAir } = this.state
     blueAir.updateIntent({
@@ -175,7 +183,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
     wall: drawWall,
     vic: drawVic,
     champagne: drawChampagne,
-    cap: drawCap,
+    //cap: drawCap,
     threat: drawThreat,
     ea: drawEA,
     pod: drawPOD,

@@ -25,6 +25,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw a three group champagne and return the correct answer.
@@ -39,6 +40,7 @@ export const drawChampagne: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   const picture = {
@@ -66,7 +68,6 @@ export const drawChampagne: PictureDrawFunction = (
     sy: startY,
     hdg: heading + randomNumber(-10, 10),
   })
-  tg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -89,7 +90,6 @@ export const drawChampagne: PictureDrawFunction = (
       hdg: heading + randomNumber(-10, 10),
     })
   }
-  nlg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -119,6 +119,12 @@ export const drawChampagne: PictureDrawFunction = (
     })
     offsetX = -70
   }
+
+  checkCaps([tg, nlg, slg])
+  console.log(tg.isCapping(), nlg.isCapping(), slg.isCapping())
+
+  tg.draw(ctx, props.dataStyle)
+  nlg.draw(ctx, props.dataStyle)
   slg.draw(ctx, props.dataStyle)
 
   let realDepth, realWidth

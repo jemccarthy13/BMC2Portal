@@ -8,7 +8,7 @@ import {
 import PSAlert from "../../../pscomponents/alert/psalert"
 
 // Functions
-import { drawAltitudes, drawGroupCap, drawText } from "../drawutils"
+import { drawAltitudes, drawText } from "../drawutils"
 import { randomNumber } from "../../../utils/psmath"
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 
@@ -109,22 +109,24 @@ function doAnimation(
 
       const nextPoint = groups[x].getNextRoutingPoint()
       if (nextPoint) {
-        newHeading = groups[x].getCenterOfMass(props.dataStyle).getBR(nextPoint)
-          .bearingNum
+        newHeading = groups[x]
+          .getCenterOfMass(props.dataStyle)
+          .getBR(nextPoint).bearingNum
       }
       groups[x].updateIntent({
         desiredHeading: newHeading,
       })
     } else {
-      const sPos = groups[x].getCenterOfMass(props.dataStyle)
-      drawGroupCap(
-        ctx,
-        props.orientation.orient,
-        groups[x].getStrength(),
-        sPos.x,
-        sPos.y,
-        "blue"
-      )
+      // const sPos = groups[x].getCenterOfMass(props.dataStyle)
+      groups[x].draw(ctx, props.dataStyle)
+      // drawGroupCap(
+      //   ctx,
+      //   props.orientation.orient,
+      //   groups[x].getStrength(),
+      //   sPos.x,
+      //   sPos.y,
+      //   "blue"
+      // )
     }
     const sPos = groups[x].getCenterOfMass(props.dataStyle)
     drawText(ctx, groups[x].getLabel(), sPos.x - 10, sPos.y + 20, 12)

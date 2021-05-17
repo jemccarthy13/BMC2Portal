@@ -29,6 +29,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw two groups azimuth and return the correct answer.
@@ -43,6 +44,7 @@ export const drawAzimuth: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point
 ): PictureAnswer => {
   // Min distance apart = 5 nm, max = 40
@@ -62,8 +64,6 @@ export const drawAzimuth: PictureDrawFunction = (
   // Create the first group
   const ng = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
 
-  ng.draw(ctx, props.dataStyle)
-
   // if hard mode and ALSA, we randomize the 2nd groups heading
   // otherwise, pair to first group +/- 10 degrees
   const heading = props.isHardMode
@@ -81,6 +81,13 @@ export const drawAzimuth: PictureDrawFunction = (
     hdg: heading,
     dataTrailType: props.dataStyle,
   })
+
+  if (hasCaps) {
+    checkCaps([ng, sg])
+  }
+  console.log(ng.isCapping(), sg.isCapping())
+
+  ng.draw(ctx, props.dataStyle)
   sg.draw(ctx, props.dataStyle)
 
   let offsetX = 0

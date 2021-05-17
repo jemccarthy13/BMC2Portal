@@ -151,6 +151,8 @@ export default class ParrotSourIntercept extends React.PureComponent<
    * Called to start the animation
    */
   startAnimate = (): void => {
+    const { answer } = this.state
+    answer.groups.forEach((grp) => grp.setCapping(false))
     this.setState({ animate: true })
   }
 

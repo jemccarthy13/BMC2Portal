@@ -13,6 +13,7 @@ import { Point } from "../classes/point"
 import { PaintBrush } from "./draw/paintbrush"
 import { PIXELS_TO_NM } from "../utils/psmath"
 import { formatAlt } from "./draw/formatutils"
+import { Aircraft } from "../classes/aircraft/aircraft"
 
 interface CanvasMouseEvent {
   clientX: number
@@ -196,6 +197,36 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     }
   }
 
+  //
+  // Display 'baseball card' in upper left
+  //
+  const drawCursorInfo = (mousePos: Point) => {
+    const { answer } = props
+    const grps: Aircraft[] = []
+    answer.groups.forEach((grp) => {
+      grp.forEach((ac) => {
+        if (
+          ac
+            .getCenterOfMass(props.dataStyle)
+            .getBR(new Point(mousePos.x + 50, mousePos.y)).range < 1.5
+        ) {
+          grps.push(ac)
+        }
+      })
+    })
+
+    if (grps.length > 0) {
+      const ctx = mouseCvCtx.current
+
+      if (ctx) {
+        drawText(ctx, "Hdg:", 20, 20)
+        drawText(ctx, grps[0].getHeading().toString(), 50, 20)
+        drawText(ctx, "Alt:", 20, 40)
+        drawText(ctx, formatAlt(grps[0].getAltitude()), 50, 40)
+      }
+    }
+  }
+
   /**
    * Called when the mouse moves on the canvas.
    * Draws the appropriate information on the canvas.
@@ -218,11 +249,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     drawMouse(mouseStart, mousePos)
 
     //
-    // TODO -- alt stack boot.
-    //
-    // Will probably need a static class. Call the 'AltBoot' method
-    // which notifies subscribers of the alt boot start end
-    // ..dang.
+    // draw the range ring & "stack" boot
     //
     if (isCapsLock && mouseCvCtx.current && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
@@ -241,6 +268,9 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
 
         drawBoot(mousePos)
       }
+    } else {
+      // on cur over...
+      drawCursorInfo(mousePos)
     }
   }
 

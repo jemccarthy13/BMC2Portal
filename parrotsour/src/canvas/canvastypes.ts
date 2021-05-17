@@ -70,6 +70,7 @@ export interface PictureDrawFunction {
     context: CanvasRenderingContext2D,
     props: PictureCanvasProps,
     state: PictureCanvasState,
+    hasCaps: boolean,
     start?: Point
   ): PictureAnswer
 }
@@ -78,6 +79,7 @@ export interface PictureReDrawFunction {
   (
     context: CanvasRenderingContext2D,
     forced?: boolean,
-    start?: Point
+    start?: Point,
+    hasCaps?: boolean
   ): PictureAnswer
 }

@@ -17,6 +17,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   const isNS = FightAxis.isNS(props.orientation.orient)
@@ -31,7 +32,7 @@ export const drawLeadEdge: PictureDrawFunction = (
     100,
     { start }
   )
-  const answer1 = state.reDraw(ctx, true, pic1StartPos)
+  const answer1 = state.reDraw(ctx, true, pic1StartPos, hasCaps)
   const groups1 = answer1.groups
 
   let furthestPic1Group = groups1[0]
@@ -69,7 +70,7 @@ export const drawLeadEdge: PictureDrawFunction = (
     25,
     40
   )
-  const answer2 = state.reDraw(ctx, true, pic2StartPos)
+  const answer2 = state.reDraw(ctx, true, pic2StartPos, hasCaps)
   const groups2 = answer2.groups
 
   let closestPic2Group = groups2[0]
@@ -97,7 +98,7 @@ export const drawLeadEdge: PictureDrawFunction = (
     pic:
       groups1.length +
       groups2.length +
-      "GROUPS, LEADING EDGE " +
+      " GROUPS, LEADING EDGE " +
       answer1.pic +
       " FOLLOW ON " +
       (props.format === FORMAT.IPE ? " GROUPS " : "") +

@@ -24,6 +24,7 @@ export const drawThreat: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   if (!state.blueAir) {

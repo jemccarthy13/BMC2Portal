@@ -191,6 +191,7 @@ export const drawEA: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point
 ): PictureAnswer => {
   // force draw to happen on the right side of the screen

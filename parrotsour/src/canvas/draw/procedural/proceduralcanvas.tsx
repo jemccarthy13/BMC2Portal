@@ -8,12 +8,14 @@ import {
   PictureCanvasState,
 } from "../../../canvas/canvastypes"
 
-import { drawGroupCap, drawLine, drawText } from "../drawutils"
+import { drawLine, drawText } from "../drawutils"
 import { animateGroups, pauseFight } from "./animate"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { randomNumber } from "../../../utils/psmath"
 import { Point } from "../../../classes/point"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
+import { GroupFactory } from "../../../classes/groups/groupfactory"
+import { IDMatrix } from "../../../classes/aircraft/id"
 
 /**
  * This component is the main control for drawing pictures for procedural control
@@ -99,16 +101,19 @@ export default class ProceduralCanvas extends React.PureComponent<
       start,
     })
 
-    const grp = drawGroupCap(
+    const grp = GroupFactory.randomGroupAtLoc(
       ctx,
-      orientation.orient,
-      1,
-      startPos.x,
-      startPos.y,
-      "blue"
+      this.props,
+      this.state,
+      startPos
     )
+    grp.setIDMatrix(IDMatrix.FRIEND)
+    grp.setCapping(true)
+
     grp.addRoutingPoint(startPos)
     grp.setLabel("VR01")
+
+    grp.draw(ctx, dataStyle)
 
     const grpPos = grp.getCenterOfMass(dataStyle)
 

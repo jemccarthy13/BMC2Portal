@@ -22,6 +22,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw a 3-5 group ladder and return the correct answer.
@@ -36,6 +37,7 @@ export const drawLadder: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   const groups: AircraftGroup[] = []
@@ -95,7 +97,6 @@ export const drawLadder: PictureDrawFunction = (
         sy: startY - totalArrowOffset,
         hdg: heading + offsetHeading,
       })
-      grp.draw(ctx, props.dataStyle)
       groups.push(grp)
     } else {
       const grp = new AircraftGroup({
@@ -104,7 +105,6 @@ export const drawLadder: PictureDrawFunction = (
         sy: startY,
         hdg: heading + offsetHeading,
       })
-      grp.draw(ctx, props.dataStyle)
       groups.push(grp)
       offsetX = -40 + -5 * (numGroups - x)
       offsetY = -20 + -11 * (numGroups - x)
@@ -129,6 +129,10 @@ export const drawLadder: PictureDrawFunction = (
 
     altstacks[x] = groups[x].getAltStack(props.format)
   }
+
+  checkCaps(groups)
+
+  groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
 
   let deep
   const prevGpPos = groups[groups.length - 1].getCenterOfMass(props.dataStyle)

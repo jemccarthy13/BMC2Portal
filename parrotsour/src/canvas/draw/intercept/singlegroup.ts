@@ -16,6 +16,7 @@ import { formatGroup } from "../formatutils"
 import { getStartPos } from "./pictureclamp"
 import { picTrackDir } from "./picturehelpers"
 import { PIXELS_TO_NM } from "../../../utils/psmath"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw a single group, one contact (for debugging)
@@ -30,6 +31,7 @@ export const drawSingleGroup: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point
 ): PictureAnswer => {
   const startPos = getStartPos(
@@ -46,6 +48,7 @@ export const drawSingleGroup: PictureDrawFunction = (
 
   // Create the first group
   const sg = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
+  checkCaps([sg])
   sg.setLabel("SINGLE GROUP")
   sg.draw(ctx, props.dataStyle)
 

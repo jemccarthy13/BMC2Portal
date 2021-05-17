@@ -129,6 +129,9 @@ export class Aircraft {
    * @param ctx Current drawing context
    */
   getCenterOfMass(dataStyle?: SensorType): Point {
+    if (this.isCapping()) {
+      return this.getStartPos()
+    }
     dataStyle = dataStyle === undefined ? SensorType.ARROW : dataStyle
     const dataTrail = this.dataTrail.get(dataStyle)
     if (dataTrail) {
@@ -143,6 +146,13 @@ export class Aircraft {
    */
   isCapping(): boolean {
     return this.capping
+  }
+
+  /**
+   * @param newVal New value for isCapping
+   */
+  setCapping(newVal: boolean): void {
+    this.capping = newVal
   }
 
   /*************************************************************************

@@ -6,8 +6,6 @@
 // Interfaces
 import { AircraftGroup } from "../../classes/groups/group"
 import {
-  BlueInThe,
-  FightAxis,
   PictureCanvasProps,
   PictureCanvasState,
 } from "../../canvas/canvastypes"
@@ -16,7 +14,7 @@ import { Braaseye } from "../../classes/braaseye"
 
 // Utility functions
 import { formatAlt } from "./formatutils"
-import { PIXELS_TO_NM, randomNumber, toRadians } from "../../utils/psmath"
+import { PIXELS_TO_NM, randomNumber } from "../../utils/psmath"
 
 /**
  * 'Clamp' the location to the confines of the drawing context
@@ -155,83 +153,6 @@ export function drawMeasurement(
       (startY + endY) / 2 - 3
     )
   }
-}
-
-/**
- * Draw a capping group's arrows
- * @param orientation Orientation of the drawing context
- * @param contacts Number of contacts in the CAP
- * @param startX X starting position
- * @param startY Y starting position
- * @param color (optional) color for the CAP, defaults to red
- */
-export function drawGroupCap(
-  c: CanvasRenderingContext2D,
-  orientation: BlueInThe,
-  contacts: number,
-  startX: number,
-  startY: number,
-  color = "red"
-): AircraftGroup {
-  if (!c) {
-    return new AircraftGroup()
-  }
-
-  // eslint-disable-next-line
-  let alts: number[] = [...Array(contacts)].map((_) => randomNumber(15, 45))
-
-  c.lineWidth = 1
-  c.fillStyle = color
-  c.strokeStyle = color
-
-  c.beginPath()
-
-  let radius = 10
-  if (contacts === 1) {
-    c.arc(startX, startY, 10, 1.0 * Math.PI, 0.8 * Math.PI)
-    c.stroke()
-    drawLine(c, startX - 8, startY + 6, startX - 6, startY + 12, color)
-  } else {
-    const ratio = 2 / contacts - 0.1
-    let startPI = 0
-    let endPI = ratio
-    radius = 12
-    for (let x = 1; x <= contacts; x++) {
-      c.arc(startX, startY, radius, startPI * Math.PI, endPI * Math.PI)
-      c.stroke()
-
-      const opp: number = radius * Math.sin(endPI * Math.PI)
-      const adj: number = radius * Math.cos(endPI * Math.PI)
-
-      const endy = startY + opp
-      const endx = startX + adj
-
-      c.beginPath()
-      c.moveTo(startX + adj * 0.6, startY + opp * 0.9)
-      c.lineTo(endx, endy)
-      c.stroke()
-      c.beginPath()
-
-      startPI = endPI + 0.1
-      endPI = startPI + ratio
-    }
-  }
-
-  const angle = FightAxis.isNS(orientation) ? 0 : 270
-  const sY: number = Math.floor(startY + radius * Math.sin(toRadians(angle)))
-  const sX: number = Math.floor(startX + radius * Math.cos(toRadians(angle)))
-
-  const p = {
-    sx: startX,
-    sy: startY,
-    sX,
-    sY,
-    numContacts: contacts,
-    hdg: randomNumber(0, 360),
-    alts,
-    desiredHdg: 90,
-  }
-  return new AircraftGroup(p)
 }
 
 export function drawBullseye(

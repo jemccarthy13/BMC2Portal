@@ -5,11 +5,7 @@ import {
   PictureCanvasState,
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
-import {
-  drawAltitudes,
-  drawBullseye,
-  drawMeasurement,
-} from "../../../canvas/draw/drawutils"
+import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import { formatGroup } from "../../../canvas/draw/formatutils"
 import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
@@ -26,6 +22,7 @@ import {
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
+import { checkCaps } from "./capdraw"
 
 /**
  * Draw a three group vic and return the correct answer.
@@ -40,6 +37,7 @@ export const drawVic: PictureDrawFunction = (
   ctx: CanvasRenderingContext2D,
   props: PictureCanvasProps,
   state: PictureCanvasState,
+  hasCaps: boolean,
   start?: Point | undefined
 ): PictureAnswer => {
   const picture = {
@@ -79,8 +77,6 @@ export const drawVic: PictureDrawFunction = (
     nLbl = "WEST"
     sLbl = "EAST"
   }
-  ntg.draw(ctx, props.dataStyle)
-  drawBullseye(ctx, ntg.getStartPos())
 
   if (props.isHardMode)
     heading = randomHeading(props.format, state.blueAir.getHeading())
@@ -100,6 +96,10 @@ export const drawVic: PictureDrawFunction = (
       hdg: heading + randomNumber(-10, 10),
     })
   }
+
+  checkCaps([ntg, stg])
+
+  ntg.draw(ctx, props.dataStyle)
   stg.draw(ctx, props.dataStyle)
 
   if (props.isHardMode)

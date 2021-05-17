@@ -15,6 +15,7 @@ import {
   PIXELS_TO_NM,
   randomNumber,
 } from "../../utils/psmath"
+import { drawGroupCap } from "./groupcap"
 
 /**
  * The types of data that can be used to seed a group.
@@ -131,6 +132,13 @@ export class AircraftGroup extends Array<Aircraft> {
         return !ac.isCapping()
       }) === undefined
     )
+  }
+
+  /**
+   * Set each aircraft in this group to be capping
+   */
+  setCapping(newVal: boolean): void {
+    this.forEach((ac) => ac.setCapping(newVal))
   }
 
   /*************************************************************************
@@ -289,7 +297,11 @@ export class AircraftGroup extends Array<Aircraft> {
    * @param dataStyle The type of DataTrail to use
    */
   draw(context: CanvasRenderingContext2D, dataStyle: SensorType): void {
-    this.forEach((ac) => ac.draw(context, dataStyle))
+    if (this.isCapping()) {
+      drawGroupCap(context, this)
+    } else {
+      this.forEach((ac) => ac.draw(context, dataStyle))
+    }
   }
 
   /**
