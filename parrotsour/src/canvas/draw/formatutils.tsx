@@ -5,7 +5,8 @@
 import { Braaseye } from "../../classes/braaseye"
 import { AircraftGroup } from "../../classes/groups/group"
 import { AltStack } from "../../classes/altstack"
-import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
+import { toRadians } from "../../utils/psmath"
+import { ArrowDataTrail } from "../../classes/aircraft/datatrail/arrowdatatrail"
 
 type RangeBack = {
   label: string
@@ -17,8 +18,7 @@ type RangeBack = {
  * @param alt int altitude to change to padded string
  */
 export function formatAlt(alt: number): string {
-  const altF = (alt * 10).toString().substring(0, 3)
-  return altF.length < 3 ? "0" + altF : altF
+  return (alt * 10).toString().substring(0, 3).padStart(3, "0")
 }
 
 /**
@@ -81,39 +81,51 @@ export function formatGroup(
  * @param fg First group of picture
  * @param sg Second group of picture
  */
-export function getGroupOpenClose(
+export function getOpenCloseAzimuth(
   fg: AircraftGroup,
-  sg: AircraftGroup,
-  dataStyle: SensorType
+  sg: AircraftGroup
 ): string {
-  const fgPos = fg.getCenterOfMass(dataStyle)
-  const sgPos = sg.getCenterOfMass(dataStyle)
+  let retVal = ""
+
   const fgStartPos = fg.getStartPos()
   const sgStartPos = sg.getStartPos()
 
-  // if the head of the arrow is closer, it's pointing towards the other fighter
-  const b1 = sgPos.getBR(fgPos).range
-  const b2 = sgPos.getBR(fgStartPos).range
-  const mina = Math.min(b1, b2)
+  const angle1to2 = fgStartPos.getBR(sgStartPos).bearingNum
 
-  const b3 = sgStartPos.getBR(fgPos).range
-  const b4 = sgStartPos.getBR(fgStartPos).range
-  const minb = Math.min(b3, b4)
+  const fgHeading = fg.getHeading()
+  const sgHeading = sg.getHeading()
 
-  const b5 = fgPos.getBR(sgPos).range
-  const b6 = fgPos.getBR(sgStartPos).range
-  const minc = Math.min(b5, b6)
+  const speed1to2 =
+    ArrowDataTrail.LEN_TRAIL * Math.cos(toRadians(angle1to2 - fgHeading))
 
-  const b7 = fgStartPos.getBR(sgPos).range
-  const b8 = fgStartPos.getBR(sgStartPos).range
-  const mind = Math.min(b7, b8)
+  const speed2to1 =
+    ArrowDataTrail.LEN_TRAIL * Math.cos(toRadians(angle1to2 - sgHeading))
 
-  if (mina + 2 < minb && minc + 2 < mind) {
-    return "CLOSING"
+  const acceptableRate = Math.cos(toRadians(5))
+
+  let closing = speed1to2 > 0 && speed2to1 < 0
+  let opening = speed1to2 < 0 && speed2to1 > 0
+
+  closing =
+    closing ||
+    (Math.abs(speed1to2) < acceptableRate && speed2to1 < 0) ||
+    (Math.abs(speed2to1) < acceptableRate && speed1to2 > 0)
+  opening =
+    opening ||
+    (Math.abs(speed1to2) < acceptableRate && speed2to1 > 0) ||
+    (Math.abs(speed2to1) < acceptableRate && speed1to2 < 0)
+
+  const parallel =
+    Math.abs(speed1to2) < acceptableRate && Math.abs(speed2to1) < acceptableRate
+
+  if (!parallel) {
+    if (opening) {
+      retVal = " OPENING "
+    }
+    if (closing) {
+      retVal = " CLOSING "
+    }
   }
-  if (mina - 2 > minb && minc - 2 > mind) {
-    return "OPENING"
-  }
 
-  return ""
+  return retVal
 }

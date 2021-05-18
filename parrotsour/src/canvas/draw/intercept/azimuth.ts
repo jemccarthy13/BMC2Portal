@@ -15,7 +15,7 @@ import { Point } from "../../../classes/point"
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import {
   formatGroup,
-  getGroupOpenClose,
+  getOpenCloseAzimuth,
 } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
@@ -161,9 +161,9 @@ export const drawAzimuth: PictureDrawFunction = (
   // anchor both outrigger with bullseye if >10 az and !ipe
   const includeBull = width >= 10 && props.format !== FORMAT.IPE
 
-  let answer = "TWO GROUPS AZIMUTH " + width + " "
+  let answer = "TWO GROUPS AZIMUTH " + width
 
-  answer += getGroupOpenClose(ng, sg, props.dataStyle) + " "
+  answer += getOpenCloseAzimuth(ng, sg)
 
   answer += isEchelon(
     props.orientation.orient,

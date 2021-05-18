@@ -15,7 +15,7 @@ import { Point } from "../../../classes/point"
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
 import {
   formatGroup,
-  getGroupOpenClose,
+  getOpenCloseAzimuth,
 } from "../../../canvas/draw/formatutils"
 import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
@@ -206,12 +206,12 @@ export const drawChampagne: PictureDrawFunction = (
   const slgAlts: AltStack = slg.getAltStack(props.format)
 
   // TODO -- CHAMP ANSWER -- cleanup
-  const openClose = getGroupOpenClose(nlg, slg, props.dataStyle)
+  const openClose = getOpenCloseAzimuth(nlg, slg)
 
   let answer =
     "THREE GROUP CHAMPAGNE " +
     realWidth +
-    " WIDE " +
+    " WIDE" +
     openClose +
     " " +
     realDepth +

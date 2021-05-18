@@ -35,6 +35,7 @@ describe("drawingCanvas", () => {
         newPic
         animate
         animateCallback={emptyFunc}
+        answer={{ pic: "2 GRPS AZ", groups: [] }}
       />
     )
 
