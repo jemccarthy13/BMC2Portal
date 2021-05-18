@@ -47,8 +47,6 @@ export class Aircraft {
   // private speed: number
   private id: IDMatrix
 
-  // TODO -- implement radar/iff data
-  // See constructor.
   private dataTrail: Map<number, DataTrail>
 
   private type: ACType

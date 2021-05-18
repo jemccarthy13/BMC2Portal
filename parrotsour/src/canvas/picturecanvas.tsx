@@ -114,10 +114,6 @@ export default class PictureCanvas extends ParrotSourCanvas {
   }
 
   /**
-   *
-   * TODO -- CAP MORE PICS -- when "cap" is selected, behave like maneuvers. 1+ groups CAP,
-   * handle formatting in group.getTrackDir (if group.isCapping(), "CAP" instead of "TRK W")
-   *
    * Perform a picture draw on the drawing context using the correct DrawFunction
    *
    * @param context The context of the v

@@ -266,7 +266,6 @@ export class AircraftGroup extends Array<Aircraft> {
   }
 
   /**
-   * TODO -- IDMATRIX -- this should maybe not be in group?
    * @returns The most restrictive ID of child Aircraft
    */
   getIDMatrix(): IDMatrix {

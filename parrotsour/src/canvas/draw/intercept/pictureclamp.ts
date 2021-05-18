@@ -18,6 +18,9 @@ export interface PictureInfo {
 }
 
 //
+// TODO -- Comment this file so people know what's happening here.
+//
+//
 // TODO -- JEST -- "how to test non-exported functions"
 // so I can take the export off of all the helper functions
 // necessary to export for now for testing/coverage
@@ -79,18 +82,6 @@ export const getRestrictedStartPos = (
     canvasSize = ctx.canvas.height
   }
 
-  // TODO -- CLAMP --
-  // need to fix lower and upper bounds.
-  // i.e. answer the question(s):
-  // what is my lower X Cartesian?
-  // what is my lower Y cartestian?
-  // what is my upper X Cartestian?
-  // what is my upper Y Cartesian?
-  // it's limitLine (rep start Pos x/y depending on axis.)
-  // depending on pos of blue, I add/subtract from the limitLine, min/max NM
-  // to get the cartesian limit(s)
-  // Theoretically I don't even need "Bounds" as a ratio because
-  // I can get hard X/Y from the math here.
   let lBound = (limitLine + maxNMFromBlue * PIXELS_TO_NM) / canvasSize
   let uBound = (limitLine + minNMFromBlue * PIXELS_TO_NM) / canvasSize
   if (orientation === BlueInThe.SOUTH || orientation === BlueInThe.EAST) {

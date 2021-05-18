@@ -23,7 +23,7 @@ export interface IntentParams {
 export class AircraftIntent {
   private desiredHeading = 90
   private desiredAlt = 0
-  private desiredSpeed = 450 // TODO -- implement speed
+  private desiredSpeed = 450
   private desiredLoc: Point[] = []
 
   /**

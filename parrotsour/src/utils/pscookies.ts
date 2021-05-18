@@ -8,9 +8,11 @@ const HardModeCookie = "UserWantHardMode"
 const WantMeasureCookie = "UserWantMeasure"
 
 /**
- * TODO -- DATATRAIL -- Support a toggle for the different Sensor Types.....
+ * A class to wrap CookieConsent cookies to store user preferences. Abstracts out the
+ * strings and get/set of cookies as an internal API of sorts.
  */
 export default class PSCookies {
+  // static instance loads user's saved cookies
   private static profileInstance: PSCookies = new PSCookies()
 
   private speedSlider: number
@@ -58,6 +60,10 @@ export default class PSCookies {
     }
   }
 
+  /**
+   * These static accessors and mutators handle the set/retrieve of cookies
+   * throughout the application.
+   */
   public static getSliderValue(): number {
     return this.profileInstance.speedSlider
   }

@@ -90,7 +90,6 @@ const _getAnchorPkg = (
 /**
  * Draw two packages in az or range.
  *
- * TODO -- PACKAGE -- Npkg wall + spkg wall won't have min separation
  * @param ctx
  * @param props
  * @param state

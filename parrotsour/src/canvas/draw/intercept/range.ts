@@ -169,7 +169,7 @@ export const drawRange: PictureDrawFunction = (
 
   answer += picTrackDir(props.format, [tg, lg])
 
-  //console.log("TODO -- DETERMINE IF OPENING/CLOSING");
+  // TODO -- DETERMINE IF OPENING/CLOSING
 
   if (tgBraaseye.braa.range < lgBraaseye.braa.range) {
     answer +=

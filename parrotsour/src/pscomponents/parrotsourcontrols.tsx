@@ -30,8 +30,6 @@ interface PSCState {
 /**
  * 'Basic' controls for the ParrotSour pictures.
  *
- * TODO -- CONTROLS -- Consider breaking this file into smaller components
- *
  * Includes:
  * - Play/Pause
  * - Speed Slider
