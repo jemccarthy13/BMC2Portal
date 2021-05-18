@@ -71,7 +71,7 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
 
       // Trigger the parent render ('draw' from props)
       const render = async () => {
-        if (draw) draw(ctx)
+        if (draw && ctx) draw(ctx)
       }
 
       render()

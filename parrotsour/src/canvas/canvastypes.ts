@@ -45,7 +45,7 @@ export interface PictureCanvasState {
 }
 
 export interface CanvasDrawFunction {
-  (context: CanvasRenderingContext2D | null | undefined): Promise<void>
+  (context: CanvasRenderingContext2D): Promise<void>
 }
 
 export interface DrawCanvasProps extends CanvasProps {

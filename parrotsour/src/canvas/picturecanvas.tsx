@@ -45,7 +45,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * not allowed in lead edge/pkg due to separation requirement)
    */
   getRandomPicType = (leadingEdge: boolean): string => {
-    const numType = randomNumber(0, leadingEdge ? 4 : 8)
+    const numType = randomNumber(0, leadingEdge ? 3 : 8)
     const types = [
       "azimuth",
       "range",
@@ -78,7 +78,6 @@ export default class PictureCanvas extends ParrotSourCanvas {
     if (
       prevProps.dataStyle !== this.props.dataStyle ||
       prevProps.showMeasurements !== this.props.showMeasurements ||
-      prevProps.orientation !== this.props.orientation ||
       prevProps.braaFirst !== this.props.braaFirst
     ) {
       if (
@@ -140,8 +139,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
           : picType
     }
 
-    let drawFunc: PictureDrawFunction = this.functions[type]
-    if (drawFunc === undefined) drawFunc = drawAzimuth
+    const drawFunc: PictureDrawFunction = this.functions[type] || drawAzimuth
 
     const answer = drawFunc(
       context,
@@ -193,52 +191,40 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * (i.e. blue arrows, bullseye, and image 'snap' for mouse draw)
    * @param context the Context to draw in
    */
-  draw = async (
-    ctx: CanvasRenderingContext2D | null | undefined
-  ): Promise<void> => {
-    if (ctx !== null && ctx !== undefined) {
-      const bullseye = drawBullseye(ctx)
+  draw = async (ctx: CanvasRenderingContext2D): Promise<void> => {
+    const bullseye = drawBullseye(ctx)
 
-      let xPos = ctx.canvas.width - 20
-      let yPos = randomNumber(
-        ctx.canvas.height * 0.33,
-        ctx.canvas.height * 0.66
-      )
-      let heading = 270
+    let xPos = ctx.canvas.width - 20
+    let yPos = randomNumber(ctx.canvas.height * 0.33, ctx.canvas.height * 0.66)
+    let heading = 270
 
-      const { orientation } = this.props
+    const { orientation } = this.props
 
-      if (orientation.orient === BlueInThe.NORTH) {
-        xPos = randomNumber(ctx.canvas.width * 0.33, ctx.canvas.width * 0.66)
-        yPos = 20
-        heading = 180
-      }
-
-      const blueAir = new AircraftGroup({
-        ctx,
-        sx: xPos,
-        sy: yPos,
-        hdg: heading,
-        nContacts: 4,
-        id: IDMatrix.FRIEND,
-      })
-
-      await this.setState({ blueAir, bullseye })
-
-      const blueOnly = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width,
-        ctx.canvas.height
-      )
-
-      const answer: PictureAnswer = this.drawPicture(ctx)
-      this.props.setAnswer(answer)
-
-      blueAir.draw(ctx, this.props.dataStyle)
-
-      this.setState({ ctx, answer, animateCanvas: blueOnly })
+    if (orientation.orient === BlueInThe.NORTH) {
+      xPos = randomNumber(ctx.canvas.width * 0.33, ctx.canvas.width * 0.66)
+      yPos = 20
+      heading = 180
     }
+
+    const blueAir = new AircraftGroup({
+      ctx,
+      sx: xPos,
+      sy: yPos,
+      hdg: heading,
+      nContacts: 4,
+      id: IDMatrix.FRIEND,
+    })
+
+    await this.setState({ blueAir, bullseye })
+
+    const blueOnly = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+    const answer: PictureAnswer = this.drawPicture(ctx)
+    this.props.setAnswer(answer)
+
+    blueAir.draw(ctx, this.props.dataStyle)
+
+    this.setState({ ctx, answer, animateCanvas: blueOnly })
   }
 
   state: PictureCanvasState = {

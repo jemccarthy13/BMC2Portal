@@ -89,7 +89,7 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
 
   draw = async (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _ctx: CanvasRenderingContext2D | null | undefined
+    _ctx: CanvasRenderingContext2D
   ): Promise<void> => {
     return undefined
   }
