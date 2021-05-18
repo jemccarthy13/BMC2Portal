@@ -30,9 +30,10 @@ export default function VersionHistory(): JSX.Element {
   // the order in this list === display order
   const versionHistory: VersionList = [
     {
-      version: "4.0.3",
-      date: "15 May 2021",
+      version: "4.0.4",
+      date: "20 May 2021",
       features: [
+        "Please report issues as you see them. The code behind PS has undergone significant changes recently!",
         "CAP picture select now supports multiple picture types.",
         "Cursor over red air displays info in the top left corner (rudimentary first draft).",
         "Shift/CapsLock over red air displays the stack/alt boot feature.",
@@ -47,6 +48,7 @@ export default function VersionHistory(): JSX.Element {
         "Regression testing was added internally so future changes don't break existing logic",
       ],
       fixes: [
+        "Opening/Closing is supported by better logic.",
         "Animation doesn't pause on measure (due to internal improvements this became possible)",
         "Animation no longer interferes with other internal processing (bull on cursor display became " +
           "more responsive during animation)",

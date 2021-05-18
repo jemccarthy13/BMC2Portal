@@ -1,6 +1,6 @@
 {
   "name": "parrotsour-components",
-  "version": "4.0.0",
+  "version": "4.0.4",
   "private": false,
   "homepage": "http://www.parrotsour.com",
   "main": "dist/index.tsx",

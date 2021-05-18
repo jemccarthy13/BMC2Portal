@@ -16,15 +16,9 @@ export default function BugList(): JSX.Element {
   const classes = useStyles()
 
   const features = [
-    "(v4.1.1) Cookies to remember user settings for PSControls",
-    "(v4.1.2) Caps lock / shift draws circle",
-    "(v4.1.3) Hard mode/show measure toggle during animate logic fix",
-    "(v4.1.4) On cursor over aircraft, display information in TD/bball card",
-    "(v4.1.5) Display altitudes in a boot (rel to circle draw)",
-    "(v4.1.6) Map sizing and zoom review",
-    "(v4.1.7) Draw measurements (fullInfo) smartly",
-    "(v4.1.8) Finish opening/closing comm (particularly for range pics)",
-    "(v4.2.0) CAP for more (all) picture types",
+    "Draw measurements (fullInfo) more smartly",
+    "(v4.2.0) Handle FAST and different speeds for aircraft (DataTrail upgrade)",
+    "(v4.2.1) Opening/closing comm (range pics)",
     "(v4.3.0) Basic Procedural simulation",
     "(v4.4.0) Procedural simulation with more than one aircraft",
     "(v4.5.0) Procedural simulation with taskings (requests)",

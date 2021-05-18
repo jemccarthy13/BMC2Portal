@@ -16,8 +16,9 @@ export default function BugList(): JSX.Element {
 
   const bugs = [
     {
-      version: "4.0.0",
-      description: "Opening/closing pictures don't always include correct comm",
+      version: "4.0.4",
+      description:
+        "Sometimes in hard mode, picture 'width' will be <5 nm (sometimes '0')",
     },
   ]
 
