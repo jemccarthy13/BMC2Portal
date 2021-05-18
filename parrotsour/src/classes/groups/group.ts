@@ -153,6 +153,13 @@ export class AircraftGroup extends Array<Aircraft> {
   }
 
   /**
+   * @param newHdg New heading to set for all aircraft in this group
+   */
+  setHeading(newHdg: number): void {
+    this.forEach((ac) => ac.setHeading(newHdg))
+  }
+
+  /**
    * @returns Cardinal track direction or undefined. If there is a picture
    * track direction specified (i.e. all groups track West) this function
    * returns undefined. Otherwise, cardinal direction from heading.

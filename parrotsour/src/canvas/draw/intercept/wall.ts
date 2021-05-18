@@ -22,7 +22,10 @@ import {
   picTrackDir,
 } from "../../../canvas/draw/intercept/picturehelpers"
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
+import {
+  formatGroup,
+  getOpenCloseAzimuth,
+} from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { FORMAT } from "../../../classes/supportedformats"
 import { checkCaps } from "./capdraw"
@@ -186,7 +189,8 @@ export const drawWall: PictureDrawFunction = (
       break
   }
 
-  let answer = numGroups + " GROUP WALL " + width + " WIDE, "
+  const openClose = getOpenCloseAzimuth(groups[0], groups[groups.length - 1])
+  let answer = numGroups + " GROUP WALL " + width + " WIDE " + openClose + ", "
 
   answer += picTrackDir(props.format, groups)
 

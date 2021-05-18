@@ -8,15 +8,6 @@ import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup } from "../classes/groups/group"
 
 /**
- * Left pad a string with 0s
- * @param value - the string to pad
- * @param padding - how long the resulting string should be
- */
-export function lpad(value: number, padding: number): string {
-  return ([...Array(padding)].join("0") + value).slice(-padding)
-}
-
-/**
  * Get 'aspect' (HOT/FLANK/BEAM, etc) between groups
  *
  * Aspect is calculated by taking the angle difference between
@@ -26,8 +17,8 @@ export function lpad(value: number, padding: number): string {
  * In otherwords, if "ownship" turned around, how much would
  * other a/c have to turn to point at ownship?
  *
- * @param group1 - 'ownship'
- * @param group2 - other aircraft
+ * @param group1 'ownship'
+ * @param group2 other aircraft
  */
 export function getAspect(
   group1: AircraftGroup,
@@ -50,7 +41,7 @@ export function getAspect(
     aspectH = "FLANK"
   } else if (cata < 110) {
     aspectH = "BEAM"
-  } else if (cata <= 180) {
+  } else {
     aspectH = "DRAG"
   }
   return aspectH

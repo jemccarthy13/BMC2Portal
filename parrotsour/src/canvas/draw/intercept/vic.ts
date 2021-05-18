@@ -6,7 +6,10 @@ import {
   PictureDrawFunction,
 } from "../../../canvas/canvastypes"
 import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
+import {
+  formatGroup,
+  getOpenCloseAzimuth,
+} from "../../../canvas/draw/formatutils"
 import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import {
   isAnchorNorth,
@@ -198,8 +201,16 @@ export const drawVic: PictureDrawFunction = (
   const stgAlts: AltStack = stg.getAltStack(props.format)
   const ntgAlts: AltStack = ntg.getAltStack(props.format)
 
+  const openClose = getOpenCloseAzimuth(ntg, stg)
+
   let answer =
-    "THREE GROUP VIC " + realDepth + " DEEP, " + realWidth + " WIDE, "
+    "THREE GROUP VIC " +
+    realDepth +
+    " DEEP, " +
+    realWidth +
+    " WIDE" +
+    openClose +
+    ", "
 
   if (new Point(lgPos.x, ntgPos.y).getBR(lgPos).range < realWidth / 3) {
     answer += " WEIGHTED " + nLbl + ", "

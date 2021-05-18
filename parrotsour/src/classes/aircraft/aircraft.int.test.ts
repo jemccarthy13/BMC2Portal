@@ -55,7 +55,7 @@ describe("Aircraft", () => {
       const acft = new Aircraft({ sx: bluePos.x, sy: bluePos.y, ctx: ctx })
       expect(acft.getCenterOfMass()).toEqual({ x: 74, y: 50 })
 
-      acft.setCurHeading(180)
+      acft.setHeading(180)
       expect(acft.getCenterOfMass()).toEqual({ x: 49, y: 74 })
     })
     it("computes_for_rawdata", () => {

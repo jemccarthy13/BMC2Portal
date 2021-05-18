@@ -168,7 +168,7 @@ export class Aircraft {
   /**
    * @param hdg Set new heading of this Aircraft
    */
-  public setCurHeading(hdg: number): void {
+  public setHeading(hdg: number): void {
     this.heading = hdg
   }
 
@@ -279,7 +279,7 @@ export class Aircraft {
       divisor = 1
     }
 
-    this.setCurHeading(Math.floor(this.getHeading() + turnDegrees / divisor))
+    this.setHeading(Math.floor(this.getHeading() + turnDegrees / divisor))
   }
 
   /**

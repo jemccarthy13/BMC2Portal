@@ -1,5 +1,4 @@
 import { drawText } from "../canvas/draw/drawutils"
-import { lpad } from "../utils/mathutilities"
 
 /**
  * BRAA is a class that contains a bearing and range
@@ -13,7 +12,7 @@ export class BRAA {
 
   constructor(bearingNum: number, range: number) {
     this.bearingNum = bearingNum
-    this.bearing = lpad(this.bearingNum, 3)
+    this.bearing = this.bearingNum.toString().padStart(3, "0")
     this.range = range
   }
 

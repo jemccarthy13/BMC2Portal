@@ -10,15 +10,16 @@ import { DataTrail } from "./datatrail"
 export class RadarDataTrail extends DataTrail {
   private radarPoints: Point[] = []
 
-  private LEN_TRAIL: number = 7 * PIXELS_TO_NM
+  public static LEN_TRAIL: number = 7 * PIXELS_TO_NM
+
   constructor(startPos: Point, heading: number) {
     super(startPos)
 
     const starty = startPos.y
     const startx = startPos.x
     const vector = headingToRadians(heading)
-    const endy = starty + this.LEN_TRAIL * -Math.sin(vector.radians)
-    const endx = startx + this.LEN_TRAIL * Math.cos(vector.radians)
+    const endy = starty + RadarDataTrail.LEN_TRAIL * -Math.sin(vector.radians)
+    const endx = startx + RadarDataTrail.LEN_TRAIL * Math.cos(vector.radians)
 
     const offsetX = (endx - startx) / PIXELS_TO_NM
     const offsetY = (endy - starty) / PIXELS_TO_NM
@@ -54,8 +55,8 @@ export class RadarDataTrail extends DataTrail {
     const starty = startPos.y
     const vector = headingToRadians(heading)
 
-    const endy = starty + this.LEN_TRAIL * -Math.sin(vector.radians)
-    const endx = startx + this.LEN_TRAIL * Math.cos(vector.radians)
+    const endy = starty + RadarDataTrail.LEN_TRAIL * -Math.sin(vector.radians)
+    const endx = startx + RadarDataTrail.LEN_TRAIL * Math.cos(vector.radians)
     const offsetX = (endx - startx) / PIXELS_TO_NM
     const offsetY = (endy - starty) / PIXELS_TO_NM
 
