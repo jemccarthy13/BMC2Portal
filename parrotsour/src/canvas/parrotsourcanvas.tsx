@@ -17,7 +17,7 @@ import { AnimationHandler } from "../animation/animationhandler"
 import { Point } from "../classes/point"
 
 /**
- * This component is the main control for drawing pictures for intercepts
+ * This component is the main Component for PS Canvases.
  */
 export default abstract class ParrotSourCanvas extends React.PureComponent<
   PictureCanvasProps,
@@ -43,7 +43,7 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
    * @param prevProps - previous set of PicCanvasProps
    */
   componentDidUpdate = (prevProps: PictureCanvasProps): void => {
-    this.checkAnimate(prevProps)
+    this._componentDidUpdate(prevProps)
   }
 
   checkAnimate = (prevProps: PictureCanvasProps): void => {
