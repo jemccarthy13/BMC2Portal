@@ -69,7 +69,7 @@ function makeRequests(groups){
     })
 }
 
-function aiProcess(msgText){
+function aiProcessOld(msgText){
     
     msgText = msgText.toUpperCase();
     let re = new RegExp("([0-9]+[A-Z]+[0-9]*)");

@@ -108,6 +108,13 @@ export class AircraftIntent {
   }
 
   /**
+   * Clears current routing points
+   */
+  clearRouting(): void {
+    this.desiredLoc = []
+  }
+
+  /**
    * @returns The next (x,y) point along the current intended route.
    */
   getNextRoutingPoint(): Point | undefined {

@@ -2,36 +2,30 @@ import React, { ReactElement } from "react"
 
 import DrawingCanvas from "../../drawingcanvas"
 
-import {
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-} from "../../../canvas/canvastypes"
+import { PictureAnswer, PictureCanvasProps } from "../../../canvas/canvastypes"
 
 import { drawLine, drawText } from "../drawutils"
-import { animateGroups, pauseFight } from "./animate"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { randomNumber } from "../../../utils/psmath"
 import { Point } from "../../../classes/point"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { IDMatrix } from "../../../classes/aircraft/id"
+import ParrotSourCanvas from "../../parrotsourcanvas"
+import { ProceduralAnimationHandler } from "../../../animation/proceduralanimator"
 
 /**
  * This component is the main control for drawing pictures for procedural control
  */
-export default class ProceduralCanvas extends React.PureComponent<
-  PictureCanvasProps,
-  PictureCanvasState
-> {
+export default class ProceduralCanvas extends ParrotSourCanvas {
   constructor(props: PictureCanvasProps) {
     super(props)
     this.state = {
       bullseye: Point.DEFAULT,
-      blueAir: new AircraftGroup(),
+      blueAir: new AircraftGroup({ sx: -1000, sy: -1000 }),
       reDraw: this.drawPicture,
       answer: { pic: "", groups: [] },
     }
+    this.animationHandler = new ProceduralAnimationHandler()
   }
 
   /**
@@ -41,46 +35,7 @@ export default class ProceduralCanvas extends React.PureComponent<
    * @param prevProps - previous set of PicCanvasProps
    */
   componentDidUpdate = (prevProps: PictureCanvasProps): void => {
-    // eslint-disable-next-line
-    var { animate, ...rest } = prevProps
-    const oldAnimate = animate
-    // eslint-disable-next-line
-    var { animate, ...newrest } = this.props
-    const newAnimate = animate
-    // eslint-disable-next-line
-    function areEqualShallow(a: any, b: any): boolean {
-      for (const key in a) {
-        if (!(key in b) || a[key] !== b[key]) {
-          return false
-        }
-      }
-      for (const key2 in b) {
-        if (!(key2 in a) || a[key2] !== b[key2]) {
-          return false
-        }
-      }
-      return true
-    }
-
-    if (areEqualShallow(rest, newrest) && oldAnimate !== newAnimate) {
-      const { animate, resetCallback } = this.props
-      const { ctx, animateCanvas, answer } = this.state
-
-      if (animate) {
-        if (ctx && animateCanvas) {
-          animateGroups(
-            ctx,
-            this.props,
-            this.state,
-            answer.groups,
-            animateCanvas,
-            resetCallback
-          )
-        }
-      } else {
-        pauseFight()
-      }
-    }
+    this._componentDidUpdate(prevProps)
   }
 
   /**
@@ -97,21 +52,26 @@ export default class ProceduralCanvas extends React.PureComponent<
     const { orientation, dataStyle } = this.props
     const { blueAir } = this.state
 
+    blueAir.setCapping(true)
+
     const startPos = getStartPos(ctx, blueAir, orientation.orient, dataStyle, {
       start,
     })
 
-    const grp = GroupFactory.randomGroupAtLoc(
-      ctx,
-      this.props,
-      this.state,
-      startPos
-    )
-    grp.setIDMatrix(IDMatrix.FRIEND)
-    grp.setCapping(true)
+    const grp = new AircraftGroup({
+      sx: startPos.x,
+      sy: startPos.y,
+      nContacts: 1,
+      id: IDMatrix.FRIEND,
+    })
 
+    grp.setCapping(true)
     grp.addRoutingPoint(startPos)
     grp.setLabel("VR01")
+
+    grp.updateIntent({
+      desiredAlt: grp.getAltitude(),
+    })
 
     grp.draw(ctx, dataStyle)
 

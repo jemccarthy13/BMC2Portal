@@ -1,29 +1,11 @@
 import React, { ReactElement, KeyboardEvent } from "react"
 
-import { aiProcess } from "./prochelpers"
 import SpeechTextControls from "./speechtext"
 
 import { getTimeStamp } from "../../utils/pstime"
 
-import nlp from "compromise"
-import sentences from "compromise-sentences"
 import { PictureAnswer } from "../../canvas/canvastypes"
-
-nlp.extend(sentences)
-// eslint-disable-next-line
-nlp.extend((Doc: any, world: any) => {
-  world.addWords({
-    transit: "Verb",
-    climb: "Verb",
-    elev: "Verb",
-    elevator: "Verb",
-    posit: "Noun",
-    proceed: "Verb",
-    FL: "Unit",
-    tasking: "Noun",
-    state: "Noun",
-  })
-})
+import { aiProcess } from "./aiprocess"
 
 type CBState = {
   text: string
@@ -50,8 +32,10 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
     if (msgBox !== null) msgBox.scrollTop = msgBox.scrollHeight
   }
 
-  inputRef: React.MutableRefObject<HTMLTextAreaElement | null> = React.createRef<HTMLTextAreaElement>()
-  chatroomRef: React.MutableRefObject<HTMLTextAreaElement | null> = React.createRef<HTMLTextAreaElement>()
+  inputRef: React.MutableRefObject<HTMLTextAreaElement | null> =
+    React.createRef<HTMLTextAreaElement>()
+  chatroomRef: React.MutableRefObject<HTMLTextAreaElement | null> =
+    React.createRef<HTMLTextAreaElement>()
 
   handleInputKeypress = (event: KeyboardEvent<HTMLTextAreaElement>): void => {
     const key = event.key
@@ -117,7 +101,7 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
       const { sender } = this.state
       const { answer } = this.props
       await this.sendMessage(sender, msg)
-      aiProcess(nlp, { text: msg, voice: false }, answer, this.sendMessage)
+      aiProcess({ text: msg, voice: false }, answer, this.sendMessage)
       success = true
     }
     const current: HTMLTextAreaElement | null = this.inputRef.current
@@ -126,7 +110,7 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
 
   handleMessage = (text: string): void => {
     const { answer } = this.props
-    aiProcess(nlp, { text, voice: true }, answer, this.sendMessage)
+    aiProcess({ text, voice: true }, answer, this.sendMessage)
   }
 
   render(): ReactElement {

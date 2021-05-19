@@ -101,7 +101,7 @@ export class AircraftGroup extends Array<Aircraft> {
    * the 'rear' end of the data trail.
    */
   getStartPos(): Point {
-    return this.startPos
+    return this[0].getStartPos()
   }
 
   /**
@@ -113,6 +113,9 @@ export class AircraftGroup extends Array<Aircraft> {
    * Aircraft's center of mass.
    */
   getCenterOfMass(dataStyle: SensorType): Point {
+    if (this.isCapping()) {
+      return this.startPos
+    }
     let x = 0
     let y = 0
     for (let idx = 0; idx < this.getStrength(); idx++) {
@@ -363,6 +366,13 @@ export class AircraftGroup extends Array<Aircraft> {
    */
   doNextRouting(): void {
     this.forEach((ac) => ac.doNextRouting())
+  }
+
+  /**
+   * Clears all currently assigned transit locations
+   */
+  clearRouting(): void {
+    this.forEach((ac) => ac.clearRouting())
   }
 
   /*************************************************************************
