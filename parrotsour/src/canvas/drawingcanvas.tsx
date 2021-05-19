@@ -15,7 +15,7 @@ import { PIXELS_TO_NM } from "../utils/psmath"
 import { formatAlt } from "./draw/formatutils"
 import { Aircraft } from "../classes/aircraft/aircraft"
 
-interface CanvasMouseEvent {
+export interface CanvasMouseEvent {
   clientX: number
   clientY: number
   getModifierState: (key: string) => boolean
@@ -242,10 +242,9 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
         mouseCanvasRef.current.height
       )
     }
-    let isCapsLock = false
-    if (e) {
-      isCapsLock = e.getModifierState("CapsLock") || e.getModifierState("Shift")
-    }
+    const isCapsLock =
+      e.getModifierState("CapsLock") || e.getModifierState("Shift")
+
     drawMouse(mouseStart, mousePos)
 
     //

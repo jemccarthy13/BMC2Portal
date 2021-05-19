@@ -61,10 +61,10 @@ describe("Aircraft", () => {
     it("computes_for_rawdata", () => {
       const acft = new Aircraft({ sx: 50, sy: 50, hdg: 90 })
       const centMass = acft.getCenterOfMass(SensorType.RAW)
-      expect(centMass.x).toBeGreaterThanOrEqual(80)
-      expect(centMass.x).toBeLessThanOrEqual(100)
-      expect(centMass.y).toBeGreaterThanOrEqual(45)
-      expect(centMass.y).toBeLessThanOrEqual(55)
+      expect(centMass.x).toBeGreaterThanOrEqual(82)
+      expect(centMass.x).toBeLessThanOrEqual(102)
+      expect(centMass.y).toBeGreaterThanOrEqual(47)
+      expect(centMass.y).toBeLessThanOrEqual(57)
     })
   })
 
