@@ -6,6 +6,10 @@ import { getTimeStamp } from "../../utils/pstime"
 
 import { PictureAnswer } from "../../canvas/canvastypes"
 import { aiProcess } from "./aiprocess"
+import { AircraftGroup } from "../../classes/groups/group"
+import { convertToCGRS } from "./prochelpers"
+import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
+import { formatAlt } from "../../canvas/draw/formatutils"
 
 type CBState = {
   text: string
@@ -22,7 +26,8 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
     this.state = {
       text:
         "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n" +
-        "*** /help to display help information\r\n",
+        "*** /help to display help information\r\n" +
+        "*** /handover to simulate a handover message\r\n",
       sender: "UR_CALLSIGN",
     }
   }
@@ -54,9 +59,11 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
     this.sendChatMessage(text)
   }
 
-  sendSystemMsg = (msg: string): void => {
+  sendSystemMsg = async (msg: string): Promise<void> => {
     const { text } = this.state
-    this.setState({ text: text + getTimeStamp() + " *** " + msg + "\r\n" })
+    await this.setState({
+      text: text + getTimeStamp() + " *** " + msg + "\r\n",
+    })
   }
 
   sendMessage = (sender: string, message: string, voice?: boolean): void => {
@@ -72,15 +79,32 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
     }
   }
 
+  _clearTextBox = (): void => {
+    const current: HTMLTextAreaElement | null = this.inputRef.current
+    if (current !== null) current.value = ""
+  }
+
   sendChatMessage = async (msg: string): Promise<void> => {
-    let success = false
     if (msg.indexOf("/") === 0) {
       if (msg.indexOf("/nick") === 0) {
         const newCs = msg.replace("/nick", "").trim()
         this.setState({ sender: newCs })
         this.sendSystemMsg("changed nick to " + newCs)
-      }
-      if (msg.indexOf("/help") === 0) {
+      } else if (msg.indexOf("/handover") === 0) {
+        const { answer } = this.props
+        await this.sendSystemMsg("BMA Rundown")
+        answer.groups.forEach((grp: AircraftGroup) => {
+          const pos = grp.getCenterOfMass(SensorType.ARROW)
+          this.sendSystemMsg(
+            grp.getLabel() +
+              " / " +
+              convertToCGRS(pos.x, pos.y) +
+              " / FL " +
+              formatAlt(grp.getAltitude())
+          )
+        })
+        await this.sendSystemMsg("End rundown")
+      } else if (msg.indexOf("/help") === 0) {
         this.sendSystemMsg(
           "*** Use /nick to set your callsign. ***\r\n" +
             "*** This chatroom simulates an airspace control room.\r\n" +
@@ -96,16 +120,14 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
             "----------------------------------------\r\n"
         )
       }
-      success = true
     } else {
       const { sender } = this.state
       const { answer } = this.props
       await this.sendMessage(sender, msg)
       aiProcess({ text: msg, voice: false }, answer, this.sendMessage)
-      success = true
     }
-    const current: HTMLTextAreaElement | null = this.inputRef.current
-    if (current !== null && success) current.value = ""
+
+    this._clearTextBox()
   }
 
   handleMessage = (text: string): void => {
