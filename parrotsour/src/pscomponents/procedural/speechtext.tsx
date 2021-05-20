@@ -35,6 +35,7 @@ export function SpeechTextControls(props: SpeechTextProps): ReactElement {
     tmpAnswer = tmpAnswer.replaceAll("positive", "posit")
 
     tmpAnswer = tmpAnswer.replaceAll("flight level", "FL")
+    tmpAnswer = tmpAnswer.replaceAll("flight Level", "FL")
     const re = new RegExp(
       /^([A-Za-z])[A-Za-z]*([A-Za-z]) *([0-9])[0-9]*([0-9])/
     )
@@ -68,6 +69,7 @@ export function SpeechTextControls(props: SpeechTextProps): ReactElement {
       let tmpAnswer = transcript
 
       tmpAnswer = preProcess(transcript)
+      console.log(tmpAnswer)
       props.handler(tmpAnswer)
     })
   }

@@ -24,6 +24,7 @@ export function processMoveLayer(
   cgrs: string[],
   isVoice: boolean
 ): string {
+  processedText = processedText.replace(/\s\s+/g, " ")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const nl: any = AIProcessor.process(processedText)
 
@@ -34,7 +35,7 @@ export function processMoveLayer(
 
   const move3dCommandSearchStr =
     moveCommndSearchStr +
-    " * app? [#Verb?] [#Preposition?] #Unit [<fl>#Cardinal] * app?"
+    " * app? [#Verb?] [#Preposition?] #Unit [<fl>#Cardinal] * #Unit? [<flupper>#Cardinal?]"
 
   const move = nl.match(moveCommndSearchStr)
   const move3d = nl.match(move3dCommandSearchStr)

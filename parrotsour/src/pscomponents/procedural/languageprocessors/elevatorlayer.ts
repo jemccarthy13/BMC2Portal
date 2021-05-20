@@ -21,6 +21,7 @@ export function processElevatorLayer(
   const elevCmd = nl.match("[<cs>#Noun] [<act>#Verb] #Unit [<fl>#Cardinal]")
   const isCommand = elevCmd.found
 
+  const originalReplaceStr = elevCmd.text()
   if (isCommand) {
     const newflActual = elevCmd.groups().fl.text()
     let newfl = newflActual
@@ -39,5 +40,5 @@ export function processElevatorLayer(
     })
   }
 
-  return processedText.replaceAll(elevCmd.text(), "")
+  return processedText.replaceAll(originalReplaceStr, "")
 }
