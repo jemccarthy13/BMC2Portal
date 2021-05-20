@@ -336,7 +336,7 @@ export class Aircraft {
     if (!this.intent.atFinalDestination()) {
       // Aircraft still has a route but we've reached our next destination
       // so pop the first point out of the intended route
-      if (this.intent.atNextRoutingPoint(this.getCenterOfMass())) {
+      if (this.intent.atNextRoutingPoint(this.getStartPos())) {
         this.intent.removeRoutingPoint()
       }
       // If Aircraft still has a point left in routing, update desired heading
@@ -349,9 +349,7 @@ export class Aircraft {
       this.turnToTarget()
     } else {
       // Aircraft has reached final destination, so if intent matches it is capping
-      this.capping =
-        this.intent.atFinalDestination() &&
-        this.intent.getDesiredHeading() == this.heading
+      this.capping = this.intent.atFinalDestination()
     }
   }
 

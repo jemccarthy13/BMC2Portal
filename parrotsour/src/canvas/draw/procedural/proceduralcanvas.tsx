@@ -6,7 +6,7 @@ import { PictureAnswer, PictureCanvasProps } from "../../../canvas/canvastypes"
 
 import { drawLine, drawText } from "../drawutils"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { randomNumber } from "../../../utils/psmath"
+import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
 import { Point } from "../../../classes/point"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { IDMatrix } from "../../../classes/aircraft/id"
@@ -85,15 +85,15 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
   }
 
   drawCGRSGrid = (ctx: CanvasRenderingContext2D): void => {
-    for (let x = 0; x < ctx.canvas.width; x += 40) {
-      if (x % 120 === 0) {
+    for (let x = 0; x < ctx.canvas.width; x += 10 * PIXELS_TO_NM) {
+      if (x % (30 * PIXELS_TO_NM) === 0) {
         drawLine(ctx, x, 0, x, ctx.canvas.height)
       } else {
         drawLine(ctx, x, 0, x, ctx.canvas.height, "gray")
       }
     }
-    for (let y = 0; y < ctx.canvas.height; y += 40) {
-      if (y % 120 === 0) {
+    for (let y = 0; y < ctx.canvas.height; y += 10 * PIXELS_TO_NM) {
+      if (y % (30 * PIXELS_TO_NM) === 0) {
         drawLine(ctx, 0, y, ctx.canvas.width, y)
       } else {
         drawLine(ctx, 0, y, ctx.canvas.width, y, "gray")
@@ -105,8 +105,8 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
     const startCol2 = randomNumber(0, 26)
 
     localStorage.startRow = startRow
-    localStorage.startCol1 = startCol1
-    localStorage.startCol2 = startCol2
+    localStorage.startCol1 = 65 + startCol1
+    localStorage.startCol2 = 65 + startCol2
 
     const chr = (n: number): string => {
       return String.fromCharCode(65 + n)
@@ -127,7 +127,9 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
           ctx,
           rowC + chr(startCol1 + off) + chr(col2Chr + colC),
           x + 33,
-          y + 60
+          y + 60,
+          12,
+          "gray"
         )
         colC++
       }
