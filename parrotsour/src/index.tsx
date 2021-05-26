@@ -43,6 +43,7 @@ const cookieIsNotSet =
 // remove after confidence most people have seen new release notification
 if (cookieIsNotSet) {
   snackActions.info("Check out the newest release of ParrotSour!", {
+    style: { pointerEvents: "all" },
     autoHideDuration: 10000,
     preventDuplicate: true,
     // eslint-disable-next-line react/display-name
