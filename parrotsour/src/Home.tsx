@@ -38,6 +38,10 @@ export default class Home extends React.PureComponent {
     return <ParrotSour type="procedural" />
   }
 
+  getPSC = (): JSX.Element => {
+    return <ParrotSour type="close" />
+  }
+
   getPSI = (): JSX.Element => {
     return <ParrotSour type="intercept" />
   }
@@ -50,9 +54,15 @@ export default class Home extends React.PureComponent {
             <Suspense fallback={<div>Loading...</div>}>
               <Route exact path="/" component={this.getPSI} />
               <Route path="/changelog.html" component={ChangeLog} />
+              <Route path="/changelog" component={ChangeLog} />
               <Route path="/parrotsour.html" render={this.getPS} />
+              <Route path="/parrotsour" render={this.getPS} />
               <Route path="/intercept.html" render={this.getPSI} />
+              <Route path="/intercept" render={this.getPSI} />
+              <Route path="/close.html" render={this.getPSC} />
+              <Route path="/close" render={this.getPSC} />
               <Route path="/procedural.html" render={this.getPSP} />
+              <Route path="/procedural" render={this.getPSP} />
             </Suspense>
           </HashRouter>
         </div>
