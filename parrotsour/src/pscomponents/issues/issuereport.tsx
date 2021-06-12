@@ -24,7 +24,7 @@ type IRState = {
 }
 
 type IRProps = {
-  answer: PictureAnswer
+  answer?: PictureAnswer
 }
 
 export default class IssueReport extends React.PureComponent<IRProps, IRState> {

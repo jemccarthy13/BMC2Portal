@@ -7,6 +7,7 @@ const ParrotSourIntercept = lazy(
 const ParrotSourProcedural = lazy(
   () => import("./procedural/parrotsourprocedural")
 )
+const ParrotSourClose = lazy(() => import("./close/parrotsourclose"))
 
 type PSProps = {
   type: string
@@ -30,6 +31,8 @@ export const ParrotSour = (props: PSProps): ReactElement => {
     comp = <ParrotSourIntercept />
   } else if (type === "procedural") {
     comp = <ParrotSourProcedural />
+  } else if (type === "close") {
+    comp = <ParrotSourClose />
   }
   return <Suspense fallback={<div>Loading...</div>}>{comp}</Suspense>
 }

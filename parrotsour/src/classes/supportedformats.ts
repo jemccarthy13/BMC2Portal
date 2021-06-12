@@ -8,4 +8,5 @@
 export enum FORMAT {
   ALSA,
   IPE,
+  CLOSE,
 }

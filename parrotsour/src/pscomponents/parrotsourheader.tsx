@@ -6,7 +6,7 @@ import { PictureAnswer } from "canvas/canvastypes"
 
 interface PSHeaderProps {
   comp?: ReactElement
-  answer: PictureAnswer
+  answer?: PictureAnswer
 }
 
 interface PSHeaderState {
