@@ -1,4 +1,4 @@
-import React, { ChangeEvent, lazy, ReactElement, Suspense } from "react"
+import React, { lazy, ReactElement, Suspense } from "react"
 
 import "../../css/select.css"
 import "../../css/slider.css"
@@ -14,14 +14,13 @@ import PSCookies from "../../utils/pscookies"
 const ParrotSourHeader = lazy(() => import("../parrotsourheader"))
 const ParrotSourControls = lazy(() => import("../parrotsourcontrols"))
 
-const PictureCanvas = lazy(() => import("../../canvas/picturecanvas"))
+const CloseCanvas = lazy(() => import("../../canvas/closecanvas"))
 const VersionInfo = lazy(() => import("../../versioninfo"))
 
 interface PSCState {
   speedSliderValue: number
   canvasConfig: CanvasOrient
   braaFirst: boolean
-  picType: string
   animate: boolean
   newPic: boolean
   dataStyle: SensorType
@@ -51,7 +50,6 @@ export default class ParrotSourClose extends React.PureComponent<
             orient: BlueInThe.EAST,
           },
       braaFirst: PSCookies.getBraaFirst(),
-      picType: "close",
       newPic: false,
       animate: false,
       dataStyle: PSCookies.getDataStyleIsRadar()
@@ -127,17 +125,6 @@ export default class ParrotSourClose extends React.PureComponent<
     this.setState({ canvasConfig: newConfig })
   }
 
-  /**
-   * Called when the picture type selector changes values
-   * @param e - ChangeEvent for the Select element
-   */
-  onChangePicType = (
-    e: ChangeEvent<{ name?: string | undefined; value: unknown }>
-  ): void => {
-    if (typeof e.target.value === "string")
-      this.setState({ picType: e.target.value })
-  }
-
   onDataStyleChange = (): void => {
     const { dataStyle } = this.state
     if (dataStyle === SensorType.ARROW) {
@@ -152,7 +139,6 @@ export default class ParrotSourClose extends React.PureComponent<
   }
 
   render(): ReactElement {
-    const { picType, dataStyle } = this.state
     const { canvasConfig, braaFirst } = this.state
     const { animate, newPic, speedSliderValue } = this.state
 
@@ -181,21 +167,25 @@ export default class ParrotSourClose extends React.PureComponent<
         <br />
 
         <Suspense fallback={<div />}>
-          <PictureCanvas
-            orientation={canvasConfig}
-            braaFirst={braaFirst}
-            picType={picType}
-            format={FORMAT.CLOSE}
-            showMeasurements
-            isHardMode={false}
-            setAnswer={this.emptyFunc}
-            newPic={newPic}
-            animate={animate}
-            sliderSpeed={speedSliderValue}
-            resetCallback={this.dummyCallback}
-            animateCallback={this.startAnimate}
-            dataStyle={dataStyle}
-          />
+          <div style={{ display: "inline-flex", width: "100%" }}>
+            <CloseCanvas
+              setAnswer={this.emptyFunc}
+              showMeasurements
+              isHardMode={false}
+              orientation={canvasConfig}
+              braaFirst={braaFirst}
+              picType="random"
+              format={FORMAT.ALSA}
+              newPic={newPic}
+              animate={animate}
+              sliderSpeed={speedSliderValue}
+              resetCallback={this.pauseAnimate}
+              animateCallback={this.startAnimate}
+              dataStyle={SensorType.RAW}
+            />
+
+            {/*<CloseCommandBox />*/}
+          </div>
         </Suspense>
 
         <Suspense fallback={<div>Loading...</div>}>

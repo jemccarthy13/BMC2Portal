@@ -30,9 +30,11 @@ export function toDegrees(rads: number): number {
  *          - headAngle (150 deg delta from heading, useful for
  *              drawing Arrow DataTrail)
  */
-export function headingToRadians(
-  heading: number
-): { radians: number; headAngle: number; offset: number } {
+export function headingToRadians(heading: number): {
+  radians: number
+  headAngle: number
+  offset: number
+} {
   let deg: number = 360 - (heading - 90)
   if (heading < 90) deg = 90 - heading
 
@@ -81,12 +83,16 @@ export function randomHeading(format: FORMAT, blueHeading = -1): number {
  */
 export function getDegDeltaBetween(
   heading: number,
-  desHeading: number
+  desHeading: number,
+  forced: string | undefined
 ): number {
   const LH = (heading - desHeading + 360) % 360
   const RH = (desHeading - heading + 360) % 360
+
   let deltaA = RH
-  if (LH < RH) {
+  if (forced === "LEFT") {
+    deltaA = -LH
+  } else if (LH < RH) {
     deltaA = -LH
   }
   return deltaA

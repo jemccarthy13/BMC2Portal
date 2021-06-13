@@ -9,6 +9,7 @@ export interface IntentParams {
   desiredSpeed: number
   desiredLoc: Point[]
   tasking: Tasking
+  forcedTurn: string | undefined
 }
 
 /**
@@ -25,6 +26,7 @@ export class AircraftIntent {
   private desiredAlt = 0
   private desiredSpeed = 450
   private desiredLoc: Point[] = []
+  private forcedTurn: string | undefined
 
   /**
    * Construct, which really performs update to set initial values
@@ -49,6 +51,7 @@ export class AircraftIntent {
     this.desiredAlt = newIntent.desiredAlt || this.desiredAlt
     this.desiredHeading = newIntent.desiredHeading || this.desiredHeading
     this.desiredSpeed = newIntent.desiredSpeed || this.desiredSpeed
+    this.forcedTurn = newIntent.forcedTurn || this.forcedTurn
   }
 
   /**
@@ -63,6 +66,14 @@ export class AircraftIntent {
    */
   getDesiredHeading(): number {
     return this.desiredHeading
+  }
+
+  getForcedTurn(): string | undefined {
+    return this.forcedTurn
+  }
+
+  setForcedTurn(fTurn: string | undefined): void {
+    this.forcedTurn = fTurn
   }
 
   /**

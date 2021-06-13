@@ -264,7 +264,8 @@ export class Aircraft {
     // how "far away" from current heading is the desired?
     const turnDegrees = getDegDeltaBetween(
       this.getHeading(),
-      this.intent.getDesiredHeading()
+      this.intent.getDesiredHeading(),
+      this.intent.getForcedTurn()
     )
 
     // apply 'logical' turn by only turning so far towards the target
