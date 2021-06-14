@@ -62,6 +62,7 @@ export class CloseAnimationHandler extends AnimationHandler {
     //   this.pauseFight(resetCallback)
     // }
 
+    console.log(grp)
     // draw altitudes during the animation
     if (ctx && this.continueAnimate) {
       const grpPos = grp.getCenterOfMass(dataStyle)

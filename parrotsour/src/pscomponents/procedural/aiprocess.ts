@@ -5,14 +5,16 @@ import { PictureAnswer } from "../../canvas/canvastypes"
 import { AircraftGroup } from "../../classes/groups/group"
 
 // 'AI' Processors -- see the function aiProcess for more details
-import { AIProcessor } from "./languageprocessors/nlprocessor"
-import { processQuestionLayer } from "./languageprocessors/questionlayer"
-import { processMoveLayer } from "./languageprocessors/movelayer"
-import { processElevatorLayer } from "./languageprocessors/elevatorlayer"
+import { AIProcessor } from "../../ai/languageprocessors/nlprocessor"
+import { processQuestionLayer } from "../../ai/languageprocessors/questionlayer"
+import { processMoveLayer } from "../../ai/languageprocessors/movelayer"
+import { processCloseLayer } from "../../ai/languageprocessors/closelayer"
+import { processElevatorLayer } from "../../ai/languageprocessors/elevatorlayer"
+import { processRadioCheckLayer } from "../../ai/languageprocessors/radiochecklayer"
 
 // Functions
-import { convertToXY, getAsset } from "./prochelpers"
-import { processRadioCheckLayer } from "./languageprocessors/radiochecklayer"
+import { getAsset } from "../../ai/getAsset"
+import { convertToXY } from "./cgrshelpers"
 
 /**
  * This function mutates the original string to replace cgrs with
@@ -128,6 +130,13 @@ export function aiProcess(
     sendResponseWrapper,
     asset,
     cgrs,
+    msg.voice
+  )
+
+  processedText = processCloseLayer(
+    processedText,
+    sendResponseWrapper,
+    asset,
     msg.voice
   )
 

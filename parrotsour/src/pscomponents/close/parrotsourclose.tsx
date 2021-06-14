@@ -6,10 +6,15 @@ import "../../css/parrotsour.css"
 import "../../css/toggle.css"
 
 import { InterceptQT } from "../quicktips/interceptQT"
-import { BlueInThe, CanvasOrient } from "../../canvas/canvastypes"
+import {
+  BlueInThe,
+  CanvasOrient,
+  PictureAnswer,
+} from "../../canvas/canvastypes"
 import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 import { FORMAT } from "../../classes/supportedformats"
 import PSCookies from "../../utils/pscookies"
+import CloseCommandBox from "./commandbox"
 
 const ParrotSourHeader = lazy(() => import("../parrotsourheader"))
 const ParrotSourControls = lazy(() => import("../parrotsourcontrols"))
@@ -24,6 +29,7 @@ interface PSCState {
   animate: boolean
   newPic: boolean
   dataStyle: SensorType
+  answer: PictureAnswer
 }
 
 /**
@@ -52,6 +58,10 @@ export default class ParrotSourClose extends React.PureComponent<
       braaFirst: PSCookies.getBraaFirst(),
       newPic: false,
       animate: false,
+      answer: {
+        pic: "",
+        groups: [],
+      },
       dataStyle: PSCookies.getDataStyleIsRadar()
         ? SensorType.RAW
         : SensorType.ARROW,
@@ -67,6 +77,14 @@ export default class ParrotSourClose extends React.PureComponent<
    */
   onSliderChange = (value: number): void => {
     this.setState({ speedSliderValue: value })
+  }
+
+  /**
+   * Called when an answer is avaiable; to be displayed in the answer collapsible
+   * @param answer - the answer to the displayed picture
+   */
+  setAnswer = (answer: PictureAnswer): void => {
+    this.setState({ answer })
   }
 
   /**
@@ -134,13 +152,10 @@ export default class ParrotSourClose extends React.PureComponent<
     }
   }
 
-  emptyFunc = (): void => {
-    // do nothing
-  }
-
   render(): ReactElement {
     const { canvasConfig, braaFirst } = this.state
     const { animate, newPic, speedSliderValue } = this.state
+    const { answer } = this.state
 
     return (
       <div>
@@ -169,7 +184,7 @@ export default class ParrotSourClose extends React.PureComponent<
         <Suspense fallback={<div />}>
           <div style={{ display: "inline-flex", width: "100%" }}>
             <CloseCanvas
-              setAnswer={this.emptyFunc}
+              setAnswer={this.setAnswer}
               showMeasurements
               isHardMode={false}
               orientation={canvasConfig}
@@ -184,7 +199,7 @@ export default class ParrotSourClose extends React.PureComponent<
               dataStyle={SensorType.RAW}
             />
 
-            {/*<CloseCommandBox />*/}
+            <CloseCommandBox answer={answer} />
           </div>
         </Suspense>
 

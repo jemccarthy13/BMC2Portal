@@ -12,7 +12,12 @@ import { AircraftGroup } from "../classes/groups/group"
 import { Point } from "../classes/point"
 
 // Functions
-import { drawBullseye, drawFullInfo } from "./draw/drawutils"
+import {
+  drawAltitudes,
+  drawBullseye,
+  drawFullInfo,
+  drawText,
+} from "./draw/drawutils"
 import { randomNumber } from "../utils/psmath"
 
 // Interfaces
@@ -97,17 +102,32 @@ export default class CloseCanvas extends ParrotSourCanvas {
     forced?: boolean,
     start?: Point
   ): PictureAnswer => {
-    console.log("draw close")
+    let xPos = context.canvas.width - 20
+    let yPos = randomNumber(
+      context.canvas.height * 0.33,
+      context.canvas.height * 0.66
+    )
+    let heading = 270
 
-    //const drawFunc: PictureDrawFunction = drawCloseIntercept
+    const { orientation } = this.props
 
-    //const { blueAir } = this.state
-    // blueAir.updateIntent({
-    //   desiredHeading: blueAir
-    //     .getCenterOfMass(this.props.dataStyle)
-    //     .getBR(answer.groups[0].getCenterOfMass(this.props.dataStyle))
-    //     .bearingNum,
-    // })
+    if (orientation.orient === BlueInThe.NORTH) {
+      xPos = randomNumber(
+        context.canvas.width * 0.33,
+        context.canvas.width * 0.66
+      )
+      yPos = 20
+      heading = 180
+    }
+    const fighter = new AircraftGroup({
+      sx: xPos,
+      sy: yPos,
+      hdg: heading,
+      nContacts: 1,
+      id: IDMatrix.FRIEND,
+    })
+    fighter.setLabel("VR01")
+    fighter.draw(context, SensorType.RAW)
 
     const target = new AircraftGroup({
       ctx: context,
@@ -118,13 +138,20 @@ export default class CloseCanvas extends ParrotSourCanvas {
       id: IDMatrix.FRIEND,
     })
     target.draw(context, SensorType.RAW)
-    target.setLabel("VIPER02")
+    target.setLabel("VR02")
+
+    const ftrPos = fighter.getCenterOfMass(SensorType.RAW)
+    drawAltitudes(context, ftrPos, fighter.getAltitudes())
+    drawText(context, fighter.getLabel(), ftrPos.x, ftrPos.y + 35, 12)
+
+    const grpPos = target.getCenterOfMass(SensorType.RAW)
+    drawAltitudes(context, grpPos, target.getAltitudes())
+    drawText(context, target.getLabel(), grpPos.x, grpPos.y + 35, 12)
 
     return {
       pic: "",
-      groups: [target],
+      groups: [target, fighter],
     }
-    // return answer
   }
 
   /**
@@ -135,27 +162,7 @@ export default class CloseCanvas extends ParrotSourCanvas {
   draw = async (ctx: CanvasRenderingContext2D): Promise<void> => {
     const bullseye = drawBullseye(ctx)
 
-    let xPos = ctx.canvas.width - 20
-    let yPos = randomNumber(ctx.canvas.height * 0.33, ctx.canvas.height * 0.66)
-    let heading = 270
-
-    const { orientation } = this.props
-
-    if (orientation.orient === BlueInThe.NORTH) {
-      xPos = randomNumber(ctx.canvas.width * 0.33, ctx.canvas.width * 0.66)
-      yPos = 20
-      heading = 180
-    }
-
-    const blueAir = new AircraftGroup({
-      ctx,
-      sx: xPos,
-      sy: yPos,
-      hdg: heading,
-      nContacts: 1,
-      id: IDMatrix.FRIEND,
-    })
-    blueAir.setLabel("VIPER01")
+    const blueAir = new AircraftGroup({ sx: -1000, sy: -1000, nContacts: 0 })
 
     await this.setState({ blueAir, bullseye })
 
@@ -163,8 +170,6 @@ export default class CloseCanvas extends ParrotSourCanvas {
 
     const answer: PictureAnswer = this.drawPicture(ctx)
     this.props.setAnswer(answer)
-
-    blueAir.draw(ctx, SensorType.RAW)
 
     this.setState({ ctx, answer, animateCanvas: blueOnly })
   }

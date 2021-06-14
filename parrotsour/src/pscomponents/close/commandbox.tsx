@@ -5,11 +5,7 @@ import SpeechTextControls from "../../ai/speechtext"
 import { getTimeStamp } from "../../utils/pstime"
 
 import { PictureAnswer } from "../../canvas/canvastypes"
-import { aiProcess } from "./aiprocess"
-import { AircraftGroup } from "../../classes/groups/group"
-import { convertToCGRS } from "./cgrshelpers"
-import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
-import { formatAlt } from "../../canvas/draw/formatutils"
+import { aiProcess } from "../procedural/aiprocess"
 
 type CBState = {
   text: string
@@ -20,14 +16,16 @@ type CBProps = {
   answer: PictureAnswer
 }
 
-export default class ChatBox extends React.PureComponent<CBProps, CBState> {
+export default class CloseCommandBox extends React.PureComponent<
+  CBProps,
+  CBState
+> {
   constructor(props: CBProps) {
     super(props)
     this.state = {
       text:
         "*** CONNECTED TO PARROTSOUR CHAT SERVER ***\r\n" +
-        "*** /help to display help information\r\n" +
-        "*** /handover to simulate a handover message\r\n",
+        "*** /help to display help information\r\n",
       sender: "UR_CALLSIGN",
     }
   }
@@ -90,33 +88,18 @@ export default class ChatBox extends React.PureComponent<CBProps, CBState> {
         const newCs = msg.replace("/nick", "").trim()
         this.setState({ sender: newCs })
         this.sendSystemMsg("changed nick to " + newCs)
-      } else if (msg.indexOf("/handover") === 0) {
-        const { answer } = this.props
-        await this.sendSystemMsg("BMA Rundown")
-        answer.groups.forEach((grp: AircraftGroup) => {
-          const pos = grp.getCenterOfMass(SensorType.ARROW)
-          this.sendSystemMsg(
-            grp.getLabel() +
-              " / " +
-              convertToCGRS(pos.x, pos.y) +
-              " / FL " +
-              formatAlt(grp.getAltitude())
-          )
-        })
-        await this.sendSystemMsg("End rundown")
       } else if (msg.indexOf("/help") === 0) {
         this.sendSystemMsg(
           "*** Use /nick to set your callsign. ***\r\n" +
-            "*** This chatroom simulates an airspace control room.\r\n" +
-            "*** Here you can give transit instructions to assets.\n" +
-            "*** Commands can be entered in plain english. \n" +
+            "*** This chatroom allows you to give L/R turns and\r\n" +
+            "*** climb or descend commands.\n" +
+            "*** Commands can be entered in 'plain' english. \n" +
             "*** Assets will respond if they understand the tasking.\n" +
             "*** Assets will let you know if they don't understand.\n" +
             "*** Please use 'report a bug' to request command support.\n" +
-            "*** Some common formats:\n" +
-            "*** RPA01 proceed 89AG FL 240\n" +
-            "*** RPA01 proceed dir 89AG at FL 240\n" +
-            "*** RPA01 app 89AG FL 240\n" +
+            "*** Some supported formats:\n" +
+            "*** VR01 left 330 FL 200\n" +
+            "*** VR01 right 020\n" +
             "----------------------------------------\r\n"
         )
       }

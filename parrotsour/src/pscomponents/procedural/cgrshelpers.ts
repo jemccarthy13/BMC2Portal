@@ -1,15 +1,5 @@
-import { AircraftGroup } from "../../classes/groups/group"
 import { Point } from "../../classes/point"
 import { PIXELS_TO_NM } from "../../utils/psmath"
-
-export function getAsset(
-  groups: AircraftGroup[],
-  callsign: string
-): AircraftGroup | undefined {
-  return groups.find((a) => {
-    return a.getLabel().toUpperCase() === callsign.toUpperCase()
-  })
-}
 
 export function Base26(sLetter: string): number {
   return sLetter.toUpperCase().charCodeAt(0) - 64

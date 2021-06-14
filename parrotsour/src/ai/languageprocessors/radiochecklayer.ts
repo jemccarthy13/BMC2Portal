@@ -1,4 +1,4 @@
-import { AircraftGroup } from "../../../classes/groups/group"
+import { AircraftGroup } from "../../classes/groups/group"
 
 export function processRadioCheckLayer(
   processedText: string,

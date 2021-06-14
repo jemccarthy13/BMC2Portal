@@ -1,13 +1,9 @@
 import { AircraftGroup } from "../../classes/groups/group"
 import { Point } from "../../classes/point"
 import { PIXELS_TO_NM } from "../../utils/psmath"
-import {
-  Base26,
-  convertToCGRS,
-  convertToXY,
-  getAsset,
-  getColIndex,
-} from "./prochelpers"
+import { getAsset } from "../../ai/getAsset"
+
+import { Base26, convertToCGRS, convertToXY, getColIndex } from "./cgrshelpers"
 
 describe("ProcHelpers", () => {
   describe("findAsset", () => {

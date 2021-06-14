@@ -1,5 +1,5 @@
-import { AircraftGroup } from "../../../classes/groups/group"
-import { Point } from "../../../classes/point"
+import { AircraftGroup } from "../../classes/groups/group"
+import { Point } from "../../classes/point"
 import { AIProcessor } from "./nlprocessor"
 import { convertToNATOPhonetic } from "./toNATOphonetic"
 

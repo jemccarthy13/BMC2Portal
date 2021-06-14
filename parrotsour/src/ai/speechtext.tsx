@@ -1,4 +1,4 @@
-import "../../css/microphone.css"
+import "../css/microphone.css"
 import React, { ReactElement, useRef, useState } from "react"
 
 import SpeechRecognition, {

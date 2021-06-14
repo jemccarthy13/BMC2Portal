@@ -19,6 +19,8 @@ nlp.extend((Doc: any, world: any) => {
     FL: "Unit",
     tasking: "Noun",
     state: "Noun",
+    right: "CloseDir",
+    left: "CloseDir",
   })
 })
 
