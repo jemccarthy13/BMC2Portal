@@ -94,13 +94,15 @@ export default class CloseCanvas extends ParrotSourCanvas {
    * Perform a picture draw on the drawing context using the correct DrawFunction
    *
    * @param context The context of the v
-   * @param forced true iff picture type should be forced as random, !lead edge and !packages
-   * @param start (optional) start position for the picture
+   * @param _forced true iff picture type should be forced as random, !lead edge and !packages
+   * @param _start (optional) start position for the picture
    */
   drawPicture = (
     context: CanvasRenderingContext2D,
-    forced?: boolean,
-    start?: Point
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _forced?: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _start?: Point
   ): PictureAnswer => {
     let xPos = context.canvas.width - 20
     let yPos = randomNumber(

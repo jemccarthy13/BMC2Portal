@@ -133,12 +133,7 @@ export function aiProcess(
     msg.voice
   )
 
-  processedText = processCloseLayer(
-    processedText,
-    sendResponseWrapper,
-    asset,
-    msg.voice
-  )
+  processedText = processCloseLayer(processedText, sendResponseWrapper, asset)
 
   processedText = processElevatorLayer(
     processedText,

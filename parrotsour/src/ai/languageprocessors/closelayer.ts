@@ -17,8 +17,7 @@ import { AIProcessor } from "./nlprocessor"
 export function processCloseLayer(
   processedText: string,
   sendResponse: (s1: string, s2: string) => void,
-  asset: AircraftGroup,
-  isVoice: boolean
+  asset: AircraftGroup
 ): string {
   processedText = processedText.replace(/\s\s+/g, " ")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,9 +40,6 @@ export function processCloseLayer(
     const newHeading = move.groups().hdg
     const turnDirText = turnDir ? turnDir.text() : undefined
     const newHdgText = newHeading ? newHeading.text() : undefined
-
-    console.log(turnDirText)
-    console.log(newHdgText)
 
     if (turnDir) {
       let fl
