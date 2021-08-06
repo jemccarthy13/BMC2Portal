@@ -63,7 +63,7 @@ export const drawAzimuth: PictureDrawFunction = (
   )
 
   const ngCts = randomNumber(1, desiredNumContacts - 1)
-  const sgCts = randomNumber(1, desiredNumContacts - ngCts)
+  const sgCts = desiredNumContacts ? desiredNumContacts - ngCts : 0
 
   // Create the first group
   const ng = GroupFactory.randomGroupAtLoc(
