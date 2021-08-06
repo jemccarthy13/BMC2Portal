@@ -51,8 +51,6 @@ export const drawAzimuth: PictureDrawFunction = (
   // Min distance apart = 5 nm, max = 40
   const drawDistance = randomNumber(7, 40) * PIXELS_TO_NM
 
-  console.log(desiredNumContacts + " az")
-
   const startPos = getStartPos(
     ctx,
     state.blueAir,
@@ -64,8 +62,18 @@ export const drawAzimuth: PictureDrawFunction = (
     }
   )
 
+  const ngCts = randomNumber(1, desiredNumContacts - 1)
+  const sgCts = randomNumber(1, desiredNumContacts - ngCts)
+
   // Create the first group
-  const ng = GroupFactory.randomGroupAtLoc(ctx, props, state, startPos)
+  const ng = GroupFactory.randomGroupAtLoc(
+    ctx,
+    props,
+    state,
+    startPos,
+    undefined,
+    ngCts
+  )
 
   // if hard mode and ALSA, we randomize the 2nd groups heading
   // otherwise, pair to first group +/- 10 degrees
@@ -83,6 +91,7 @@ export const drawAzimuth: PictureDrawFunction = (
     sy: isNS ? ngStPos.y : ngStPos.y + drawDistance,
     hdg: heading,
     dataTrailType: props.dataStyle,
+    nContacts: sgCts,
   })
 
   checkCaps(hasCaps, [ng, sg])
