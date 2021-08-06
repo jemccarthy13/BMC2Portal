@@ -61,11 +61,15 @@ export const drawRange: PictureDrawFunction = (
 
   let heading: number = randomHeading(props.format, state.blueAir.getHeading())
 
+  const tgCtx = randomNumber(1, desiredNumContacts - 1)
+  const lgCtx = desiredNumContacts ? desiredNumContacts - tgCtx : 0
+
   const tg = new AircraftGroup({
     ctx,
     sx: startX,
     sy: startY,
     hdg: heading,
+    nContacts: tgCtx,
   })
 
   if (props.isHardMode)
@@ -87,6 +91,7 @@ export const drawRange: PictureDrawFunction = (
       sx: startX,
       sy: startY + drawDistance,
       hdg: heading,
+      nContacts: lgCtx,
     })
     m2 = new Point(tgPos.x, lg.getCenterOfMass(props.dataStyle).y)
   } else {
@@ -95,6 +100,7 @@ export const drawRange: PictureDrawFunction = (
       sx: startX + drawDistance,
       sy: startY,
       hdg: heading,
+      nContacts: lgCtx,
     })
     m2 = new Point(lg.getCenterOfMass(props.dataStyle).x, tgPos.y)
     offsetX = -10
