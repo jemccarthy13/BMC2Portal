@@ -5,7 +5,7 @@ import {
   PictureDrawFunction,
   PictureCanvasProps,
   PictureCanvasState,
-} from "../../../canvas/canvastypes"
+} from "../../canvastypes"
 
 // Functions
 import { drawAltitudes, drawLine, drawText } from "../drawutils"

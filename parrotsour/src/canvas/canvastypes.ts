@@ -58,6 +58,7 @@ export interface PictureCanvasProps extends CanvasProps {
   format: FORMAT
   setAnswer: { (answer: PictureAnswer): void }
   sliderSpeed: number
+  desiredNumContacts: number
 }
 
 export type PictureAnswer = {
@@ -71,6 +72,7 @@ export interface PictureDrawFunction {
     props: PictureCanvasProps,
     state: PictureCanvasState,
     hasCaps: boolean,
+    desiredNumContacts: number,
     start?: Point
   ): PictureAnswer
 }

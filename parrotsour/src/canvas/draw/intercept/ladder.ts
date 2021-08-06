@@ -22,7 +22,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw a 3-5 group ladder and return the correct answer.
@@ -38,6 +38,7 @@ export const drawLadder: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   const groups: AircraftGroup[] = []

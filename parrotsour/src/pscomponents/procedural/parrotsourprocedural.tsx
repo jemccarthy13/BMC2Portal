@@ -148,13 +148,8 @@ export default class ParrotSourProcedural extends React.PureComponent<
 
   render(): ReactElement {
     const { canvasConfig, braaFirst, answer } = this.state
-    const {
-      showMeasurements,
-      isHardMode,
-      animate,
-      newPic,
-      speedSliderValue,
-    } = this.state
+    const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } =
+      this.state
     return (
       <div>
         <Suspense fallback={<div>Loading...</div>}>
@@ -194,6 +189,7 @@ export default class ParrotSourProcedural extends React.PureComponent<
               resetCallback={this.pauseAnimate}
               animateCallback={this.startAnimate}
               dataStyle={SensorType.ARROW}
+              desiredNumContacts={0}
             />
 
             <ChatBox answer={answer} />

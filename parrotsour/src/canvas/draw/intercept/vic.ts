@@ -25,7 +25,7 @@ import {
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw a three group vic and return the correct answer.
@@ -41,6 +41,7 @@ export const drawVic: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   const picture = {

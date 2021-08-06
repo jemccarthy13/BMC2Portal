@@ -197,6 +197,7 @@ export default class ParrotSourClose extends React.PureComponent<
               resetCallback={this.pauseAnimate}
               animateCallback={this.startAnimate}
               dataStyle={SensorType.RAW}
+              desiredNumContacts={0}
             />
 
             <CloseCommandBox answer={answer} />

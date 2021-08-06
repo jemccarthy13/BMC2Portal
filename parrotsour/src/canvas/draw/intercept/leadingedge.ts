@@ -18,6 +18,7 @@ export const drawLeadEdge: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   const isNS = FightAxis.isNS(props.orientation.orient)

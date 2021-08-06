@@ -14,6 +14,7 @@ import {
 import { SensorType } from "../../classes/aircraft/datatrail/sensortype"
 import { FORMAT } from "../../classes/supportedformats"
 import PSCookies from "../../utils/pscookies"
+import ContactSelector from "./contactselector"
 
 const PicTypeSelector = lazy(() => import("./picoptionsbar"))
 const StandardSelector = lazy(() => import("./standardselector"))
@@ -36,6 +37,7 @@ interface PSIState {
   animate: boolean
   newPic: boolean
   dataStyle: SensorType
+  desiredNumContacts: number
 }
 
 /**
@@ -76,6 +78,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
       dataStyle: PSCookies.getDataStyleIsRadar()
         ? SensorType.RAW
         : SensorType.ARROW,
+      desiredNumContacts: 0,
     }
     this.dummyCallback = this.pauseAnimate.bind(this)
   }
@@ -130,6 +133,13 @@ export default class ParrotSourIntercept extends React.PureComponent<
     this.setState((prevState) => ({
       showMeasurements: !prevState.showMeasurements,
     }))
+  }
+
+  /**
+   * Update the count of contacts
+   */
+  updateCounter = (count: number): void => {
+    this.setState({ desiredNumContacts: count })
   }
 
   /**
@@ -210,9 +220,9 @@ export default class ParrotSourIntercept extends React.PureComponent<
 
   render(): ReactElement {
     const { showAnswer, answer, picType, dataStyle } = this.state
-    const { canvasConfig, braaFirst, format } = this.state
-    const { showMeasurements, isHardMode, animate, newPic, speedSliderValue } =
-      this.state
+    const { canvasConfig, braaFirst, format, newPic } = this.state
+    const { showMeasurements, isHardMode, speedSliderValue } = this.state
+    const { animate, desiredNumContacts } = this.state
 
     return (
       <div>
@@ -246,6 +256,8 @@ export default class ParrotSourIntercept extends React.PureComponent<
             handleDataStyleChange={this.onDataStyleChange}
           />
         </Suspense>
+
+        <ContactSelector updateCount={this.updateCounter} />
 
         <br />
 
@@ -284,6 +296,7 @@ export default class ParrotSourIntercept extends React.PureComponent<
             resetCallback={this.dummyCallback}
             animateCallback={this.startAnimate}
             dataStyle={dataStyle}
+            desiredNumContacts={desiredNumContacts}
           />
         </Suspense>
 

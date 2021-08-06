@@ -28,7 +28,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw a three group champagne and return the correct answer.
@@ -44,6 +44,7 @@ export const drawChampagne: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   const picture = {

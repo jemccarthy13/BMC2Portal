@@ -22,9 +22,9 @@ import { drawVic } from "../canvas/draw/intercept/vic"
 import { drawChampagne } from "../canvas/draw/intercept/champagne"
 import { drawPackage } from "../canvas/draw/intercept/packages"
 import { drawLeadEdge } from "./draw/intercept/leadingedge"
-import { drawThreat } from "./draw/intercept/threatdraw"
-import { drawEA } from "./draw/intercept/eadraw"
-import { drawPOD } from "./draw/intercept/poddraw"
+import { drawThreat } from "./draw/intercept/threat"
+import { drawEA } from "./draw/intercept/ea"
+import { drawPOD } from "./draw/intercept/pod"
 import { drawSingleGroup } from "./draw/intercept/singlegroup"
 import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
@@ -44,21 +44,25 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * limit the types of pictures to the standard (with caveat: wall is
    * not allowed in lead edge/pkg due to separation requirement)
    */
-  getRandomPicType = (leadingEdge: boolean): string => {
-    const numType = randomNumber(0, leadingEdge ? 3 : 8)
-    const types = [
-      "azimuth",
-      "range",
-      "vic",
-      "champagne",
-      "cap",
-      "wall",
-      "ladder",
-      "leading edge",
-      "package",
-      "singlegroup",
-    ]
-    return types[numType]
+  getRandomPicType = (
+    leadingEdge: boolean,
+    desiredNumContacts: number
+  ): string => {
+    //const numType = randomNumber(0, leadingEdge ? 3 : 8)
+    const type1 = ["singlegroup"]
+    const type2 = type1.concat(["range", "azimuth", "cap"])
+    const type3 = type2.concat(["vic", "champagne", "wall", "ladder"])
+    const type4 = type3.concat(["leading edge", "package"])
+
+    const types = [[], type1, type2, type3, type4]
+
+    if (desiredNumContacts === 0) {
+      desiredNumContacts = 4
+    }
+    const numType = randomNumber(0, types[desiredNumContacts].length - 1)
+
+    console.log(types[desiredNumContacts][numType])
+    return types[desiredNumContacts][numType]
   }
 
   /**
@@ -125,19 +129,22 @@ export default class PictureCanvas extends ParrotSourCanvas {
     start?: Point
   ): PictureAnswer => {
     const { picType } = this.props
+    const { desiredNumContacts } = this.props
 
     const isLeadEdge =
       picType === "leading edge" || picType === "package" || picType === "ea"
 
     let type = "azimuth"
     if (forced) {
-      type = this.getRandomPicType(true)
+      type = this.getRandomPicType(true, desiredNumContacts)
     } else {
       type =
         picType === "random" || picType === "cap"
-          ? this.getRandomPicType(isLeadEdge)
+          ? this.getRandomPicType(isLeadEdge, desiredNumContacts)
           : picType
     }
+
+    console.log("TYPE ---- " + type)
 
     const drawFunc: PictureDrawFunction = this.functions[type] || drawAzimuth
 
@@ -146,6 +153,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
       this.props,
       this.state,
       picType === "cap",
+      desiredNumContacts,
       start
     )
 

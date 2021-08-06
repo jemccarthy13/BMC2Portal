@@ -28,7 +28,7 @@ import {
 } from "../../../canvas/draw/formatutils"
 import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw a 3-5 group wall and return the correctly formatted answer.
@@ -44,6 +44,7 @@ export const drawWall: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   const isNS = props.orientation.orient === BlueInThe.NORTH

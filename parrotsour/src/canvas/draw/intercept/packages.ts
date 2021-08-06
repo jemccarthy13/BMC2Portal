@@ -101,6 +101,7 @@ export const drawPackage: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   //const isRange = randomNumber(0,120) < 50
@@ -199,7 +200,14 @@ export const drawPackage: PictureDrawFunction = (
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       drawBullseye(ctx, state.bullseye)
       state.blueAir.draw(ctx, props.dataStyle)
-      finalAnswer = drawPackage(ctx, props, state, hasCaps, start)
+      finalAnswer = drawPackage(
+        ctx,
+        props,
+        state,
+        hasCaps,
+        desiredNumContacts,
+        start
+      )
     } else {
       realAnswer.pic =
         " 2 PACKAGES RANGE " +
@@ -226,7 +234,14 @@ export const drawPackage: PictureDrawFunction = (
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       drawBullseye(ctx, state.bullseye)
       state.blueAir.draw(ctx, props.dataStyle)
-      finalAnswer = drawPackage(ctx, props, state, hasCaps, start)
+      finalAnswer = drawPackage(
+        ctx,
+        props,
+        state,
+        hasCaps,
+        desiredNumContacts,
+        start
+      )
     } else {
       const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
       const leadBR = bPos.getBR(bull1).range

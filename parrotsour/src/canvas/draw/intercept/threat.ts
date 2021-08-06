@@ -5,7 +5,7 @@ import {
   PictureCanvasProps,
   PictureCanvasState,
   BlueInThe,
-} from "../../../canvas/canvastypes"
+} from "../../canvastypes"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Braaseye } from "../../../classes/braaseye"
 import { Point } from "../../../classes/point"
@@ -25,6 +25,7 @@ export const drawThreat: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point | undefined
 ): PictureAnswer => {
   if (!state.blueAir) {

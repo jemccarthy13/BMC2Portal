@@ -21,7 +21,7 @@ import {
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw two groups in range and return the correct answer.
@@ -37,6 +37,7 @@ export const drawRange: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point
 ): PictureAnswer => {
   const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)

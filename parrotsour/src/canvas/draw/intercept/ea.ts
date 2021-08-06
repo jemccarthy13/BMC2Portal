@@ -4,7 +4,7 @@ import {
   PictureDrawFunction,
   PictureCanvasProps,
   PictureCanvasState,
-} from "../../../canvas/canvastypes"
+} from "../../canvastypes"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { BRAA } from "../../../classes/braa"
@@ -192,6 +192,7 @@ export const drawEA: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point
 ): PictureAnswer => {
   // force draw to happen on the right side of the screen

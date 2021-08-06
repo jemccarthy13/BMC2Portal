@@ -29,7 +29,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./capdraw"
+import { checkCaps } from "./cap"
 
 /**
  * Draw two groups azimuth and return the correct answer.
@@ -45,10 +45,13 @@ export const drawAzimuth: PictureDrawFunction = (
   props: PictureCanvasProps,
   state: PictureCanvasState,
   hasCaps: boolean,
+  desiredNumContacts: number,
   start?: Point
 ): PictureAnswer => {
   // Min distance apart = 5 nm, max = 40
   const drawDistance = randomNumber(7, 40) * PIXELS_TO_NM
+
+  console.log(desiredNumContacts + " az")
 
   const startPos = getStartPos(
     ctx,

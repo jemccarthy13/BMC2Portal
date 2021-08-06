@@ -11,14 +11,16 @@ export class GroupFactory {
     props: PictureCanvasProps,
     state: PictureCanvasState,
     startLoc: Point,
-    heading?: number
+    heading?: number,
+    nContacts?: number
   ): AircraftGroup {
     const hdg = heading
       ? heading
       : randomHeading(props.format, state.blueAir.getHeading())
     const startPos = startLoc
 
-    const p = { sx: startPos.x, sy: startPos.y, hdg, ctx }
+    console.log("creating group with " + nContacts)
+    const p = { sx: startPos.x, sy: startPos.y, hdg, ctx, nContacts }
     const grp = new AircraftGroup(p)
     return grp
   }
@@ -27,7 +29,8 @@ export class GroupFactory {
     ctx: CanvasRenderingContext2D,
     props: PictureCanvasProps,
     state: PictureCanvasState,
-    heading?: number
+    heading?: number,
+    numContacts?: number
   ): AircraftGroup {
     const startLoc = getStartPos(
       ctx,
@@ -35,6 +38,13 @@ export class GroupFactory {
       props.orientation.orient,
       props.dataStyle
     )
-    return this.randomGroupAtLoc(ctx, props, state, startLoc, heading)
+    return this.randomGroupAtLoc(
+      ctx,
+      props,
+      state,
+      startLoc,
+      heading,
+      numContacts
+    )
   }
 }
