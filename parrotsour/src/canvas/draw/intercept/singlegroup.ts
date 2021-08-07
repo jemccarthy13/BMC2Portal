@@ -47,7 +47,7 @@ export const drawSingleGroup: PictureDrawFunction = (
     }
   )
 
-  // Create the first group
+  // Create the single group
   const sg = GroupFactory.randomGroupAtLoc(
     ctx,
     props,
@@ -57,8 +57,6 @@ export const drawSingleGroup: PictureDrawFunction = (
     desiredNumContacts
   )
 
-  console.log("sg -- " + desiredNumContacts)
-  console.log("sg str -- " + sg.getStrength())
   checkCaps(hasCaps, [sg])
   sg.setLabel("SINGLE GROUP")
   sg.draw(ctx, props.dataStyle)
@@ -67,17 +65,12 @@ export const drawSingleGroup: PictureDrawFunction = (
 
   let offsetX = 0
   let offsetY = 0
-  let offsetX2 = 0
-  let offsetY2 = 0
   if (isNS) {
     offsetX = -60
     offsetY = 40
-    offsetX2 = 10
-    offsetY2 = 10
   }
   const sgPos = sg.getCenterOfMass(props.dataStyle)
   drawAltitudes(ctx, sgPos, sg.getAltitudes(), offsetX, offsetY)
-  drawAltitudes(ctx, sgPos, sg.getAltitudes(), offsetX2, offsetY2)
 
   const ngBraaseye = new Braaseye(
     sgPos,
@@ -95,11 +88,7 @@ export const drawSingleGroup: PictureDrawFunction = (
 
   const sgAlts = sg.getAltStack(props.format)
 
-  let answer = "SINGLE GROUP "
-
-  answer += picTrackDir(props.format, [sg])
-
-  answer += formatGroup(
+  const answer = formatGroup(
     "SINGLE",
     ngBraaseye,
     sgAlts,
