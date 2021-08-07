@@ -14,7 +14,6 @@ import { Point } from "../../../classes/point"
 import { drawAltitudes } from "../drawutils"
 import { formatGroup } from "../formatutils"
 import { getStartPos } from "./pictureclamp"
-import { picTrackDir } from "./picturehelpers"
 import { PIXELS_TO_NM } from "../../../utils/psmath"
 import { checkCaps } from "./cap"
 
