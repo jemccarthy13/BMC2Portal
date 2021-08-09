@@ -1,3 +1,4 @@
+import snackActions from "../../../pscomponents/alert/psalert"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
@@ -76,8 +77,13 @@ export abstract class DrawPic {
   assignContacts = (grps: number, contacts: number): number[] => {
     let cntSoFar = 0
     const answer = []
-    if (grps > contacts) {
-      console.error("Not enough groups for " + contacts + " contacts.")
+    if (grps > contacts && contacts !== 0) {
+      snackActions.error(
+        contacts +
+          " contact(s) is not enough for " +
+          grps +
+          " group(s). Picture will be random."
+      )
     }
     for (let x = 0; x < grps; x++) {
       // 0 for random contacts per group
