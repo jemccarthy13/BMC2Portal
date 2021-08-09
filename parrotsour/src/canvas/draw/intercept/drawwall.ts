@@ -14,9 +14,15 @@ import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
-export default class DrawRange extends DrawPic {
+export default class DrawWall extends DrawPic {
   getNumGroups(nCts: number): number {
-    const maxGrps = nCts !== 0 && nCts < 5 ? nCts : 5
+    let maxGrps = 5
+    if (nCts < 3) {
+      maxGrps = 3
+    } else if (nCts < 5) {
+      maxGrps = nCts
+    }
+    if (nCts === 0) maxGrps = 5
     return randomNumber(3, maxGrps)
   }
 

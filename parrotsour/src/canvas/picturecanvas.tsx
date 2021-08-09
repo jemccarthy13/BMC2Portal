@@ -29,6 +29,7 @@ import { PaintBrush } from "./draw/paintbrush"
 import DrawSingleGroup from "./draw/intercept/singlegroup"
 import DrawAzimuth from "./draw/intercept/azimuth"
 import DrawRange from "./draw/intercept/range"
+import DrawWall from "./draw/intercept/drawwall"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -181,13 +182,14 @@ export default class PictureCanvas extends ParrotSourCanvas {
   singleDraw = new DrawSingleGroup()
   azimuthDraw = new DrawAzimuth()
   rangeDraw = new DrawRange()
+  wallDraw = new DrawWall()
 
   // A list of all avaiable functions
   functions: { [key: string]: PictureDrawFunction } = {
     azimuth: this.azimuthDraw.draw,
     range: this.rangeDraw.draw,
     ladder: drawLadder,
-    wall: drawWall,
+    wall: this.wallDraw.draw,
     vic: drawVic,
     champagne: drawChampagne,
     //cap: drawCap,
