@@ -13,12 +13,12 @@ import { trackDirFromHdg } from "../../../utils/mathutilities"
  * comment
  */
 export const isAnchorNorth = (
-  ngBraaseye: Braaseye,
-  sgBraaseye: Braaseye,
   ng: AircraftGroup,
   sg: AircraftGroup
 ): boolean => {
   let anchorN = false
+  const ngBraaseye = ng.getBraaseye()
+  const sgBraaseye = sg.getBraaseye()
   if (ngBraaseye.braa.range < sgBraaseye.braa.range) {
     anchorN = true
   } else if (ngBraaseye.braa.range === sgBraaseye.braa.range) {

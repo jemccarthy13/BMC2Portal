@@ -1,249 +1,230 @@
-// Classes & Types
-import {
-  FightAxis,
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-  PictureDrawFunction,
-} from "../../../canvas/canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-
-// Functions
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import {
-  formatGroup,
-  getOpenCloseAzimuth,
-} from "../../../canvas/draw/formatutils"
-import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import {
-  isAnchorNorth,
-  picTrackDir,
-} from "../../../canvas/draw/intercept/picturehelpers"
+import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./cap"
+import { FightAxis } from "../../canvastypes"
+import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { DrawPic } from "./drawpic"
+import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
+import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
-/**
- * Draw a three group champagne and return the correct answer.
- *
- * @param ctx Current drawing context
- * @param props PicCanvasProps for the canvas
- * @param state PicCanvasState of the current canvas
- * @param start (Optional) Forced starting location for the picture
- * @returns DrawAnswer with the correct answer for this picture
- */
-export const drawChampagne: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point | undefined
-): PictureAnswer => {
-  const picture = {
-    start,
-    width: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
-    depth: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
+export default class DrawChampagne extends DrawPic {
+  getNumGroups(): number {
+    return 3
   }
 
-  const startPos = getRestrictedStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    45 + picture.depth,
-    100,
-    picture
-  )
-  const startX = startPos.x
-  const startY = startPos.y
+  getPictureInfo(start?: Point): PictureInfo {
+    const picture = {
+      start,
+      wide: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
+      deep: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
+    }
 
-  let heading: number = randomHeading(props.format, state.blueAir.getHeading())
-  const tg = new AircraftGroup({
-    ctx,
-    sx: startX,
-    sy: startY,
-    hdg: heading + randomNumber(-10, 10),
-  })
-
-  if (props.isHardMode)
-    heading = randomHeading(props.format, state.blueAir.getHeading())
-
-  const isNS = FightAxis.isNS(props.orientation.orient)
-
-  let nlg: AircraftGroup
-  if (isNS) {
-    nlg = new AircraftGroup({
-      ctx,
-      sx: startX - picture.width / 2,
-      sy: startY - picture.depth,
-      hdg: heading + randomNumber(-10, 10),
-    })
-  } else {
-    nlg = new AircraftGroup({
-      ctx,
-      sx: startX + picture.depth,
-      sy: startY - picture.width / 2,
-      hdg: heading + randomNumber(-10, 10),
-    })
-  }
-
-  if (props.isHardMode)
-    heading = randomHeading(props.format, state.blueAir.getHeading())
-  let slg: AircraftGroup
-  let offsetX = 0
-  let offsetX2 = 0
-
-  let sLbl = "SOUTH"
-  let nLbl = "NORTH"
-
-  if (isNS) {
-    slg = new AircraftGroup({
-      ctx,
-      sx: startX + picture.width / 2,
-      sy: startY - picture.depth,
-      hdg: heading + randomNumber(-10, 10),
-    })
-    offsetX2 = -70
-    sLbl = "EAST"
-    nLbl = "WEST"
-  } else {
-    slg = new AircraftGroup({
-      ctx,
-      sx: startX + picture.depth,
-      sy: startY + picture.width / 2,
-      hdg: heading + randomNumber(-10, 10),
-    })
-    offsetX = -70
-  }
-
-  checkCaps(hasCaps, [tg, nlg, slg])
-
-  tg.draw(ctx, props.dataStyle)
-  nlg.draw(ctx, props.dataStyle)
-  slg.draw(ctx, props.dataStyle)
-
-  let realDepth, realWidth
-  const nlgPos = nlg.getCenterOfMass(props.dataStyle)
-  const slgPos = slg.getCenterOfMass(props.dataStyle)
-  const tgPos = tg.getCenterOfMass(props.dataStyle)
-  if (isNS) {
-    realWidth = new Point(slgPos.x, nlgPos.y).getBR(nlgPos).range
-    realDepth = new Point(tgPos.x, nlgPos.y).getBR(tgPos).range
-    drawMeasurement(
-      ctx,
-      nlgPos.x,
-      nlgPos.y,
-      tgPos.x,
-      nlgPos.y,
-      realWidth,
-      props.showMeasurements
+    const startPos = getRestrictedStartPos(
+      this.ctx,
+      this.state.blueAir,
+      this.props.orientation.orient,
+      this.props.dataStyle,
+      45 + picture.deep,
+      100,
+      picture
     )
-    drawMeasurement(
-      ctx,
-      tgPos.x,
-      tgPos.y,
-      tgPos.x,
-      nlgPos.y,
-      realDepth,
-      props.showMeasurements
-    )
-  } else {
-    realWidth = nlgPos.getBR(new Point(nlgPos.x, slgPos.y)).range
-    realDepth = new Point(nlgPos.x, tgPos.y).getBR(tgPos).range
-    drawMeasurement(
-      ctx,
-      nlgPos.x,
-      slgPos.y,
-      nlgPos.x,
-      nlgPos.y,
-      realWidth,
-      props.showMeasurements
-    )
-    drawMeasurement(
-      ctx,
-      tgPos.x,
-      tgPos.y,
-      nlgPos.x,
-      tgPos.y,
-      realDepth,
-      props.showMeasurements
-    )
+    picture.start = startPos
+    return picture
   }
 
-  drawAltitudes(ctx, tgPos, tg.getAltitudes(), offsetX)
-  drawAltitudes(ctx, slgPos, slg.getAltitudes())
-  drawAltitudes(ctx, nlgPos, nlg.getAltitudes(), offsetX2)
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-  const tgBraaseye = new Braaseye(
-    tgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-  const nlgBraaseye = new Braaseye(
-    nlgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-  const slgBraaseye = new Braaseye(
-    slgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
+    let heading: number = randomHeading(
+      this.props.format,
+      this.state.blueAir.getHeading()
+    )
+    const tg = new AircraftGroup({
+      ctx: this.ctx,
+      sx: startPos.x,
+      sy: startPos.y,
+      hdg: heading + randomNumber(-10, 10),
+      nContacts: contactList[0],
+    })
+    tg.setLabel("TRAIL GROUP")
 
-  tgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst, offsetX)
-  nlgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst, offsetX2)
-  slgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
+    if (this.props.isHardMode)
+      heading = randomHeading(
+        this.props.format,
+        this.state.blueAir.getHeading()
+      )
 
-  tg.setBraaseye(tgBraaseye)
-  nlg.setBraaseye(nlgBraaseye)
-  slg.setBraaseye(slgBraaseye)
+    console.log(this.wide, this.deep)
 
-  // TODO -- CHAMP ANSWER -- cleanup
-  const openClose = getOpenCloseAzimuth(nlg, slg)
+    let nlg: AircraftGroup
+    if (isNS) {
+      nlg = new AircraftGroup({
+        ctx: this.ctx,
+        sx: startPos.x - this.wide / 2,
+        sy: startPos.y - this.deep,
+        hdg: heading + randomNumber(-10, 10),
+        nContacts: contactList[1],
+      })
+    } else {
+      nlg = new AircraftGroup({
+        ctx: this.ctx,
+        sx: startPos.x + this.deep,
+        sy: startPos.y - this.wide / 2,
+        hdg: heading + randomNumber(-10, 10),
+        nContacts: contactList[1],
+      })
+    }
 
-  let answer =
-    "THREE GROUP CHAMPAGNE " +
-    realWidth +
-    " WIDE" +
-    openClose +
-    " " +
-    realDepth +
-    " DEEP, "
+    if (this.props.isHardMode)
+      heading = randomHeading(
+        this.props.format,
+        this.state.blueAir.getHeading()
+      )
 
-  // determine if weighted
-  if (new Point(nlgPos.x, tgPos.y).getBR(nlgPos).range < realWidth / 3) {
-    answer += " WEIGHTED " + nLbl + ", "
-  } else if (new Point(slgPos.x, tgPos.y).getBR(slgPos).range < realWidth / 3) {
-    answer += " WEIGHTED " + sLbl + ", "
+    let slg
+    if (isNS) {
+      slg = new AircraftGroup({
+        ctx: this.ctx,
+        sx: startPos.x + this.wide / 2,
+        sy: startPos.y - this.deep,
+        hdg: heading + randomNumber(-10, 10),
+        nContacts: contactList[2],
+      })
+      nlg.setLabel("WEST LEAD GROUP")
+      slg.setLabel("EAST LEAD GROUP")
+    } else {
+      slg = new AircraftGroup({
+        ctx: this.ctx,
+        sx: startPos.x + this.deep,
+        sy: startPos.y + this.wide / 2,
+        hdg: heading + randomNumber(-10, 10),
+        nContacts: contactList[2],
+      })
+
+      nlg.setLabel("NORTH LEAD GROUP")
+      slg.setLabel("SOUTH LEAD GROUP")
+    }
+
+    return [tg, nlg, slg]
   }
 
-  answer += picTrackDir(props.format, [nlg, slg, tg])
+  drawInfo(): void {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-  const includeBull = realWidth >= 10 && props.format !== FORMAT.IPE
+    const { showMeasurements } = this.props
 
-  const anchorN = isAnchorNorth(nlgBraaseye, slgBraaseye, nlg, slg)
-  if (anchorN) {
-    answer += formatGroup(props.format, nlg, true) + " "
-    answer += formatGroup(props.format, slg, includeBull) + " "
-  } else {
-    answer += formatGroup(props.format, slg, true) + " "
-    answer += formatGroup(props.format, nlg, includeBull) + " "
+    const tg = this.groups[0]
+    const nlg = this.groups[1]
+    const slg = this.groups[2]
+
+    const nlgPos = nlg.getCenterOfMass(this.props.dataStyle)
+    const slgPos = slg.getCenterOfMass(this.props.dataStyle)
+    const tgPos = tg.getCenterOfMass(this.props.dataStyle)
+
+    let wPt = new Point(nlgPos.x, slgPos.y)
+    let dPt = new Point(nlgPos.x, tgPos.y)
+    if (isNS) {
+      wPt = new Point(slgPos.x, nlgPos.y)
+      dPt = new Point(tgPos.x, nlgPos.y)
+    }
+    this.wide = wPt.getBR(nlgPos).range
+    this.deep = dPt.getBR(tgPos).range
+    drawMeasurement(this.ctx, nlgPos, wPt, this.wide, showMeasurements)
+    drawMeasurement(this.ctx, tgPos, dPt, this.deep, showMeasurements)
+
+    const offsetXTrail = !isNS ? -100 : 0
+    const offsetXNL = isNS ? -100 : 0
+    drawAltitudes(this.ctx, tgPos, tg.getAltitudes(), offsetXTrail)
+    drawAltitudes(this.ctx, slgPos, slg.getAltitudes())
+    drawAltitudes(this.ctx, nlgPos, nlg.getAltitudes(), offsetXNL)
+
+    const { blueAir, bullseye } = this.state
+    const { dataStyle, braaFirst } = this.props
+
+    const tgBraaseye = new Braaseye(
+      tgPos,
+      blueAir.getCenterOfMass(dataStyle),
+      bullseye
+    )
+    const nlgBraaseye = new Braaseye(
+      nlgPos,
+      blueAir.getCenterOfMass(dataStyle),
+      bullseye
+    )
+    const slgBraaseye = new Braaseye(
+      slgPos,
+      blueAir.getCenterOfMass(dataStyle),
+      bullseye
+    )
+
+    tgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetXTrail)
+    nlgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetXNL)
+    slgBraaseye.draw(this.ctx, showMeasurements, braaFirst)
+
+    tg.setBraaseye(tgBraaseye)
+    nlg.setBraaseye(nlgBraaseye)
+    slg.setBraaseye(slgBraaseye)
   }
-  answer += formatGroup(props.format, tg, false)
 
-  tg.setLabel("TRAIL GROUP")
-  nlg.setLabel(nLbl + " LEAD GROUP")
-  slg.setLabel(sLbl + " LEAD GROUP")
+  getAnswer(): string {
+    const tg = this.groups[0]
+    const nlg = this.groups[1]
+    const slg = this.groups[2]
 
-  return {
-    pic: answer,
-    groups: [tg, nlg, slg],
+    // TODO -- CHAMP ANSWER -- cleanup
+    const openClose = getOpenCloseAzimuth(nlg, slg)
+
+    let answer =
+      "THREE GROUP CHAMPAGNE " +
+      this.wide +
+      " WIDE" +
+      openClose +
+      " " +
+      this.deep +
+      " DEEP, "
+
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const nLbl = isNS ? "WEST" : "NORTH"
+    const sLbl = isNS ? "EAST" : "SOUTH"
+
+    nlg.draw(this.ctx, this.props.dataStyle)
+    const nlgPos = nlg.getCenterOfMass(this.props.dataStyle)
+    const slgPos = slg.getCenterOfMass(this.props.dataStyle)
+    const tgPos = tg.getCenterOfMass(this.props.dataStyle)
+    // determine if weighted
+    let frmNPt = new Point(nlgPos.x, tgPos.y)
+    let fromSPt = new Point(slgPos.x, tgPos.y)
+    if (isNS) {
+      frmNPt = new Point(tgPos.x, nlgPos.y)
+      fromSPt = new Point(tgPos.x, slgPos.y)
+    }
+    if (frmNPt.getBR(nlgPos).range < this.wide / 3) {
+      answer += " WEIGHTED " + nLbl + ", "
+    } else if (fromSPt.getBR(slgPos).range < this.wide / 3) {
+      answer += " WEIGHTED " + sLbl + ", "
+    }
+
+    answer += picTrackDir(this.props.format, [nlg, slg, tg])
+
+    const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
+
+    const anchorN = isAnchorNorth(nlg, slg)
+    if (anchorN) {
+      answer += formatGroup(this.props.format, nlg, true) + " "
+      answer += formatGroup(this.props.format, slg, includeBull) + " "
+    } else {
+      answer += formatGroup(this.props.format, slg, true) + " "
+      answer += formatGroup(this.props.format, nlg, includeBull) + " "
+    }
+    answer += formatGroup(this.props.format, tg, false)
+
+    return answer
   }
 }

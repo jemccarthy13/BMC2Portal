@@ -56,6 +56,7 @@ export abstract class DrawPic {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.wide = this.pInfo.wide!
 
+    console.log(this.deep, this.wide)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const startPos = this.pInfo.start!
 

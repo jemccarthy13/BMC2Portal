@@ -137,20 +137,18 @@ export function drawAltitudes(
  */
 export function drawMeasurement(
   ctx: CanvasRenderingContext2D,
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number,
+  start: Point,
+  end: Point,
   distance: number,
   showMeasurements: boolean
 ): void {
   if (showMeasurements) {
-    drawLine(ctx, startX, startY, endX, endY)
+    drawLine(ctx, start.x, start.y, end.x, end.y)
     drawText(
       ctx,
       Math.floor(distance).toString(),
-      (startX + endX) / 2,
-      (startY + endY) / 2 - 3
+      (start.x + end.x) / 2,
+      (start.y + end.y) / 2 - 3
     )
   }
 }

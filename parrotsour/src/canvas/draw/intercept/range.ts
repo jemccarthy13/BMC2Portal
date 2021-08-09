@@ -76,18 +76,21 @@ export default class DrawRange extends DrawPic {
     const tg = this.groups[0]
     const lg = this.groups[1]
 
-    const lPos = lg.getCenterOfMass(this.props.dataStyle)
-    const tPos = tg.getCenterOfMass(this.props.dataStyle)
+    const { dataStyle, orientation, showMeasurements, braaFirst } = this.props
+    const { blueAir, bullseye } = this.state
+
+    const lPos = lg.getCenterOfMass(dataStyle)
+    const tPos = tg.getCenterOfMass(dataStyle)
     let m2: Point
     let offsetX = 0
     let offsetY = 0
     let offsetX2 = 0
     let offsetY2 = 0
-    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const isNS = FightAxis.isNS(orientation.orient)
     if (isNS) {
-      m2 = new Point(tPos.x, lg.getCenterOfMass(this.props.dataStyle).y)
+      m2 = new Point(tPos.x, lg.getCenterOfMass(dataStyle).y)
     } else {
-      m2 = new Point(lg.getCenterOfMass(this.props.dataStyle).x, tPos.y)
+      m2 = new Point(lg.getCenterOfMass(dataStyle).x, tPos.y)
       offsetX = -10
       offsetY = 40
       offsetX2 = -60
@@ -95,44 +98,24 @@ export default class DrawRange extends DrawPic {
     }
     this.deep = m2.getBR(tPos).range
 
-    drawMeasurement(
-      this.ctx,
-      tPos.x,
-      tPos.y,
-      m2.x,
-      m2.y,
-      this.deep,
-      this.props.showMeasurements
-    )
+    drawMeasurement(this.ctx, tPos, m2, this.deep, showMeasurements)
 
     drawAltitudes(this.ctx, lPos, lg.getAltitudes(), offsetX, offsetY)
     drawAltitudes(this.ctx, tPos, tg.getAltitudes(), offsetX2, offsetY2)
 
     const lgBraaseye = new Braaseye(
       lPos,
-      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-      this.state.bullseye
+      blueAir.getCenterOfMass(dataStyle),
+      bullseye
     )
     const tgBraaseye = new Braaseye(
       tPos,
-      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-      this.state.bullseye
+      blueAir.getCenterOfMass(dataStyle),
+      bullseye
     )
 
-    lgBraaseye.draw(
-      this.ctx,
-      this.props.showMeasurements,
-      this.props.braaFirst,
-      offsetX,
-      offsetY
-    )
-    tgBraaseye.draw(
-      this.ctx,
-      this.props.showMeasurements,
-      this.props.braaFirst,
-      offsetX2,
-      offsetY2
-    )
+    lgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetX, offsetY)
+    tgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetX2, offsetY2)
     lg.setBraaseye(lgBraaseye)
     tg.setBraaseye(tgBraaseye)
   }

@@ -93,7 +93,8 @@ export const drawLeadEdge: PictureDrawFunction = (
 
   const drawXTo = isNS ? pic1Pos.x : pic2Pos.x
   const drawYTo = isNS ? pic2Pos.y : pic1Pos.y
-  drawMeasurement(ctx, pic1Pos.x, pic1Pos.y, drawXTo, drawYTo, rngBack, true)
+  const drawTo = new Point(drawXTo, drawYTo)
+  drawMeasurement(ctx, pic1Pos, drawTo, rngBack, true)
 
   const finalAnswer = {
     pic:

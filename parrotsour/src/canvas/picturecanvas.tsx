@@ -15,7 +15,6 @@ import { Point } from "../classes/point"
 // Functions
 import { drawBullseye, drawFullInfo } from "./draw/drawutils"
 import { drawVic } from "../canvas/draw/intercept/vic"
-import { drawChampagne } from "../canvas/draw/intercept/champagne"
 import { drawPackage } from "../canvas/draw/intercept/packages"
 import { drawLeadEdge } from "./draw/intercept/leadingedge"
 import { drawThreat } from "./draw/intercept/threat"
@@ -28,7 +27,8 @@ import DrawSingleGroup from "./draw/intercept/singlegroup"
 import DrawAzimuth from "./draw/intercept/azimuth"
 import DrawRange from "./draw/intercept/range"
 import DrawWall from "./draw/intercept/wall"
-import DrawLadder from "./draw/intercept/drawladder"
+import DrawLadder from "./draw/intercept/ladder"
+import DrawChampagne from "./draw/intercept/champagne"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -183,6 +183,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
   rangeDraw = new DrawRange()
   wallDraw = new DrawWall()
   ladderDraw = new DrawLadder()
+  champDraw = new DrawChampagne()
 
   // A list of all avaiable functions
   functions: { [key: string]: PictureDrawFunction } = {
@@ -191,7 +192,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
     ladder: this.ladderDraw.draw,
     wall: this.wallDraw.draw,
     vic: drawVic,
-    champagne: drawChampagne,
+    champagne: this.champDraw.draw,
     //cap: drawCap,
     threat: drawThreat,
     ea: drawEA,

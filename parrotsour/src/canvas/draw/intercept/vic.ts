@@ -128,50 +128,18 @@ export const drawVic: PictureDrawFunction = (
   const ntgPos = ntg.getCenterOfMass(props.dataStyle)
   const stgPos = stg.getCenterOfMass(props.dataStyle)
   const lgPos = lg.getCenterOfMass(props.dataStyle)
-  let realDepth, realWidth
+
+  let dPt = new Point(stgPos.x, lgPos.y)
+  let wPt = new Point(stgPos.y, ntgPos.y)
   if (isNS) {
-    realDepth = new Point(lgPos.x, stgPos.y).getBR(lgPos).range
-    realWidth = new Point(ntgPos.x, stgPos.y).getBR(stgPos).range
-    drawMeasurement(
-      ctx,
-      lgPos.x,
-      lgPos.y,
-      lgPos.x,
-      stgPos.y,
-      realDepth,
-      props.showMeasurements
-    )
-    drawMeasurement(
-      ctx,
-      stgPos.x,
-      stgPos.y,
-      ntgPos.x,
-      stgPos.y,
-      realWidth,
-      props.showMeasurements
-    )
-  } else {
-    realDepth = new Point(stgPos.x, lgPos.y).getBR(lgPos).range
-    realWidth = new Point(stgPos.x, ntgPos.y).getBR(stgPos).range
-    drawMeasurement(
-      ctx,
-      lgPos.x,
-      lgPos.y,
-      stgPos.x,
-      lgPos.y,
-      realDepth,
-      props.showMeasurements
-    )
-    drawMeasurement(
-      ctx,
-      stgPos.x,
-      stgPos.y,
-      stgPos.x,
-      ntgPos.y,
-      realWidth,
-      props.showMeasurements
-    )
+    dPt = new Point(lgPos.x, stgPos.y)
+    wPt = new Point(ntgPos.x, stgPos.y)
   }
+
+  const realDepth = dPt.getBR(lgPos).range
+  const realWidth = wPt.getBR(stgPos).range
+  drawMeasurement(ctx, lgPos, dPt, realDepth, props.showMeasurements)
+  drawMeasurement(ctx, stgPos, wPt, realWidth, props.showMeasurements)
 
   drawAltitudes(ctx, lgPos, lg.getAltitudes())
   drawAltitudes(ctx, stgPos, stg.getAltitudes())
@@ -224,7 +192,9 @@ export const drawVic: PictureDrawFunction = (
 
   answer += formatGroup(props.format, lg, true) + " "
 
-  const anchorN = isAnchorNorth(ntgBraaseye, stgBraaseye, ntg, stg)
+  ntg.setBraaseye(ntgBraaseye)
+  stg.setBraaseye(stgBraaseye)
+  const anchorN = isAnchorNorth(ntg, stg)
 
   lg.setLabel("LEAD GROUP")
   stg.setLabel(sLbl + " TRAIL GROUP")

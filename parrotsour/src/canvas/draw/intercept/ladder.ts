@@ -38,6 +38,11 @@ export default class DrawLadder extends DrawPic {
     this.deep = depth
     const wide = 5 * PIXELS_TO_NM // ensures group is clamped visible in canvas
 
+    const pInfo = {
+      start,
+      deep: this.deep,
+      wide,
+    }
     const startPos = getRestrictedStartPos(
       this.ctx,
       this.state.blueAir,
@@ -45,16 +50,10 @@ export default class DrawLadder extends DrawPic {
       this.props.dataStyle,
       45 + this.deep / PIXELS_TO_NM,
       200,
-      {
-        start,
-        deep: this.deep,
-      }
+      pInfo
     )
-    return {
-      start: startPos,
-      wide,
-      deep: this.deep,
-    }
+    pInfo.start = startPos
+    return pInfo
   }
 
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
@@ -134,10 +133,8 @@ export default class DrawLadder extends DrawPic {
       actualDeep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x - 30,
-        gpPos.y,
-        gpPos.x - 30,
-        prevGpPos.y,
+        new Point(gpPos.x - 30, gpPos.y),
+        new Point(gpPos.x - 30, prevGpPos.y),
         actualDeep,
         this.props.showMeasurements
       )
@@ -145,10 +142,8 @@ export default class DrawLadder extends DrawPic {
       actualDeep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x,
-        gpPos.y + 40,
-        prevGpPos.x,
-        gpPos.y + 40,
+        new Point(gpPos.x, gpPos.y + 40),
+        new Point(prevGpPos.x, gpPos.y + 40),
         actualDeep,
         this.props.showMeasurements
       )

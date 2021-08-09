@@ -93,15 +93,7 @@ export default class DrawAzimuth extends DrawPic {
     }
 
     this.wide = m2.getBR(nPos).range
-    drawMeasurement(
-      this.ctx,
-      nPos.x,
-      nPos.y + 2,
-      m2.x,
-      m2.y + 2,
-      this.wide,
-      this.props.showMeasurements
-    )
+    drawMeasurement(this.ctx, nPos, m2, this.wide, this.props.showMeasurements)
     drawAltitudes(this.ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
     drawAltitudes(
       this.ctx,
@@ -162,7 +154,7 @@ export default class DrawAzimuth extends DrawPic {
 
     answer += picTrackDir(this.props.format, [ng, sg])
 
-    const anchorN = isAnchorNorth(ng.getBraaseye(), sg.getBraaseye(), ng, sg)
+    const anchorN = isAnchorNorth(ng, sg)
 
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 

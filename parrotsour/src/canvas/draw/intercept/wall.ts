@@ -38,6 +38,11 @@ export default class DrawWall extends DrawPic {
     this.wide = width
     const deep = 20 * PIXELS_TO_NM // to ensure measurements can be drawn behind wall
 
+    const pInfo = {
+      start,
+      wide: this.wide,
+      deep,
+    }
     const startPos = getRestrictedStartPos(
       this.ctx,
       this.state.blueAir,
@@ -45,17 +50,10 @@ export default class DrawWall extends DrawPic {
       this.props.dataStyle,
       45,
       200,
-      {
-        start,
-        wide: this.wide,
-        deep,
-      }
+      pInfo
     )
-    return {
-      start: startPos,
-      wide: this.wide,
-      deep,
-    }
+    pInfo.start = startPos
+    return pInfo
   }
 
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
@@ -135,10 +133,8 @@ export default class DrawWall extends DrawPic {
       widthNM = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x,
-        gpPos.y - 25,
-        prevGpPos.x,
-        gpPos.y - 25,
+        new Point(gpPos.x, gpPos.y - 25),
+        new Point(prevGpPos.x, gpPos.y - 25),
         widthNM,
         this.props.showMeasurements
       )
@@ -146,10 +142,8 @@ export default class DrawWall extends DrawPic {
       widthNM = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x + 25,
-        gpPos.y,
-        gpPos.x + 25,
-        prevGpPos.y,
+        new Point(gpPos.x + 25, gpPos.y),
+        new Point(gpPos.x + 25, prevGpPos.y),
         widthNM,
         this.props.showMeasurements
       )
@@ -192,8 +186,6 @@ export default class DrawWall extends DrawPic {
     answer += picTrackDir(this.props.format, this.groups)
 
     const anchorNorth = isAnchorNorth(
-      this.groups[0].getBraaseye(),
-      this.groups[this.groups.length - 1].getBraaseye(),
       this.groups[0],
       this.groups[this.groups.length - 1]
     )
