@@ -8,7 +8,6 @@ import {
 } from "../../../canvas/canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
 
 // Functions
@@ -202,9 +201,9 @@ export const drawChampagne: PictureDrawFunction = (
   nlgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst, offsetX2)
   slgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
 
-  const tgAlts: AltStack = tg.getAltStack(props.format)
-  const nlgAlts: AltStack = nlg.getAltStack(props.format)
-  const slgAlts: AltStack = slg.getAltStack(props.format)
+  tg.setBraaseye(tgBraaseye)
+  nlg.setBraaseye(nlgBraaseye)
+  slg.setBraaseye(slgBraaseye)
 
   // TODO -- CHAMP ANSWER -- cleanup
   const openClose = getOpenCloseAzimuth(nlg, slg)
@@ -231,52 +230,13 @@ export const drawChampagne: PictureDrawFunction = (
 
   const anchorN = isAnchorNorth(nlgBraaseye, slgBraaseye, nlg, slg)
   if (anchorN) {
-    answer +=
-      formatGroup(
-        nLbl + " LEAD",
-        nlgBraaseye,
-        nlgAlts,
-        nlg.getStrength(),
-        true,
-        nlg.getTrackDir()
-      ) + " "
-    answer +=
-      formatGroup(
-        sLbl + " LEAD",
-        slgBraaseye,
-        slgAlts,
-        slg.getStrength(),
-        includeBull,
-        slg.getTrackDir()
-      ) + " "
+    answer += formatGroup(props.format, nlg, true) + " "
+    answer += formatGroup(props.format, slg, includeBull) + " "
   } else {
-    answer +=
-      formatGroup(
-        sLbl + " LEAD",
-        slgBraaseye,
-        slgAlts,
-        slg.getStrength(),
-        true,
-        slg.getTrackDir()
-      ) + " "
-    answer +=
-      formatGroup(
-        nLbl + " LEAD",
-        nlgBraaseye,
-        nlgAlts,
-        nlg.getStrength(),
-        includeBull,
-        nlg.getTrackDir()
-      ) + " "
+    answer += formatGroup(props.format, slg, true) + " "
+    answer += formatGroup(props.format, nlg, includeBull) + " "
   }
-  answer += formatGroup(
-    "TRAIL",
-    tgBraaseye,
-    tgAlts,
-    tg.getStrength(),
-    false,
-    tg.getTrackDir()
-  )
+  answer += formatGroup(props.format, tg, false)
 
   tg.setLabel("TRAIL GROUP")
   nlg.setLabel(nLbl + " LEAD GROUP")

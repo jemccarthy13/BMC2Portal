@@ -52,7 +52,6 @@ export default class DrawAzimuth extends DrawPic {
       undefined,
       contactList[0]
     )
-    ng.setLabel(isNS ? "WEST GROUP" : "EAST GROUP")
 
     // if hard mode and ALSA, we randomize the 2nd groups heading
     // otherwise, pair to first group +/- 10 degrees
@@ -70,7 +69,6 @@ export default class DrawAzimuth extends DrawPic {
       nContacts: contactList[1],
     })
 
-    sg.setLabel(isNS ? "EAST GROUP" : "WEST GROUP")
     return [ng, sg]
   }
 
@@ -171,44 +169,30 @@ export default class DrawAzimuth extends DrawPic {
     // if Anchor N and NS, SG = "EAST", NG = "WEST"
     let firstGroup = sg
     let secondGroup = ng
-    let firstLbl = "EAST"
-    let secondLbl = "WEST"
+    firstGroup.setLabel("EAST GROUP")
+    secondGroup.setLabel("WEST GROUP")
     if (!anchorN) {
       if (!isNS) {
-        firstLbl = "SOUTH"
-        secondLbl = "NORTH"
+        firstGroup.setLabel("SOUTH GROUP")
+        secondGroup.setLabel("NORTH GROUP")
       }
     } else {
       if (isNS) {
         firstGroup = ng
-        firstLbl = "WEST"
+        firstGroup.setLabel("WEST GROUP")
         secondGroup = sg
-        secondLbl = "EAST"
+        secondGroup.setLabel("EAST GROUP")
       } else {
         firstGroup = ng
-        firstLbl = "NORTH"
+        firstGroup.setLabel("NORTH GROUP")
         secondGroup = sg
-        secondLbl = "SOUTH"
+        secondGroup.setLabel("SOUTH GROUP")
       }
     }
-    answer += formatGroup(
-      firstLbl,
-      firstGroup.getBraaseye(),
-      firstGroup.getAltStack(this.props.format),
-      firstGroup.getStrength(),
-      true,
-      firstGroup.getTrackDir()
-    )
-    answer +=
-      " " +
-      formatGroup(
-        secondLbl,
-        secondGroup.getBraaseye(),
-        secondGroup.getAltStack(this.props.format),
-        secondGroup.getStrength(),
-        includeBull,
-        secondGroup.getTrackDir()
-      )
+    answer += formatGroup(this.props.format, firstGroup, true)
+
+    answer += " " + formatGroup(this.props.format, secondGroup, includeBull)
+
     return answer
   }
 }

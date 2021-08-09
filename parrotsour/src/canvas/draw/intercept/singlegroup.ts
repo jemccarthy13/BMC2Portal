@@ -89,13 +89,6 @@ export default class DrawSingleGroup extends DrawPic {
 
   getAnswer = (): string => {
     const sg = this.groups[0]
-    return formatGroup(
-      "SINGLE",
-      sg.getBraaseye(),
-      sg.getAltStack(this.props.format),
-      sg.getStrength(),
-      true,
-      sg.getTrackDir()
-    )
+    return formatGroup(this.props.format, sg, true)
   }
 }

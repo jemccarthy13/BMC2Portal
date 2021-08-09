@@ -197,15 +197,11 @@ export const drawLadder: PictureDrawFunction = (
   }
 
   for (let g = groups.length - 1; g >= 0; g--) {
-    const label = groups[g].getLabel()
     answer +=
       formatGroup(
-        label,
-        braaseyes[g],
-        altstacks[g],
-        groups[g].getStrength(),
+        props.format,
+        groups[g],
         g === groups.length - 1,
-        groups[g].getTrackDir(),
         g === groups.length - 2 ? rangeBack : undefined
       ) + " "
   }

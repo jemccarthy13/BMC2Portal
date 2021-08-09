@@ -67,14 +67,9 @@ export const drawPOD: PictureDrawFunction = (
       state.blueAir.getCenterOfMass(props.dataStyle),
       state.bullseye
     )
-    response += formatGroup(
-      "",
-      braaseye,
-      groups[z].getAltStack(props.format),
-      groups[z].getStrength(),
-      true,
-      groups[z].getTrackDir() + " "
-    )
+    closestGroups[z].setBraaseye(braaseye)
+    closestGroups[z].setLabel("GROUP")
+    response += formatGroup(props.format, groups[z], true)
   }
 
   response +=

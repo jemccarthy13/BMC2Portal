@@ -17,7 +17,6 @@ import {
 } from "../../../canvas/draw/intercept/picturehelpers"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
 
 import {
@@ -198,9 +197,9 @@ export const drawVic: PictureDrawFunction = (
   stgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
   ntgBraaseye.draw(ctx, props.showMeasurements, props.braaFirst, offsetX)
 
-  const lgAlts: AltStack = lg.getAltStack(props.format)
-  const stgAlts: AltStack = stg.getAltStack(props.format)
-  const ntgAlts: AltStack = ntg.getAltStack(props.format)
+  lg.setBraaseye(lgBraaseye)
+  stg.setBraaseye(stgBraaseye)
+  ntg.setBraaseye(ntgBraaseye)
 
   const openClose = getOpenCloseAzimuth(ntg, stg)
 
@@ -223,59 +222,20 @@ export const drawVic: PictureDrawFunction = (
 
   answer += picTrackDir(props.format, [ntg, stg, lg])
 
-  answer +=
-    formatGroup(
-      "LEAD",
-      lgBraaseye,
-      lgAlts,
-      lg.getStrength(),
-      true,
-      lg.getTrackDir()
-    ) + " "
+  answer += formatGroup(props.format, lg, true) + " "
 
   const anchorN = isAnchorNorth(ntgBraaseye, stgBraaseye, ntg, stg)
-
-  if (anchorN) {
-    answer +=
-      formatGroup(
-        nLbl + " TRAIL",
-        ntgBraaseye,
-        ntgAlts,
-        ntg.getStrength(),
-        false,
-        ntg.getTrackDir()
-      ) + " "
-    answer += formatGroup(
-      sLbl + " TRAIL",
-      stgBraaseye,
-      stgAlts,
-      stg.getStrength(),
-      false,
-      stg.getTrackDir()
-    )
-  } else {
-    answer +=
-      formatGroup(
-        sLbl + " TRAIL",
-        stgBraaseye,
-        stgAlts,
-        stg.getStrength(),
-        false,
-        stg.getTrackDir()
-      ) + " "
-    answer += formatGroup(
-      nLbl + " TRAIL",
-      ntgBraaseye,
-      ntgAlts,
-      ntg.getStrength(),
-      false,
-      ntg.getTrackDir()
-    )
-  }
 
   lg.setLabel("LEAD GROUP")
   stg.setLabel(sLbl + " TRAIL GROUP")
   ntg.setLabel(nLbl + " TRAIL GROUP")
+  if (anchorN) {
+    answer += formatGroup(props.format, ntg, false) + " "
+    answer += formatGroup(props.format, stg, false)
+  } else {
+    answer += formatGroup(props.format, stg, false) + " "
+    answer += formatGroup(props.format, ntg, false)
+  }
 
   return {
     pic: answer,

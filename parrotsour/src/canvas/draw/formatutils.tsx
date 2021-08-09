@@ -1,12 +1,10 @@
 /**
  * This file contains utilities for group and answer formatting
  */
-
-import { Braaseye } from "../../classes/braaseye"
 import { AircraftGroup } from "../../classes/groups/group"
-import { AltStack } from "../../classes/altstack"
 import { toRadians } from "../../utils/psmath"
 import { ArrowDataTrail } from "../../classes/aircraft/datatrail/arrowdatatrail"
+import { FORMAT } from "../../classes/supportedformats"
 
 type RangeBack = {
   label: string
@@ -32,16 +30,13 @@ export function formatAlt(alt: number): string {
  * @param rangeBack separation, if included
  */
 export function formatGroup(
-  label: string,
-  braaseye: Braaseye,
-  altitudes: AltStack,
-  numContacts: number,
+  format: FORMAT,
+  group: AircraftGroup,
   anchor: boolean,
-  trackDir: string | undefined,
   rangeBack?: RangeBack
 ): string {
   // format label
-  let answer = label + " GROUP "
+  let answer = group.getLabel() + " "
 
   // format separation
   if (rangeBack !== null && rangeBack !== undefined) {
@@ -49,30 +44,35 @@ export function formatGroup(
   }
 
   // format bullseye if anchor priority
+  const braaseye = group.getBraaseye()
   if (anchor || false) {
     answer +=
-      " BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
+      "BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
   }
 
   // format altitude stack
-  answer += altitudes.stack
+  const altStack = group.getAltStack(format)
+  answer += altStack.stack
 
   // format track direction (if given)
+  const trackDir = group.getTrackDir()
   answer +=
     trackDir !== undefined
       ? (trackDir === "CAP" ? " " : " TRACK ") + trackDir
       : ""
 
   // apply ID
-  answer += " HOSTILE "
+  answer += " HOSTILE"
 
   // apply fill-in for # contacts
+  const numContacts = group.getStrength()
   if (numContacts > 1) {
-    answer += (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
+    answer +=
+      " " + (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
   }
 
   // apply fill-ins (HI/FAST/etc)
-  answer += " " + altitudes.fillIns
+  answer += " " + altStack.fillIns
   return answer
 }
 

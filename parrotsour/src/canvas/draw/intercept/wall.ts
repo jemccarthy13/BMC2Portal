@@ -158,6 +158,7 @@ export const drawWall: PictureDrawFunction = (
       altOffsetX,
       altOffsetY
     )
+    grp.setBraaseye(grpBraaseye)
     braaseyes.push(grpBraaseye)
     altStacks.push(grp.getAltStack(props.format))
   }
@@ -240,14 +241,12 @@ export const drawWall: PictureDrawFunction = (
 
   for (let g = 0; g < numGroups; g++) {
     const idx: number = anchorNorth ? g : numGroups - 1 - g
+    const group = groups[idx]
     answer +=
       formatGroup(
-        groups[idx].getLabel(),
-        braaseyes[idx],
-        altStacks[idx],
-        groups[idx].getStrength(),
-        g === 0 || (g === numGroups - 1 && includeBull) || false,
-        groups[idx].getTrackDir()
+        props.format,
+        group,
+        g === 0 || (g === numGroups - 1 && includeBull) || false
       ) + " "
   }
 

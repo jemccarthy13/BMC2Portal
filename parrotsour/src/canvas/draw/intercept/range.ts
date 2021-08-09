@@ -1,226 +1,183 @@
-// Classes, interfaces, types
-import {
-  FightAxis,
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-  PictureDrawFunction,
-} from "../../../canvas/canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
+import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-
-// Functions
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import { picTrackDir } from "../../../canvas/draw/intercept/picturehelpers"
 import { trackDirFromHdg } from "../../../utils/mathutilities"
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { checkCaps } from "./cap"
+import { FightAxis } from "../../canvastypes"
+import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { formatGroup } from "../formatutils"
+import { DrawPic } from "./drawpic"
+import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
+import { picTrackDir } from "./picturehelpers"
 
-/**
- * Draw two groups in range and return the correct answer.
- *
- * @param ctx Current drawing context
- * @param props PicCanvasProps for the canvas
- * @param state PicCanvasState of the current canvas
- * @param start (Optional) Forced starting location for the picture
- * @returns DrawAnswer with the correct answer for this picture
- */
-export const drawRange: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point
-): PictureAnswer => {
-  const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)
-
-  const picture = {
-    start,
-    deep: drawDistance,
+export default class DrawRange extends DrawPic {
+  getNumGroups(): number {
+    return 2
   }
 
-  const startPos = getRestrictedStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    45 + drawDistance / PIXELS_TO_NM,
-    100,
-    picture
-  )
-  const startX = startPos.x
-  const startY = startPos.y
+  getPictureInfo(start?: Point): PictureInfo {
+    const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)
 
-  let heading: number = randomHeading(props.format, state.blueAir.getHeading())
-
-  const tgCtx = randomNumber(1, desiredNumContacts - 1)
-  const lgCtx = desiredNumContacts ? desiredNumContacts - tgCtx : 0
-
-  const tg = new AircraftGroup({
-    ctx,
-    sx: startX,
-    sy: startY,
-    hdg: heading,
-    nContacts: tgCtx,
-  })
-
-  if (props.isHardMode)
-    heading = randomHeading(props.format, state.blueAir.getHeading())
-
-  let lg: AircraftGroup
-  let m2: Point
-  let offsetX = 0
-  let offsetY = 0
-  let offsetX2 = 0
-  let offsetY2 = 0
-
-  const tgPos = tg.getCenterOfMass(props.dataStyle)
-
-  const isNS = FightAxis.isNS(props.orientation.orient)
-  if (isNS) {
-    lg = new AircraftGroup({
-      ctx,
-      sx: startX,
-      sy: startY + drawDistance,
-      hdg: heading,
-      nContacts: lgCtx,
-    })
-    m2 = new Point(tgPos.x, lg.getCenterOfMass(props.dataStyle).y)
-  } else {
-    lg = new AircraftGroup({
-      ctx,
-      sx: startX + drawDistance,
-      sy: startY,
-      hdg: heading,
-      nContacts: lgCtx,
-    })
-    m2 = new Point(lg.getCenterOfMass(props.dataStyle).x, tgPos.y)
-    offsetX = -10
-    offsetY = 40
-    offsetX2 = -60
-    offsetY2 = 40
-  }
-
-  checkCaps(hasCaps, [lg, tg])
-
-  lg.draw(ctx, props.dataStyle)
-  tg.draw(ctx, props.dataStyle)
-
-  const lgPos = lg.getCenterOfMass(props.dataStyle)
-
-  const range = m2.getBR(tgPos).range
-  drawMeasurement(
-    ctx,
-    tgPos.x,
-    tgPos.y,
-    m2.x,
-    m2.y,
-    range,
-    props.showMeasurements
-  )
-
-  const tgAlts = tg.getAltStack(props.format)
-  const lgAlts = lg.getAltStack(props.format)
-
-  drawAltitudes(ctx, lgPos, lg.getAltitudes(), offsetX, offsetY)
-  drawAltitudes(ctx, tgPos, tg.getAltitudes(), offsetX2, offsetY2)
-
-  const lgBraaseye = new Braaseye(
-    lgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-  const tgBraaseye = new Braaseye(
-    tgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-
-  lgBraaseye.draw(
-    ctx,
-    props.showMeasurements,
-    props.braaFirst,
-    offsetX,
-    offsetY
-  )
-  tgBraaseye.draw(
-    ctx,
-    props.showMeasurements,
-    props.braaFirst,
-    offsetX2,
-    offsetY2
-  )
-
-  let answer: string = "TWO GROUPS RANGE " + range + ", "
-
-  if (
-    (!isNS && new Point(tgPos.x, lgPos.y).getBR(tgPos).range > 5) ||
-    (isNS && tgPos.getBR(new Point(lgPos.x, tgPos.y)).range > 5)
-  ) {
-    if (!isNS) {
-      answer +=
-        " ECHELON " + trackDirFromHdg(lgPos.getBR(tgPos).bearingNum) + ", "
-    } else {
-      answer +=
-        " ECHELON " + trackDirFromHdg(tgPos.getBR(lgPos).bearingNum) + ", "
+    console.log(drawDistance)
+    return {
+      deep: drawDistance,
+      wide: -1,
+      start: getRestrictedStartPos(
+        this.ctx,
+        this.state.blueAir,
+        this.props.orientation.orient,
+        this.props.dataStyle,
+        45 + drawDistance / PIXELS_TO_NM,
+        100,
+        {
+          start,
+          deep: drawDistance,
+        }
+      ),
     }
   }
 
-  answer += picTrackDir(props.format, [tg, lg])
-
-  // TODO -- DETERMINE IF OPENING/CLOSING
-
-  if (tgBraaseye.braa.range < lgBraaseye.braa.range) {
-    answer +=
-      formatGroup(
-        "LEAD",
-        tgBraaseye,
-        tgAlts,
-        tg.getStrength(),
-        true,
-        tg.getTrackDir()
-      ) + " "
-    answer += formatGroup(
-      "TRAIL",
-      lgBraaseye,
-      lgAlts,
-      lg.getStrength(),
-      false,
-      lg.getTrackDir()
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const tg = GroupFactory.randomGroupAtLoc(
+      this.ctx,
+      this.props,
+      this.state,
+      startPos,
+      undefined,
+      contactList[0]
     )
-  } else {
-    answer +=
-      formatGroup(
-        "LEAD",
-        lgBraaseye,
-        lgAlts,
-        lg.getStrength(),
-        true,
-        lg.getTrackDir()
-      ) + " "
-    answer += formatGroup(
-      "TRAIL",
-      tgBraaseye,
-      tgAlts,
-      tg.getStrength(),
-      false,
-      tg.getTrackDir()
-    )
+    tg.setLabel("TRAIL GROUP")
+
+    // if hard mode and ALSA, we randomize the 2nd groups heading
+    // otherwise, pair to first group +/- 10 degrees
+    const heading = this.props.isHardMode
+      ? randomHeading(this.props.format, this.state.blueAir.getHeading())
+      : tg.getHeading() + randomNumber(-10, 10)
+
+    console.log(this.deep)
+    //const tgPos = tg.getCenterOfMass(this.props.dataStyle)
+    const lg = new AircraftGroup({
+      ctx: this.ctx,
+      sx: isNS ? startPos.x : startPos.x + this.deep,
+      sy: isNS ? startPos.y + this.deep : startPos.y,
+      hdg: heading,
+      dataTrailType: this.props.dataStyle,
+      nContacts: contactList[1],
+    })
+    lg.setLabel("LEAD GROUP")
+    return [tg, lg]
   }
 
-  tg.setLabel("TRAIL GROUP")
-  lg.setLabel("LEAD GROUP")
+  drawInfo(): void {
+    const tg = this.groups[0]
+    const lg = this.groups[1]
 
-  return {
-    pic: answer,
-    groups: [tg, lg],
+    const lPos = lg.getCenterOfMass(this.props.dataStyle)
+    const tPos = tg.getCenterOfMass(this.props.dataStyle)
+    let m2: Point
+    let offsetX = 0
+    let offsetY = 0
+    let offsetX2 = 0
+    let offsetY2 = 0
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    if (isNS) {
+      m2 = new Point(tPos.x, lg.getCenterOfMass(this.props.dataStyle).y)
+    } else {
+      m2 = new Point(lg.getCenterOfMass(this.props.dataStyle).x, tPos.y)
+      offsetX = -10
+      offsetY = 40
+      offsetX2 = -60
+      offsetY2 = 40
+    }
+    this.deep = m2.getBR(tPos).range
+
+    drawMeasurement(
+      this.ctx,
+      tPos.x,
+      tPos.y,
+      m2.x,
+      m2.y,
+      this.deep,
+      this.props.showMeasurements
+    )
+
+    drawAltitudes(this.ctx, lPos, lg.getAltitudes(), offsetX, offsetY)
+    drawAltitudes(this.ctx, tPos, tg.getAltitudes(), offsetX2, offsetY2)
+
+    const lgBraaseye = new Braaseye(
+      lPos,
+      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+      this.state.bullseye
+    )
+    const tgBraaseye = new Braaseye(
+      tPos,
+      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+      this.state.bullseye
+    )
+
+    lgBraaseye.draw(
+      this.ctx,
+      this.props.showMeasurements,
+      this.props.braaFirst,
+      offsetX,
+      offsetY
+    )
+    tgBraaseye.draw(
+      this.ctx,
+      this.props.showMeasurements,
+      this.props.braaFirst,
+      offsetX2,
+      offsetY2
+    )
+    lg.setBraaseye(lgBraaseye)
+    tg.setBraaseye(tgBraaseye)
+  }
+
+  getAnswer(): string {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    const tg = this.groups[0]
+    const lg = this.groups[1]
+
+    const tgPos = tg.getCenterOfMass(this.props.dataStyle)
+    const lgPos = lg.getCenterOfMass(this.props.dataStyle)
+
+    let answer: string = "TWO GROUPS RANGE " + this.deep + ", "
+    if (
+      (!isNS && new Point(tgPos.x, lgPos.y).getBR(tgPos).range > 5) ||
+      (isNS && tgPos.getBR(new Point(lgPos.x, tgPos.y)).range > 5)
+    ) {
+      if (!isNS) {
+        answer +=
+          " ECHELON " + trackDirFromHdg(lgPos.getBR(tgPos).bearingNum) + ", "
+      } else {
+        answer +=
+          " ECHELON " + trackDirFromHdg(tgPos.getBR(lgPos).bearingNum) + ", "
+      }
+    }
+
+    answer += picTrackDir(this.props.format, [tg, lg])
+
+    // TODO -- DETERMINE IF OPENING/CLOSING
+
+    let firstGroup = lg
+    let secondGroup = tg
+    if (tg.getBraaseye().braa.range < lg.getBraaseye().braa.range) {
+      firstGroup = tg
+      firstGroup.setLabel("LEAD GROUP")
+      secondGroup = lg
+      secondGroup.setLabel("TRAIL GROUP")
+    }
+    answer += formatGroup(this.props.format, firstGroup, true) + " "
+
+    answer += formatGroup(this.props.format, secondGroup, false)
+
+    return answer
   }
 }
