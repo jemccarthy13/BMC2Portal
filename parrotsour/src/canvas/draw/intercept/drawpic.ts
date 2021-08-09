@@ -10,7 +10,7 @@ import { checkCaps } from "./cap"
 import { PictureInfo } from "./pictureclamp"
 
 export abstract class DrawPic {
-  abstract getNumGroups(): number
+  abstract getNumGroups(nCtx: number): number
 
   abstract createGroups: (
     startPos: Point,
@@ -23,6 +23,7 @@ export abstract class DrawPic {
 
   abstract getAnswer(): string
 
+  numGroups = 0
   groups: AircraftGroup[] = []
   answer = ""
   ctx!: CanvasRenderingContext2D
@@ -40,10 +41,8 @@ export abstract class DrawPic {
     desiredNumContacts: number,
     start?: Point
   ) => {
-    const contactList = this.assignContacts(
-      this.getNumGroups(),
-      desiredNumContacts
-    )
+    this.numGroups = this.getNumGroups(desiredNumContacts)
+    const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
 
     this.ctx = ctx
     this.props = props
