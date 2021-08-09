@@ -1,213 +1,210 @@
-// Classes, interfaces, types
-import {
-  FightAxis,
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-  PictureDrawFunction,
-} from "../../../canvas/canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import { AltStack } from "../../../classes/altstack"
 import { Point } from "../../../classes/point"
-
-// Functions
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import { formatGroup } from "../../../canvas/draw/formatutils"
-import { getRestrictedStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import { picTrackDir } from "../../../canvas/draw/intercept/picturehelpers"
+import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./cap"
+import { FightAxis } from "../../canvastypes"
+import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { formatGroup } from "../formatutils"
+import { DrawPic } from "./drawpic"
+import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
+import { picTrackDir } from "./picturehelpers"
 
-/**
- * Draw a 3-5 group ladder and return the correct answer.
- *
- * @param ctx Current drawing context
- * @param props Current PictureCanvasProps
- * @param state Current PictureCanvasState
- * @param start (Optional) forced start position
- * @returns DrawAnswer
- */
-export const drawLadder: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point | undefined
-): PictureAnswer => {
-  const groups: AircraftGroup[] = []
-  const braaseyes: Braaseye[] = []
-  const altstacks: AltStack[] = []
-
-  const numGroups = randomNumber(3, 5)
-
-  // calculate group separations ahead of time
-  // to allow clamp logic
-  const seps = [0]
-  let totalDepth = 0
-  for (let x = 1; x < numGroups; x++) {
-    const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
-    seps.push(nextSep)
-    totalDepth += nextSep
+export default class DrawLadder extends DrawPic {
+  getNumGroups(nCts: number): number {
+    let maxGrps = 5
+    if (nCts < 3) {
+      maxGrps = 3
+    } else if (nCts < 5) {
+      maxGrps = nCts
+    }
+    if (nCts === 0) maxGrps = 5
+    return randomNumber(3, maxGrps)
   }
 
-  // use restricted to ensure lead group has min sep from blue
-  // the argument (45 + totalDepth / PIXELS_TO_NM) pushes the picture
-  // further away based on ladder depth
-  const startPos = getRestrictedStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    45 + totalDepth / PIXELS_TO_NM,
-    200,
-    {
-      start,
-      deep: totalDepth,
+  seps: number[] = [0]
+
+  getPictureInfo(start?: Point): PictureInfo {
+    let depth = 0
+    for (let x = 1; x < this.numGroups; x++) {
+      const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
+      this.seps.push(nextSep)
+      depth += nextSep
     }
-  )
-  const startX = startPos.x
-  const startY = startPos.y
+    this.deep = depth
+    const wide = 5 * PIXELS_TO_NM // ensures group is clamped visible in canvas
 
-  let heading = randomHeading(props.format, state.blueAir.getHeading())
+    const startPos = getRestrictedStartPos(
+      this.ctx,
+      this.state.blueAir,
+      this.props.orientation.orient,
+      this.props.dataStyle,
+      45 + this.deep / PIXELS_TO_NM,
+      200,
+      {
+        start,
+        deep: this.deep,
+      }
+    )
+    return {
+      start: startPos,
+      wide,
+      deep: this.deep,
+    }
+  }
 
-  let totalArrowOffset = 0
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-  const isNS = FightAxis.isNS(props.orientation.orient)
+    let heading = randomHeading(
+      this.props.format,
+      this.state.blueAir.getHeading()
+    )
 
-  for (let x = 0; x < numGroups; x++) {
-    const offsetHeading = randomNumber(-5, 5)
-    totalArrowOffset += seps[x]
+    let totalArrowOffset = 0
 
-    heading = !props.isHardMode
-      ? heading
-      : randomHeading(props.format, state.blueAir.getHeading())
+    const groups: AircraftGroup[] = []
+    for (let x = 0; x < this.numGroups; x++) {
+      const offsetHeading = randomNumber(-10, 10)
+      totalArrowOffset += this.seps[x]
 
-    let offsetX = 0
-    let offsetY = 0
+      if (this.props.isHardMode)
+        heading = randomHeading(
+          this.props.format,
+          this.state.blueAir.getHeading()
+        )
+
+      const grp = new AircraftGroup({
+        ctx: this.ctx,
+        sx: isNS ? startPos.x : startPos.x + totalArrowOffset,
+        sy: isNS ? startPos.y + totalArrowOffset : startPos.y,
+        hdg: heading + offsetHeading,
+        nContacts: contactList[x],
+      })
+      groups.push(grp)
+    }
+    return groups
+  }
+
+  drawInfo(): void {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    for (let x = 0; x < this.numGroups; x++) {
+      let altOffsetX = 0
+      let altOffsetY = 0
+
+      if (!isNS) {
+        altOffsetX = -40 + -5 * (this.numGroups - x)
+        altOffsetY = -20 + -11 * (this.numGroups - x)
+      }
+
+      const grp = this.groups[x]
+      const grpPos = grp.getCenterOfMass(this.props.dataStyle)
+
+      drawAltitudes(
+        this.ctx,
+        grpPos,
+        this.groups[x].getAltitudes(),
+        altOffsetX,
+        altOffsetY
+      )
+      const grpBraaseye = new Braaseye(
+        grpPos,
+        this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+        this.state.bullseye
+      )
+      grpBraaseye.draw(
+        this.ctx,
+        this.props.showMeasurements,
+        this.props.braaFirst,
+        altOffsetX,
+        altOffsetY
+      )
+      this.groups[x].setBraaseye(grpBraaseye)
+    }
+    let actualDeep
+    const prevGpPos = this.groups[this.groups.length - 1].getCenterOfMass(
+      this.props.dataStyle
+    )
+    const gpPos = this.groups[0].getCenterOfMass(this.props.dataStyle)
     if (isNS) {
-      const grp = new AircraftGroup({
-        ctx,
-        sx: startX,
-        sy: startY - totalArrowOffset,
-        hdg: heading + offsetHeading,
-      })
-      groups.push(grp)
+      actualDeep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
+      drawMeasurement(
+        this.ctx,
+        gpPos.x - 30,
+        gpPos.y,
+        gpPos.x - 30,
+        prevGpPos.y,
+        actualDeep,
+        this.props.showMeasurements
+      )
     } else {
-      const grp = new AircraftGroup({
-        ctx,
-        sx: startX + totalArrowOffset,
-        sy: startY,
-        hdg: heading + offsetHeading,
-      })
-      groups.push(grp)
-      offsetX = -40 + -5 * (numGroups - x)
-      offsetY = -20 + -11 * (numGroups - x)
+      actualDeep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
+      drawMeasurement(
+        this.ctx,
+        gpPos.x,
+        gpPos.y + 40,
+        prevGpPos.x,
+        gpPos.y + 40,
+        actualDeep,
+        this.props.showMeasurements
+      )
+    }
+    this.deep = actualDeep
+  }
+
+  getAnswer(): string {
+    switch (this.numGroups) {
+      case 3:
+        this.groups[0].setLabel("TRAIL GROUP")
+        this.groups[1].setLabel("MIDDLE GROUP")
+        this.groups[2].setLabel("LEAD GROUP")
+        break
+      case 4:
+        this.groups[0].setLabel("TRAIL GROUP")
+        this.groups[1].setLabel("3RD GROUP")
+        this.groups[2].setLabel("2ND GROUP")
+        this.groups[3].setLabel("LEAD GROUP")
+        break
+      case 5:
+        this.groups[0].setLabel("TRAIL GROUP")
+        this.groups[1].setLabel("4TH GROUP")
+        this.groups[2].setLabel("3RD GROUP")
+        this.groups[3].setLabel("2ND GROUP")
+        this.groups[4].setLabel("LEAD GROUP")
+        break
     }
 
-    const gPos = groups[x].getCenterOfMass(props.dataStyle)
-    drawAltitudes(ctx, gPos, groups[x].getAltitudes(), offsetX, offsetY)
+    let answer = this.numGroups + " GROUP LADDER " + this.deep + " DEEP, "
 
-    const grpBraaseye = new Braaseye(
-      gPos,
-      state.blueAir.getCenterOfMass(props.dataStyle),
-      state.bullseye
-    )
-    grpBraaseye.draw(
-      ctx,
-      props.showMeasurements,
-      props.braaFirst,
-      offsetX,
-      offsetY
-    )
-    braaseyes[x] = grpBraaseye
+    answer += picTrackDir(this.props.format, this.groups)
 
-    altstacks[x] = groups[x].getAltStack(props.format)
-  }
+    //console.log("CHECK FOR ECHELON LADDER?");
 
-  checkCaps(hasCaps, groups)
+    const rangeBack = {
+      label: this.props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
+      range: this.groups[this.groups.length - 2]
+        .getCenterOfMass(this.props.dataStyle)
+        .getBR(
+          this.groups[this.groups.length - 1].getCenterOfMass(
+            this.props.dataStyle
+          )
+        ).range,
+    }
 
-  groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
+    for (let g = this.groups.length - 1; g >= 0; g--) {
+      answer +=
+        formatGroup(
+          this.props.format,
+          this.groups[g],
+          g === this.groups.length - 1,
+          g === this.groups.length - 2 ? rangeBack : undefined
+        ) + " "
+    }
 
-  let deep
-  const prevGpPos = groups[groups.length - 1].getCenterOfMass(props.dataStyle)
-  const gpPos = groups[0].getCenterOfMass(props.dataStyle)
-  if (isNS) {
-    deep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
-    drawMeasurement(
-      ctx,
-      gpPos.x - 30,
-      gpPos.y,
-      gpPos.x - 30,
-      prevGpPos.y,
-      deep,
-      props.showMeasurements
-    )
-  } else {
-    deep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
-    drawMeasurement(
-      ctx,
-      gpPos.x,
-      gpPos.y + 40,
-      prevGpPos.x,
-      gpPos.y + 40,
-      deep,
-      props.showMeasurements
-    )
-  }
-
-  switch (numGroups) {
-    case 3:
-      groups[0].setLabel("TRAIL")
-      groups[1].setLabel("MIDDLE")
-      groups[2].setLabel("LEAD")
-      break
-    case 4:
-      groups[0].setLabel("TRAIL")
-      groups[1].setLabel("3RD")
-      groups[2].setLabel("2ND")
-      groups[3].setLabel("LEAD")
-      break
-    case 5:
-      groups[0].setLabel("TRAIL")
-      groups[1].setLabel("4TH")
-      groups[2].setLabel("3RD")
-      groups[3].setLabel("2ND")
-      groups[4].setLabel("LEAD")
-      break
-  }
-
-  let answer = numGroups + " GROUP LADDER " + deep + " DEEP, "
-
-  answer += picTrackDir(props.format, groups)
-
-  //console.log("CHECK FOR ECHELON LADDER?");
-
-  const rangeBack = {
-    label: props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
-    range: groups[groups.length - 2]
-      .getCenterOfMass(props.dataStyle)
-      .getBR(groups[groups.length - 1].getCenterOfMass(props.dataStyle)).range,
-  }
-
-  for (let g = groups.length - 1; g >= 0; g--) {
-    answer +=
-      formatGroup(
-        props.format,
-        groups[g],
-        g === groups.length - 1,
-        g === groups.length - 2 ? rangeBack : undefined
-      ) + " "
-  }
-
-  return {
-    pic: answer,
-    groups: groups,
+    return answer
   }
 }
