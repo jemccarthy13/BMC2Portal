@@ -28,7 +28,7 @@ import { PaintBrush } from "./draw/paintbrush"
 import DrawSingleGroup from "./draw/intercept/singlegroup"
 import DrawAzimuth from "./draw/intercept/azimuth"
 import DrawRange from "./draw/intercept/range"
-import DrawWall from "./draw/intercept/drawwall"
+import DrawWall from "./draw/intercept/wall"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
