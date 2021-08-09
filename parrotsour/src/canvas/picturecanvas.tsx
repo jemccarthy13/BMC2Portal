@@ -15,7 +15,6 @@ import { Point } from "../classes/point"
 // Functions
 import { drawBullseye, drawFullInfo } from "./draw/drawutils"
 import { drawLadder } from "../canvas/draw/intercept/ladder"
-import { drawWall } from "../canvas/draw/intercept/wall"
 import { drawVic } from "../canvas/draw/intercept/vic"
 import { drawChampagne } from "../canvas/draw/intercept/champagne"
 import { drawPackage } from "../canvas/draw/intercept/packages"
