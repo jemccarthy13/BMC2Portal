@@ -1,273 +1,214 @@
-// Classes & Types
-import {
-  FightAxis,
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-  PictureDrawFunction,
-} from "../../canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-
-// Functions
-import { drawAltitudes, drawMeasurement } from "../../../canvas/draw/drawutils"
-import {
-  formatGroup,
-  getOpenCloseAzimuth,
-} from "../../../canvas/draw/formatutils"
-import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
-import {
-  isAnchorNorth,
-  isEchelon,
-  picTrackDir,
-} from "../../../canvas/draw/intercept/picturehelpers"
+import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
-import { FORMAT } from "../../../classes/supportedformats"
-import { checkCaps } from "./cap"
+import { FightAxis } from "../../canvastypes"
+import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { DrawPic } from "./drawpic"
+import { getStartPos, PictureInfo } from "./pictureclamp"
+import { isAnchorNorth, isEchelon, picTrackDir } from "./picturehelpers"
 
-/**
- * Draw two groups azimuth and return the correct answer.
- *
- * @param ctx Current drawing context
- * @param props PicCanvasProps for the canvas
- * @param state PicCanvasState of the current canvas
- * @param start (Optional) Forced starting location for the picture
- * @returns DrawAnswer with the correct answer for this picture
- */
-export const drawAzimuth: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point
-): PictureAnswer => {
-  // Min distance apart = 5 nm, max = 40
-  const drawDistance = randomNumber(7, 40) * PIXELS_TO_NM
+export default class DrawAzimuth extends DrawPic {
+  getNumGroups(): number {
+    return 2
+  }
 
-  const startPos = getStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    {
+  getPictureInfo(start?: Point): PictureInfo {
+    // Min distance apart = 5 nm, max = 40
+    const drawDistance = randomNumber(7, 40) * PIXELS_TO_NM
+
+    return {
+      deep: -1,
       wide: drawDistance,
-      start,
-    }
-  )
-
-  const ngCts = randomNumber(1, desiredNumContacts - 1)
-  const sgCts = desiredNumContacts ? desiredNumContacts - ngCts : 0
-
-  // Create the first group
-  const ng = GroupFactory.randomGroupAtLoc(
-    ctx,
-    props,
-    state,
-    startPos,
-    undefined,
-    ngCts
-  )
-
-  // if hard mode and ALSA, we randomize the 2nd groups heading
-  // otherwise, pair to first group +/- 10 degrees
-  const heading = props.isHardMode
-    ? randomHeading(props.format, state.blueAir.getHeading())
-    : ng.getHeading() + randomNumber(-10, 10)
-
-  const isNS = FightAxis.isNS(props.orientation.orient)
-
-  const ngStPos = ng.getStartPos()
-
-  const sg = new AircraftGroup({
-    ctx,
-    sx: isNS ? ngStPos.x + drawDistance : ngStPos.x,
-    sy: isNS ? ngStPos.y : ngStPos.y + drawDistance,
-    hdg: heading,
-    dataTrailType: props.dataStyle,
-    nContacts: sgCts,
-  })
-
-  checkCaps(hasCaps, [ng, sg])
-
-  ng.draw(ctx, props.dataStyle)
-  sg.draw(ctx, props.dataStyle)
-
-  let offsetX = 0
-  let offsetY = 0
-  let offsetX2 = 0
-  let offsetY2 = 0
-  let m2: Point
-
-  const nPos = ng.getCenterOfMass(props.dataStyle)
-  if (isNS) {
-    m2 = new Point(sg.getCenterOfMass(props.dataStyle).x, nPos.y)
-    offsetX = -60
-    offsetY = 40
-    offsetX2 = 10
-    offsetY2 = 10
-    ng.setLabel("WEST GROUP")
-    sg.setLabel("EAST GROUP")
-  } else {
-    m2 = new Point(nPos.x, sg.getCenterOfMass(props.dataStyle).y)
-    ng.setLabel("NORTH GROUP")
-    sg.setLabel("SOUTH GROUP")
-  }
-
-  const width = m2.getBR(nPos).range
-
-  drawMeasurement(
-    ctx,
-    nPos.x,
-    nPos.y + 2,
-    m2.x,
-    m2.y + 2,
-    width,
-    props.showMeasurements
-  )
-
-  drawAltitudes(ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
-  drawAltitudes(
-    ctx,
-    sg.getCenterOfMass(props.dataStyle),
-    sg.getAltitudes(),
-    offsetX2,
-    offsetY2
-  )
-
-  const ngBraaseye = new Braaseye(
-    ng.getCenterOfMass(props.dataStyle),
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-  const sgBraaseye = new Braaseye(
-    sg.getCenterOfMass(props.dataStyle),
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-
-  ngBraaseye.draw(
-    ctx,
-    props.showMeasurements,
-    props.braaFirst,
-    offsetX,
-    offsetY
-  )
-  sgBraaseye.draw(
-    ctx,
-    props.showMeasurements,
-    props.braaFirst,
-    offsetX2,
-    offsetY2
-  )
-
-  const ngAlts = ng.getAltStack(props.format)
-  const sgAlts = sg.getAltStack(props.format)
-
-  // anchor both outrigger with bullseye if >10 az and !ipe
-  const includeBull = width >= 10 && props.format !== FORMAT.IPE
-
-  let answer = "TWO GROUPS AZIMUTH " + width
-
-  answer += getOpenCloseAzimuth(ng, sg)
-
-  answer += isEchelon(
-    props.orientation.orient,
-    props.dataStyle,
-    ngBraaseye,
-    sgBraaseye,
-    ng,
-    sg
-  )
-
-  answer += picTrackDir(props.format, [ng, sg])
-
-  const anchorN = isAnchorNorth(ngBraaseye, sgBraaseye, ng, sg)
-
-  // TODO -- ANSWER CLEANUP -- reformat for reduced
-  // duplication of code
-  if (!anchorN) {
-    if (isNS) {
-      answer += formatGroup(
-        "EAST",
-        sgBraaseye,
-        sgAlts,
-        sg.getStrength(),
-        true,
-        sg.getTrackDir()
-      )
-      answer += formatGroup(
-        "WEST",
-        ngBraaseye,
-        ngAlts,
-        ng.getStrength(),
-        includeBull,
-        ng.getTrackDir()
-      )
-    } else {
-      answer += formatGroup(
-        "SOUTH",
-        sgBraaseye,
-        sgAlts,
-        sg.getStrength(),
-        true,
-        sg.getTrackDir()
-      )
-      answer += formatGroup(
-        "NORTH",
-        ngBraaseye,
-        ngAlts,
-        ng.getStrength(),
-        includeBull,
-        ng.getTrackDir()
-      )
-    }
-  } else {
-    if (isNS) {
-      answer += formatGroup(
-        "WEST",
-        ngBraaseye,
-        ngAlts,
-        ng.getStrength(),
-        true,
-        ng.getTrackDir()
-      )
-      answer += formatGroup(
-        "EAST",
-        sgBraaseye,
-        sgAlts,
-        sg.getStrength(),
-        includeBull,
-        sg.getTrackDir()
-      )
-    } else {
-      answer += formatGroup(
-        "NORTH",
-        ngBraaseye,
-        ngAlts,
-        ng.getStrength(),
-        true,
-        ng.getTrackDir()
-      )
-      answer += formatGroup(
-        "SOUTH",
-        sgBraaseye,
-        sgAlts,
-        sg.getStrength(),
-        includeBull,
-        sg.getTrackDir()
-      )
+      start: getStartPos(
+        this.ctx,
+        this.state.blueAir,
+        this.props.orientation.orient,
+        this.props.dataStyle,
+        {
+          wide: drawDistance,
+          start,
+        }
+      ),
     }
   }
 
-  return {
-    pic: answer,
-    groups: [ng, sg],
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    // Create the first group
+    const ng = GroupFactory.randomGroupAtLoc(
+      this.ctx,
+      this.props,
+      this.state,
+      startPos,
+      undefined,
+      contactList[0]
+    )
+    ng.setLabel(isNS ? "WEST GROUP" : "EAST GROUP")
+
+    // if hard mode and ALSA, we randomize the 2nd groups heading
+    // otherwise, pair to first group +/- 10 degrees
+    const heading = this.props.isHardMode
+      ? randomHeading(this.props.format, this.state.blueAir.getHeading())
+      : ng.getHeading() + randomNumber(-10, 10)
+
+    const ngStPos = ng.getStartPos()
+    const sg = new AircraftGroup({
+      ctx: this.ctx,
+      sx: isNS ? ngStPos.x + this.wide : ngStPos.x,
+      sy: isNS ? ngStPos.y : ngStPos.y + this.wide,
+      hdg: heading,
+      dataTrailType: this.props.dataStyle,
+      nContacts: contactList[1],
+    })
+
+    sg.setLabel(isNS ? "EAST GROUP" : "WEST GROUP")
+    return [ng, sg]
+  }
+
+  drawInfo(): void {
+    const ng = this.groups[0]
+    const sg = this.groups[1]
+    const nPos = ng.getCenterOfMass(this.props.dataStyle)
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    let offsetX = 0
+    let offsetY = 0
+    let offsetX2 = 0
+    let offsetY2 = 0
+    let m2: Point
+    if (isNS) {
+      m2 = new Point(sg.getCenterOfMass(this.props.dataStyle).x, nPos.y)
+      offsetX = -60
+      offsetY = 40
+      offsetX2 = 10
+      offsetY2 = 10
+    } else {
+      m2 = new Point(nPos.x, sg.getCenterOfMass(this.props.dataStyle).y)
+    }
+
+    this.wide = m2.getBR(nPos).range
+    drawMeasurement(
+      this.ctx,
+      nPos.x,
+      nPos.y + 2,
+      m2.x,
+      m2.y + 2,
+      this.wide,
+      this.props.showMeasurements
+    )
+    drawAltitudes(this.ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
+    drawAltitudes(
+      this.ctx,
+      sg.getCenterOfMass(this.props.dataStyle),
+      sg.getAltitudes(),
+      offsetX2,
+      offsetY2
+    )
+
+    const ngBraaseye = new Braaseye(
+      ng.getCenterOfMass(this.props.dataStyle),
+      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+      this.state.bullseye
+    )
+    const sgBraaseye = new Braaseye(
+      sg.getCenterOfMass(this.props.dataStyle),
+      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+      this.state.bullseye
+    )
+
+    ngBraaseye.draw(
+      this.ctx,
+      this.props.showMeasurements,
+      this.props.braaFirst,
+      offsetX,
+      offsetY
+    )
+    sgBraaseye.draw(
+      this.ctx,
+      this.props.showMeasurements,
+      this.props.braaFirst,
+      offsetX2,
+      offsetY2
+    )
+    ng.setBraaseye(ngBraaseye)
+    sg.setBraaseye(sgBraaseye)
+  }
+
+  getAnswer(): string {
+    const ng = this.groups[0]
+    const sg = this.groups[1]
+
+    // anchor both outrigger with bullseye if >10 az and !ipe
+    const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
+
+    let answer = "TWO GROUPS AZIMUTH " + this.wide + " "
+
+    answer += getOpenCloseAzimuth(ng, sg)
+
+    answer += isEchelon(
+      this.props.orientation.orient,
+      this.props.dataStyle,
+      ng.getBraaseye(),
+      sg.getBraaseye(),
+      ng,
+      sg
+    )
+
+    answer += picTrackDir(this.props.format, [ng, sg])
+
+    const anchorN = isAnchorNorth(ng.getBraaseye(), sg.getBraaseye(), ng, sg)
+
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    // if Anchor N and NS, SG = "EAST", NG = "WEST"
+    let firstGroup = sg
+    let secondGroup = ng
+    let firstLbl = "EAST"
+    let secondLbl = "WEST"
+    if (!anchorN) {
+      if (!isNS) {
+        firstLbl = "SOUTH"
+        secondLbl = "NORTH"
+      }
+    } else {
+      if (isNS) {
+        firstGroup = ng
+        firstLbl = "WEST"
+        secondGroup = sg
+        secondLbl = "EAST"
+      } else {
+        firstGroup = ng
+        firstLbl = "NORTH"
+        secondGroup = sg
+        secondLbl = "SOUTH"
+      }
+    }
+    answer += formatGroup(
+      firstLbl,
+      firstGroup.getBraaseye(),
+      firstGroup.getAltStack(this.props.format),
+      firstGroup.getStrength(),
+      true,
+      firstGroup.getTrackDir()
+    )
+    answer +=
+      " " +
+      formatGroup(
+        secondLbl,
+        secondGroup.getBraaseye(),
+        secondGroup.getAltStack(this.props.format),
+        secondGroup.getStrength(),
+        includeBull,
+        secondGroup.getTrackDir()
+      )
+    return answer
   }
 }

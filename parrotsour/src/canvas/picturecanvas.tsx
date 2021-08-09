@@ -14,7 +14,6 @@ import { Point } from "../classes/point"
 
 // Functions
 import { drawBullseye, drawFullInfo } from "./draw/drawutils"
-import { drawAzimuth } from "../canvas/draw/intercept/azimuth"
 import { drawRange } from "../canvas/draw/intercept/range"
 import { drawLadder } from "../canvas/draw/intercept/ladder"
 import { drawWall } from "../canvas/draw/intercept/wall"
@@ -25,10 +24,11 @@ import { drawLeadEdge } from "./draw/intercept/leadingedge"
 import { drawThreat } from "./draw/intercept/threat"
 import { drawEA } from "./draw/intercept/ea"
 import { drawPOD } from "./draw/intercept/pod"
-import { drawSingleGroup } from "./draw/intercept/singlegroup"
 import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
 import { PaintBrush } from "./draw/paintbrush"
+import DrawSingleGroup from "./draw/intercept/singlegroup"
+import DrawAzimuth from "./draw/intercept/azimuth"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -146,7 +146,8 @@ export default class PictureCanvas extends ParrotSourCanvas {
 
     console.log("TYPE ---- " + type)
 
-    const drawFunc: PictureDrawFunction = this.functions[type] || drawAzimuth
+    const drawFunc: PictureDrawFunction =
+      this.functions[type] || this.azimuthDraw.draw
 
     const answer = drawFunc(
       context,
@@ -177,9 +178,12 @@ export default class PictureCanvas extends ParrotSourCanvas {
     return answer
   }
 
+  singleDraw = new DrawSingleGroup()
+  azimuthDraw = new DrawAzimuth()
+
   // A list of all avaiable functions
   functions: { [key: string]: PictureDrawFunction } = {
-    azimuth: drawAzimuth,
+    azimuth: this.azimuthDraw.draw,
     range: drawRange,
     ladder: drawLadder,
     wall: drawWall,
@@ -191,7 +195,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
     pod: drawPOD,
     "leading edge": drawLeadEdge,
     package: drawPackage,
-    singlegroup: drawSingleGroup,
+    singlegroup: this.singleDraw.draw,
   }
 
   /**

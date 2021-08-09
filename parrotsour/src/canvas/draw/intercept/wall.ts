@@ -31,6 +31,37 @@ import { FORMAT } from "../../../classes/supportedformats"
 import { checkCaps } from "./cap"
 
 /**
+ * Get the number of groups in the wall, limited as required
+ * by the number of desired contacts in the picture.
+ * @param nContacts number of contacts in picture
+ * @returns number of groups for the wall
+ */
+function getNumGroups(nContacts: number): number {
+  const numGroups = randomNumber(3, nContacts >= 5 ? 5 : nContacts)
+  console.log("WALL with " + numGroups + " groups")
+  return numGroups
+}
+
+/**
+ * Get the separation and total width of the wall
+ * @param nGroups number of groups in the wall
+ * @returns {width: total width, seps: array of separations between grps}
+ */
+function getSeparations(nGroups: number): { width: number; seps: number[] } {
+  const seps = [0]
+  let width = 0
+  for (let x = 1; x < nGroups; x++) {
+    const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
+    seps.push(nextSep)
+    width += nextSep
+  }
+  return {
+    width,
+    seps,
+  }
+}
+
+/**
  * Draw a 3-5 group wall and return the correctly formatted answer.
  *
  * @param ctx Current drawing context
@@ -49,17 +80,10 @@ export const drawWall: PictureDrawFunction = (
 ): PictureAnswer => {
   const isNS = props.orientation.orient === BlueInThe.NORTH
 
-  const numGroups = randomNumber(3, 5)
+  const numGroups = getNumGroups(desiredNumContacts)
 
-  // calculate group separations ahead of time
-  // to allow clamp logic
-  const seps = [0]
-  let totalDepth = 0
-  for (let x = 1; x < numGroups; x++) {
-    const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
-    seps.push(nextSep)
-    totalDepth += nextSep
-  }
+  // calculate group separations ahead of time for clamping
+  const { width, seps } = getSeparations(numGroups)
 
   const startPos = getStartPos(
     ctx,
@@ -68,7 +92,7 @@ export const drawWall: PictureDrawFunction = (
     props.dataStyle,
     {
       start,
-      wide: totalDepth + 5 * PIXELS_TO_NM,
+      wide: width + 5 * PIXELS_TO_NM,
       deep: 20 * PIXELS_TO_NM, // to ensure measurements can be drawn behind wall
     }
   )
@@ -98,6 +122,9 @@ export const drawWall: PictureDrawFunction = (
         sx: startX + totalArrowOffset,
         sy: startY,
         hdg: heading + offsetHeading,
+        nContacts: desiredNumContacts
+          ? randomNumber(1, desiredNumContacts - (desiredNumContacts - x))
+          : 0,
       })
       groups.push(grp)
       altOffsetX = -15 * (numGroups - x)
@@ -108,6 +135,9 @@ export const drawWall: PictureDrawFunction = (
         sx: startX,
         sy: startY + totalArrowOffset,
         hdg: heading + offsetHeading,
+        nContacts: desiredNumContacts
+          ? randomNumber(1, desiredNumContacts - (desiredNumContacts - x))
+          : 0,
       })
       groups.push(grp)
     }
@@ -136,7 +166,7 @@ export const drawWall: PictureDrawFunction = (
 
   groups.forEach((grp) => grp.draw(ctx, props.dataStyle))
 
-  let width = 0
+  let widthNM = 0
   let nLbl = "WEST"
   let sLbl = "EAST"
 
@@ -144,25 +174,25 @@ export const drawWall: PictureDrawFunction = (
   const gpPos = groups[0].getCenterOfMass(props.dataStyle)
 
   if (isNS) {
-    width = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
+    widthNM = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
     drawMeasurement(
       ctx,
       gpPos.x,
       gpPos.y - 25,
       prevGpPos.x,
       gpPos.y - 25,
-      width,
+      widthNM,
       props.showMeasurements
     )
   } else {
-    width = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
+    widthNM = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
     drawMeasurement(
       ctx,
       gpPos.x + 25,
       gpPos.y,
       gpPos.x + 25,
       prevGpPos.y,
-      width,
+      widthNM,
       props.showMeasurements
     )
     nLbl = "NORTH"
@@ -191,7 +221,8 @@ export const drawWall: PictureDrawFunction = (
   }
 
   const openClose = getOpenCloseAzimuth(groups[0], groups[groups.length - 1])
-  let answer = numGroups + " GROUP WALL " + width + " WIDE " + openClose + ", "
+  let answer =
+    numGroups + " GROUP WALL " + widthNM + " WIDE " + openClose + ", "
 
   answer += picTrackDir(props.format, groups)
 
@@ -205,7 +236,7 @@ export const drawWall: PictureDrawFunction = (
   // TODO -- WEIGHTED WALL
   // since we have all the seps[], we could check if any are within weighted criteria
 
-  const includeBull = width > 10 && props.format !== FORMAT.IPE
+  const includeBull = widthNM > 10 && props.format !== FORMAT.IPE
 
   for (let g = 0; g < numGroups; g++) {
     const idx: number = anchorNorth ? g : numGroups - 1 - g

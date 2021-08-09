@@ -1,103 +1,101 @@
-// Classes & Types
-import {
-  FightAxis,
-  PictureAnswer,
-  PictureCanvasProps,
-  PictureCanvasState,
-  PictureDrawFunction,
-} from "../../canvastypes"
 import { Braaseye } from "../../../classes/braaseye"
+import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-
-// Functions
+import { PIXELS_TO_NM } from "../../../utils/psmath"
+import { FightAxis } from "../../canvastypes"
 import { drawAltitudes } from "../drawutils"
 import { formatGroup } from "../formatutils"
-import { getStartPos } from "./pictureclamp"
-import { PIXELS_TO_NM } from "../../../utils/psmath"
-import { checkCaps } from "./cap"
+import { DrawPic } from "./drawpic"
+import { getStartPos, PictureInfo } from "./pictureclamp"
 
-/**
- * Draw a single group, one contact (for debugging)
- *
- * @param ctx Current drawing context
- * @param props PicCanvasProps for the canvas
- * @param state PicCanvasState of the current canvas
- * @param start (Optional) Forced starting location for the picture
- * @returns DrawAnswer with the correct answer for this picture
- */
-export const drawSingleGroup: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point
-): PictureAnswer => {
-  const startPos = getStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    {
-      wide: 7 * PIXELS_TO_NM,
-      deep: 7 * PIXELS_TO_NM,
-      start,
-    }
-  )
-
-  // Create the single group
-  const sg = GroupFactory.randomGroupAtLoc(
-    ctx,
-    props,
-    state,
-    startPos,
-    undefined,
-    desiredNumContacts
-  )
-
-  checkCaps(hasCaps, [sg])
-  sg.setLabel("SINGLE GROUP")
-  sg.draw(ctx, props.dataStyle)
-
-  const isNS = FightAxis.isNS(props.orientation.orient)
-
-  let offsetX = 0
-  let offsetY = 0
-  if (isNS) {
-    offsetX = -60
-    offsetY = 40
+export default class DrawSingleGroup extends DrawPic {
+  /**
+   * @returns # of groups in this picture
+   */
+  getNumGroups = (): number => {
+    return 1
   }
-  const sgPos = sg.getCenterOfMass(props.dataStyle)
-  drawAltitudes(ctx, sgPos, sg.getAltitudes(), offsetX, offsetY)
 
-  const ngBraaseye = new Braaseye(
-    sgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
+  /**
+   * Create a single group for this picture
+   * @param ctx Current drawing context
+   * @param props Canvas props
+   * @param state Canvas state
+   * @param startPos Start position for the picture
+   * @param desiredNumContacts # contacts in pic or 0 for random #
+   * @returns Array of AircraftGroup
+   */
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const sg = GroupFactory.randomGroupAtLoc(
+      this.ctx,
+      this.props,
+      this.state,
+      startPos,
+      undefined,
+      contactList[0]
+    )
+    sg.setLabel("SINGLE GROUP")
+    return [sg]
+  }
 
-  ngBraaseye.draw(
-    ctx,
-    props.showMeasurements,
-    props.braaFirst,
-    offsetX,
-    offsetY
-  )
+  getPictureInfo = (start?: Point): PictureInfo => {
+    return {
+      deep: -1,
+      wide: -1,
+      start: getStartPos(
+        this.ctx,
+        this.state.blueAir,
+        this.props.orientation.orient,
+        this.props.dataStyle,
+        {
+          wide: 7 * PIXELS_TO_NM,
+          deep: 7 * PIXELS_TO_NM,
+          start,
+        }
+      ),
+    }
+  }
 
-  const sgAlts = sg.getAltStack(props.format)
+  drawInfo = (): void => {
+    const sg = this.groups[0]
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-  const answer = formatGroup(
-    "SINGLE",
-    ngBraaseye,
-    sgAlts,
-    sg.getStrength(),
-    true,
-    sg.getTrackDir()
-  )
+    let offsetX = 0
+    let offsetY = 0
+    if (isNS) {
+      offsetX = -60
+      offsetY = 40
+    }
+    const sgPos = sg.getCenterOfMass(this.props.dataStyle)
+    drawAltitudes(this.ctx, sgPos, sg.getAltitudes(), offsetX, offsetY)
 
-  return {
-    pic: answer,
-    groups: [sg],
+    const braaseye = new Braaseye(
+      sgPos,
+      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
+      this.state.bullseye
+    )
+
+    braaseye.draw(
+      this.ctx,
+      this.props.showMeasurements,
+      this.props.braaFirst,
+      offsetX,
+      offsetY
+    )
+
+    sg.setBraaseye(braaseye)
+  }
+
+  getAnswer = (): string => {
+    const sg = this.groups[0]
+    return formatGroup(
+      "SINGLE",
+      sg.getBraaseye(),
+      sg.getAltStack(this.props.format),
+      sg.getStrength(),
+      true,
+      sg.getTrackDir()
+    )
   }
 }

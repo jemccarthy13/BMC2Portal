@@ -16,6 +16,7 @@ import {
   randomNumber,
 } from "../../utils/psmath"
 import { drawGroupCap } from "./groupcap"
+import { Braaseye } from "../braaseye"
 
 /**
  * The types of data that can be used to seed a group.
@@ -48,6 +49,7 @@ export class AircraftGroup extends Array<Aircraft> {
   private startPos: Point = Point.DEFAULT
   private label = "GROUP"
   private picDir: string | undefined
+  private braaseye!: Braaseye
 
   private maneuvers = 0
 
@@ -71,7 +73,6 @@ export class AircraftGroup extends Array<Aircraft> {
     this.startPos = new Point(p.sx, p.sy)
 
     // Create nContacts number of Aircraft and add to this collection
-    // TODO -- CUSTOMIZE -- user selected max # contacts per group?
     const nContacts = p.nContacts || randomNumber(1, 4)
     for (let contact = 0; contact < nContacts; contact++) {
       if (p.alts && p.alts[contact])
@@ -142,6 +143,14 @@ export class AircraftGroup extends Array<Aircraft> {
    */
   setCapping(newVal: boolean): void {
     this.forEach((ac) => ac.setCapping(newVal))
+  }
+
+  setBraaseye(braaseye: Braaseye): void {
+    this.braaseye = braaseye
+  }
+
+  getBraaseye(): Braaseye {
+    return this.braaseye
   }
 
   /*************************************************************************
