@@ -23,7 +23,6 @@ export default class DrawRange extends DrawPic {
   getPictureInfo(start?: Point): PictureInfo {
     const drawDistance = randomNumber(5 * PIXELS_TO_NM, 40 * PIXELS_TO_NM)
 
-    console.log(drawDistance)
     return {
       deep: drawDistance,
       wide: -1,
@@ -60,7 +59,6 @@ export default class DrawRange extends DrawPic {
       ? randomHeading(this.props.format, this.state.blueAir.getHeading())
       : tg.getHeading() + randomNumber(-10, 10)
 
-    console.log(this.deep)
     //const tgPos = tg.getCenterOfMass(this.props.dataStyle)
     const lg = new AircraftGroup({
       ctx: this.ctx,
