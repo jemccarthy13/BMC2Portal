@@ -9,12 +9,12 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { isAnchorNorth, picTrackDir } from "./picturehelpers"
+import { picTrackDir } from "./picturehelpers"
 
-export default class DrawWall extends DrawPic {
+export default class DrawLadder extends DrawPic {
   getNumGroups(nCts: number): number {
     let maxGrps = 5
     if (nCts < 3) {
@@ -29,32 +29,31 @@ export default class DrawWall extends DrawPic {
   seps: number[] = [0]
 
   getPictureInfo(start?: Point): PictureInfo {
-    let width = 0
+    let depth = 0
     for (let x = 1; x < this.numGroups; x++) {
       const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
       this.seps.push(nextSep)
-      width += nextSep
+      depth += nextSep
     }
-    this.wide = width
-    const deep = 20 * PIXELS_TO_NM // to ensure measurements can be drawn behind wall
+    this.deep = depth
+    const wide = 5 * PIXELS_TO_NM // ensures group is clamped visible in canvas
 
     const startPos = getRestrictedStartPos(
       this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
-      45,
+      45 + this.deep / PIXELS_TO_NM,
       200,
       {
         start,
-        wide: this.wide,
-        deep,
+        deep: this.deep,
       }
     )
     return {
       start: startPos,
-      wide: this.wide,
-      deep,
+      wide,
+      deep: this.deep,
     }
   }
 
@@ -81,33 +80,34 @@ export default class DrawWall extends DrawPic {
 
       const grp = new AircraftGroup({
         ctx: this.ctx,
-        sx: isNS ? startPos.x + totalArrowOffset : startPos.x,
-        sy: isNS ? startPos.y : startPos.y + totalArrowOffset,
+        sx: isNS ? startPos.x : startPos.x + totalArrowOffset,
+        sy: isNS ? startPos.y + totalArrowOffset : startPos.y,
         hdg: heading + offsetHeading,
         nContacts: contactList[x],
       })
       groups.push(grp)
     }
-
     return groups
   }
 
   drawInfo(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
     for (let x = 0; x < this.numGroups; x++) {
-      let altOffsetX = 30
+      let altOffsetX = 0
       let altOffsetY = 0
 
-      if (isNS) {
-        altOffsetX = -15 * (this.numGroups - x)
-        altOffsetY = 40 + 11 * (this.numGroups - (this.numGroups - x))
+      if (!isNS) {
+        altOffsetX = -40 + -5 * (this.numGroups - x)
+        altOffsetY = -20 + -11 * (this.numGroups - x)
       }
+
       const grp = this.groups[x]
       const grpPos = grp.getCenterOfMass(this.props.dataStyle)
+
       drawAltitudes(
         this.ctx,
         grpPos,
-        grp.getAltitudes(),
+        this.groups[x].getAltitudes(),
         altOffsetX,
         altOffsetY
       )
@@ -123,94 +123,85 @@ export default class DrawWall extends DrawPic {
         altOffsetX,
         altOffsetY
       )
-      grp.setBraaseye(grpBraaseye)
+      this.groups[x].setBraaseye(grpBraaseye)
     }
-
+    let actualDeep
     const prevGpPos = this.groups[this.groups.length - 1].getCenterOfMass(
       this.props.dataStyle
     )
     const gpPos = this.groups[0].getCenterOfMass(this.props.dataStyle)
-    let widthNM = 0
     if (isNS) {
-      widthNM = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
+      actualDeep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x,
-        gpPos.y - 25,
-        prevGpPos.x,
-        gpPos.y - 25,
-        widthNM,
+        gpPos.x - 30,
+        gpPos.y,
+        gpPos.x - 30,
+        prevGpPos.y,
+        actualDeep,
         this.props.showMeasurements
       )
     } else {
-      widthNM = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
+      actualDeep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
       drawMeasurement(
         this.ctx,
-        gpPos.x + 25,
-        gpPos.y,
-        gpPos.x + 25,
-        prevGpPos.y,
-        widthNM,
+        gpPos.x,
+        gpPos.y + 40,
+        prevGpPos.x,
+        gpPos.y + 40,
+        actualDeep,
         this.props.showMeasurements
       )
     }
-    this.wide = widthNM
+    this.deep = actualDeep
   }
 
   getAnswer(): string {
-    const isNS = FightAxis.isNS(this.props.orientation.orient)
-    const nLbl = isNS ? "WEST" : "NORTH"
-    const sLbl = isNS ? "EAST" : "SOUTH"
     switch (this.numGroups) {
       case 3:
-        this.groups[0].setLabel(nLbl + " GROUP")
+        this.groups[0].setLabel("TRAIL GROUP")
         this.groups[1].setLabel("MIDDLE GROUP")
-        this.groups[2].setLabel(sLbl + " GROUP")
+        this.groups[2].setLabel("LEAD GROUP")
         break
       case 4:
-        this.groups[0].setLabel(nLbl + " GROUP")
-        this.groups[1].setLabel(nLbl + " MIDDLE GROUP")
-        this.groups[2].setLabel(sLbl + " MIDDLE GROUP")
-        this.groups[3].setLabel(sLbl + " GROUP")
+        this.groups[0].setLabel("TRAIL GROUP")
+        this.groups[1].setLabel("3RD GROUP")
+        this.groups[2].setLabel("2ND GROUP")
+        this.groups[3].setLabel("LEAD GROUP")
         break
       case 5:
-        this.groups[0].setLabel(nLbl + " GROUP")
-        this.groups[1].setLabel(nLbl + " MIDDLE GROUP")
-        this.groups[2].setLabel("MIDDLE GROUP")
-        this.groups[3].setLabel(sLbl + " MIDDLE GROUP")
-        this.groups[4].setLabel(sLbl + " GROUP")
+        this.groups[0].setLabel("TRAIL GROUP")
+        this.groups[1].setLabel("4TH GROUP")
+        this.groups[2].setLabel("3RD GROUP")
+        this.groups[3].setLabel("2ND GROUP")
+        this.groups[4].setLabel("LEAD GROUP")
         break
     }
 
-    const openClose = getOpenCloseAzimuth(
-      this.groups[0],
-      this.groups[this.groups.length - 1]
-    )
-    let answer =
-      this.numGroups + " GROUP WALL " + this.wide + " WIDE " + openClose + ", "
+    let answer = this.numGroups + " GROUP LADDER " + this.deep + " DEEP, "
 
     answer += picTrackDir(this.props.format, this.groups)
 
-    const anchorNorth = isAnchorNorth(
-      this.groups[0].getBraaseye(),
-      this.groups[this.groups.length - 1].getBraaseye(),
-      this.groups[0],
-      this.groups[this.groups.length - 1]
-    )
+    //console.log("CHECK FOR ECHELON LADDER?");
 
-    // TODO -- WEIGHTED WALL
-    // since we have all the seps[], we could check if any are within weighted criteria
+    const rangeBack = {
+      label: this.props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
+      range: this.groups[this.groups.length - 2]
+        .getCenterOfMass(this.props.dataStyle)
+        .getBR(
+          this.groups[this.groups.length - 1].getCenterOfMass(
+            this.props.dataStyle
+          )
+        ).range,
+    }
 
-    const includeBull = this.wide > 10 && this.props.format !== FORMAT.IPE
-
-    for (let g = 0; g < this.numGroups; g++) {
-      const idx: number = anchorNorth ? g : this.numGroups - 1 - g
-      const group = this.groups[idx]
+    for (let g = this.groups.length - 1; g >= 0; g--) {
       answer +=
         formatGroup(
           this.props.format,
-          group,
-          g === 0 || (g === this.numGroups - 1 && includeBull) || false
+          this.groups[g],
+          g === this.groups.length - 1,
+          g === this.groups.length - 2 ? rangeBack : undefined
         ) + " "
     }
 

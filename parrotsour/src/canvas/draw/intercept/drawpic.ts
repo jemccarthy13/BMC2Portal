@@ -11,14 +11,14 @@ import { checkCaps } from "./cap"
 import { PictureInfo } from "./pictureclamp"
 
 export abstract class DrawPic {
-  abstract getNumGroups(nCtx: number): number
+  abstract getNumGroups(nCts: number): number
+
+  abstract getPictureInfo(start?: Point): PictureInfo
 
   abstract createGroups: (
     startPos: Point,
     contactList: number[]
   ) => AircraftGroup[]
-
-  abstract getPictureInfo(start?: Point): PictureInfo
 
   abstract drawInfo(): void
 
@@ -49,6 +49,7 @@ export abstract class DrawPic {
     this.props = props
     this.state = state
 
+    console.log("getting picture info...")
     this.pInfo = this.getPictureInfo(start)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.deep = this.pInfo.deep!
@@ -58,8 +59,11 @@ export abstract class DrawPic {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const startPos = this.pInfo.start!
 
+    console.log("startPos set: " + startPos)
+    console.log("creating groups...")
     this.groups = this.createGroups(startPos, contactList)
 
+    console.log("created.")
     checkCaps(hasCaps, this.groups)
 
     this.groups.forEach((grp) => {
@@ -78,7 +82,7 @@ export abstract class DrawPic {
     let cntSoFar = 0
     const answer = []
     if (grps > contacts && contacts !== 0) {
-      snackActions.error(
+      snackActions.warning(
         contacts +
           " contact(s) is not enough for " +
           grps +
