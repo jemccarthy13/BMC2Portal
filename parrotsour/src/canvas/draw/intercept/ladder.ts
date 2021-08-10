@@ -91,6 +91,11 @@ export default class DrawLadder extends DrawPic {
 
   drawInfo(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    const { dataStyle, showMeasurements, braaFirst } = this.props
+    const { blueAir, bullseye } = this.state
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
+
     for (let x = 0; x < this.numGroups; x++) {
       let altOffsetX = 0
       let altOffsetY = 0
@@ -110,25 +115,15 @@ export default class DrawLadder extends DrawPic {
         altOffsetX,
         altOffsetY
       )
-      const grpBraaseye = new Braaseye(
-        grpPos,
-        this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-        this.state.bullseye
-      )
-      grpBraaseye.draw(
-        this.ctx,
-        this.props.showMeasurements,
-        this.props.braaFirst,
-        altOffsetX,
-        altOffsetY
-      )
-      this.groups[x].setBraaseye(grpBraaseye)
+      grp.setBraaseye(new Braaseye(grpPos, bluePos, bullseye))
+      grp
+        .getBraaseye()
+        .draw(this.ctx, showMeasurements, braaFirst, altOffsetX, altOffsetY)
     }
     let actualDeep
-    const prevGpPos = this.groups[this.groups.length - 1].getCenterOfMass(
-      this.props.dataStyle
-    )
-    const gpPos = this.groups[0].getCenterOfMass(this.props.dataStyle)
+    const prevGpPos =
+      this.groups[this.groups.length - 1].getCenterOfMass(dataStyle)
+    const gpPos = this.groups[0].getCenterOfMass(dataStyle)
     if (isNS) {
       actualDeep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
       drawMeasurement(
@@ -136,7 +131,7 @@ export default class DrawLadder extends DrawPic {
         new Point(gpPos.x - 30, gpPos.y),
         new Point(gpPos.x - 30, prevGpPos.y),
         actualDeep,
-        this.props.showMeasurements
+        showMeasurements
       )
     } else {
       actualDeep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
@@ -145,7 +140,7 @@ export default class DrawLadder extends DrawPic {
         new Point(gpPos.x, gpPos.y + 40),
         new Point(prevGpPos.x, gpPos.y + 40),
         actualDeep,
-        this.props.showMeasurements
+        showMeasurements
       )
     }
     this.deep = actualDeep
