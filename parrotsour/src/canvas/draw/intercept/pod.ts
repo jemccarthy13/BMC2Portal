@@ -8,7 +8,7 @@ import {
 } from "../../canvastypes"
 
 // Functions
-import { drawAltitudes, drawLine, drawText } from "../drawutils"
+import { drawAltitudes, drawText } from "../drawutils"
 import { formatGroup } from "../formatutils"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Braaseye } from "../../../classes/braaseye"
@@ -34,13 +34,6 @@ export const drawPOD: PictureDrawFunction = (
     groups[x].draw(ctx, props.dataStyle)
 
     const grpPos = groups[x].getCenterOfMass(props.dataStyle)
-    drawLine(
-      ctx,
-      state.bullseye.x,
-      state.bullseye.y,
-      state.bullseye.x - 2,
-      state.bullseye.y - 2
-    )
 
     new Braaseye(
       grpPos,

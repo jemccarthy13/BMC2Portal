@@ -7,8 +7,8 @@ import DrawChampagne from "./champagne"
 import DrawVic from "./vic"
 import DrawThreat from "./threat"
 import DrawEA from "./ea"
+import DrawPOD from "./drawpod"
 import { randomNumber } from "../../../utils/psmath"
-import { drawPOD } from "./pod"
 import { drawLeadEdge } from "./leadingedge"
 import { drawPackage } from "./packages"
 import { DrawPic } from "./drawpic"
@@ -23,6 +23,7 @@ export class PictureFactory {
   private static vicDraw = new DrawVic()
   private static threatDraw = new DrawThreat()
   private static eaDraw = new DrawEA()
+  private static PODDraw = new DrawPOD()
 
   private static DrawMap = new Map<string, DrawPic>([
     ["azimuth", PictureFactory.azimuthDraw],
@@ -33,7 +34,7 @@ export class PictureFactory {
     ["champagne", PictureFactory.champDraw],
     ["threat", PictureFactory.threatDraw],
     ["ea", PictureFactory.eaDraw],
-    //["pod", drawPOD],
+    ["pod", PictureFactory.PODDraw],
     //["leading edge", drawLeadEdge],
     //["package", drawPackage],
     ["singlegroup", PictureFactory.singleDraw],
