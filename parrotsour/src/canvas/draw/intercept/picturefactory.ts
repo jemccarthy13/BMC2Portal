@@ -5,10 +5,10 @@ import DrawWall from "./wall"
 import DrawLadder from "./ladder"
 import DrawChampagne from "./champagne"
 import DrawVic from "./vic"
+import DrawThreat from "./threat"
 import { randomNumber } from "../../../utils/psmath"
 import { PictureDrawFunction } from "../../canvastypes"
 import { drawEA } from "./ea"
-import { drawThreat } from "./threat"
 import { drawPOD } from "./pod"
 import { drawLeadEdge } from "./leadingedge"
 import { drawPackage } from "./packages"
@@ -21,6 +21,7 @@ export class PictureFactory {
   private static ladderDraw = new DrawLadder()
   private static champDraw = new DrawChampagne()
   private static vicDraw = new DrawVic()
+  private static threatDraw = new DrawThreat()
 
   // A list of all avaiable functions
   private static functions: { [key: string]: PictureDrawFunction } = {
@@ -30,7 +31,7 @@ export class PictureFactory {
     wall: PictureFactory.wallDraw.draw,
     vic: PictureFactory.vicDraw.draw,
     champagne: PictureFactory.champDraw.draw,
-    threat: drawThreat,
+    threat: PictureFactory.threatDraw.draw,
     ea: drawEA,
     pod: drawPOD,
     "leading edge": drawLeadEdge,

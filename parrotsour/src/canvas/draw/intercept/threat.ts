@@ -1,117 +1,116 @@
-// Interfaces
-import {
-  PictureAnswer,
-  PictureDrawFunction,
-  PictureCanvasProps,
-  PictureCanvasState,
-  BlueInThe,
-} from "../../canvastypes"
-import { AircraftGroup } from "../../../classes/groups/group"
-import { Braaseye } from "../../../classes/braaseye"
-import { Point } from "../../../classes/point"
 import { AltStack } from "../../../classes/altstack"
-
-// Functions
-import { drawAltitudes } from "../drawutils"
+import { Braaseye } from "../../../classes/braaseye"
+import { AircraftGroup } from "../../../classes/groups/group"
+import { Point } from "../../../classes/point"
+import { FORMAT } from "../../../classes/supportedformats"
 import { getAspect } from "../../../utils/mathutilities"
 import {
   PIXELS_TO_NM,
   randomHeading,
   randomNumber,
 } from "../../../utils/psmath"
+import { FightAxis } from "../../canvastypes"
+import { drawAltitudes } from "../drawutils"
+import { DrawPic } from "./drawpic"
+import { PictureInfo } from "./pictureclamp"
 
-export const drawThreat: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point | undefined
-): PictureAnswer => {
-  if (!state.blueAir) {
-    return { pic: "", groups: [] }
+export default class DrawThreat extends DrawPic {
+  getNumGroups(): number {
+    return 1
   }
 
-  const offsetDeg1: number = randomNumber(-10, 10)
+  getPictureInfo(start?: Point): PictureInfo {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
+    if (start === undefined) {
+      start = new Point(
+        randomNumber(bPos.x - 25 * PIXELS_TO_NM, bPos.x - 10 * PIXELS_TO_NM),
+        isNS
+          ? randomNumber(bPos.y - 2, bPos.y + 30 * PIXELS_TO_NM)
+          : randomNumber(bPos.y - 25 * PIXELS_TO_NM, bPos.y + 25 * PIXELS_TO_NM)
+      )
+    }
+    if (start && start.y === undefined) {
+      start.y = randomNumber(bPos.y - 100, bPos.y + 40)
+    }
+    if (start && start.x === undefined) {
+      start.x = randomNumber(bPos.x - 100, bPos.x - 40)
+    }
 
-  const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
+    return {
+      start,
+      deep: 5 * PIXELS_TO_NM,
+      wide: 5 * PIXELS_TO_NM,
+    }
+  }
 
-  const isNS =
-    props.orientation.orient === BlueInThe.NORTH ||
-    props.orientation.orient === BlueInThe.SOUTH
-  if (start === undefined) {
-    start = new Point(
-      randomNumber(bPos.x - 25 * PIXELS_TO_NM, bPos.x - 10 * PIXELS_TO_NM),
-      isNS
-        ? randomNumber(bPos.y - 2, bPos.y + 30 * PIXELS_TO_NM)
-        : randomNumber(bPos.y - 25 * PIXELS_TO_NM, bPos.y + 25 * PIXELS_TO_NM)
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const heading: number = randomHeading(
+      FORMAT.IPE,
+      this.state.blueAir.getHeading()
     )
-  }
-  if (start && start.y === undefined) {
-    start.y = randomNumber(bPos.y - 100, bPos.y + 40)
-  }
-  if (start && start.x === undefined) {
-    start.x = randomNumber(bPos.x - 100, bPos.x - 40)
-  }
 
-  const heading: number = randomHeading(
-    props.format,
-    state.blueAir.getHeading()
-  )
-
-  const sg = new AircraftGroup({
-    ctx,
-    sx: start.x,
-    sy: start.y,
-    hdg: heading + offsetDeg1,
-  })
-  sg.draw(ctx, props.dataStyle)
-  const sgPos = sg.getCenterOfMass(props.dataStyle)
-
-  drawAltitudes(ctx, sgPos, sg.getAltitudes())
-
-  const sgAlts: AltStack = sg.getAltStack(props.format)
-
-  const closestBraaseye = new Braaseye(
-    sgPos,
-    state.blueAir.getCenterOfMass(props.dataStyle),
-    state.bullseye
-  )
-  closestBraaseye.draw(ctx, props.showMeasurements, props.braaFirst)
-
-  const closestGrp: AircraftGroup = sg
-
-  const aspectH = getAspect(state.blueAir, sg, props.dataStyle)
-  const trackDir = sg.getTrackDir()
-
-  let answer: string =
-    "[FTR C/S], THREAT GROUP BRAA " +
-    closestBraaseye.braa.bearing +
-    "/" +
-    closestBraaseye.braa.range +
-    " " +
-    sgAlts.stack +
-    " " +
-    aspectH +
-    " " +
-    (aspectH !== "HOT" ? trackDir : "") +
-    " HOSTILE "
-
-  if (closestGrp.getStrength() > 1) {
-    answer +=
-      (closestGrp.getStrength() >= 3 ? "HEAVY " : "") +
-      closestGrp.getStrength() +
-      " CONTACTS "
+    const sg = new AircraftGroup({
+      ctx: this.ctx,
+      sx: startPos.x,
+      sy: startPos.y,
+      hdg: heading,
+      nContacts: contactList[0],
+    })
+    return [sg]
   }
 
-  answer += sgAlts.fillIns
+  drawInfo(): void {
+    const sg = this.groups[0]
 
-  const groups = []
-  sg.setLabel("SINGLE GROUP")
-  groups.push(sg)
+    const { blueAir, bullseye } = this.state
+    const { dataStyle, showMeasurements, braaFirst } = this.props
 
-  return {
-    pic: answer,
-    groups: groups,
+    const sgPos = sg.getCenterOfMass(dataStyle)
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
+
+    drawAltitudes(this.ctx, sgPos, sg.getAltitudes())
+
+    sg.setBraaseye(new Braaseye(sgPos, bluePos, bullseye))
+    sg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
+  }
+
+  getAnswer(): string {
+    const sg = this.groups[0]
+
+    sg.setLabel("SINGLE GROUP")
+
+    const { blueAir } = this.state
+    const { dataStyle } = this.props
+
+    const aspectH = getAspect(blueAir, sg, dataStyle)
+    const trackDir = sg.getTrackDir()
+    const braaseye = sg.getBraaseye()
+
+    const sgAlts: AltStack = sg.getAltStack(this.props.format)
+
+    let answer: string =
+      "[FTR C/S], THREAT GROUP BRAA " +
+      braaseye.braa.bearing +
+      "/" +
+      braaseye.braa.range +
+      " " +
+      sgAlts.stack +
+      " " +
+      aspectH +
+      " " +
+      (aspectH !== "HOT" ? trackDir : "") +
+      " HOSTILE "
+
+    if (sg.getStrength() > 1) {
+      answer +=
+        (sg.getStrength() >= 3 ? "HEAVY " : "") +
+        sg.getStrength() +
+        " CONTACTS "
+    }
+
+    answer += sgAlts.fillIns
+
+    return answer
   }
 }
