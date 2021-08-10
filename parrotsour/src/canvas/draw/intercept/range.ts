@@ -51,7 +51,6 @@ export default class DrawRange extends DrawPic {
       undefined,
       contactList[0]
     )
-    tg.setLabel("TRAIL GROUP")
 
     // if hard mode and ALSA, we randomize the 2nd groups heading
     // otherwise, pair to first group +/- 10 degrees
@@ -68,7 +67,6 @@ export default class DrawRange extends DrawPic {
       dataTrailType: this.props.dataStyle,
       nContacts: contactList[1],
     })
-    lg.setLabel("LEAD GROUP")
     return [tg, lg]
   }
 
@@ -103,21 +101,24 @@ export default class DrawRange extends DrawPic {
     drawAltitudes(this.ctx, lPos, lg.getAltitudes(), offsetX, offsetY)
     drawAltitudes(this.ctx, tPos, tg.getAltitudes(), offsetX2, offsetY2)
 
-    const lgBraaseye = new Braaseye(
-      lPos,
-      blueAir.getCenterOfMass(dataStyle),
-      bullseye
-    )
-    const tgBraaseye = new Braaseye(
-      tPos,
-      blueAir.getCenterOfMass(dataStyle),
-      bullseye
-    )
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
+    lg.setBraaseye(new Braaseye(lPos, bluePos, bullseye))
+    tg.setBraaseye(new Braaseye(tPos, bluePos, bullseye))
 
-    lgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetX, offsetY)
-    tgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetX2, offsetY2)
-    lg.setBraaseye(lgBraaseye)
-    tg.setBraaseye(tgBraaseye)
+    lg.getBraaseye().draw(
+      this.ctx,
+      showMeasurements,
+      braaFirst,
+      offsetX,
+      offsetY
+    )
+    tg.getBraaseye().draw(
+      this.ctx,
+      showMeasurements,
+      braaFirst,
+      offsetX2,
+      offsetY2
+    )
   }
 
   getAnswer(): string {
@@ -125,6 +126,9 @@ export default class DrawRange extends DrawPic {
 
     const tg = this.groups[0]
     const lg = this.groups[1]
+
+    tg.setLabel("TRAIL GROUP")
+    lg.setLabel("LEAD GROUP")
 
     const tgPos = tg.getCenterOfMass(this.props.dataStyle)
     const lgPos = lg.getCenterOfMass(this.props.dataStyle)

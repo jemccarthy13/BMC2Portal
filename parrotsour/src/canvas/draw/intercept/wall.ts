@@ -92,6 +92,10 @@ export default class DrawWall extends DrawPic {
 
   drawInfo(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const { dataStyle, showMeasurements, braaFirst } = this.props
+
+    const bluePos = this.state.blueAir.getCenterOfMass(dataStyle)
+
     for (let x = 0; x < this.numGroups; x++) {
       let altOffsetX = 30
       let altOffsetY = 0
@@ -101,7 +105,7 @@ export default class DrawWall extends DrawPic {
         altOffsetY = 40 + 11 * (this.numGroups - (this.numGroups - x))
       }
       const grp = this.groups[x]
-      const grpPos = grp.getCenterOfMass(this.props.dataStyle)
+      const grpPos = grp.getCenterOfMass(dataStyle)
       drawAltitudes(
         this.ctx,
         grpPos,
@@ -109,45 +113,25 @@ export default class DrawWall extends DrawPic {
         altOffsetX,
         altOffsetY
       )
-      const grpBraaseye = new Braaseye(
-        grpPos,
-        this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-        this.state.bullseye
-      )
-      grpBraaseye.draw(
-        this.ctx,
-        this.props.showMeasurements,
-        this.props.braaFirst,
-        altOffsetX,
-        altOffsetY
-      )
-      grp.setBraaseye(grpBraaseye)
+      grp.setBraaseye(new Braaseye(grpPos, bluePos, this.state.bullseye))
+      grp
+        .getBraaseye()
+        .draw(this.ctx, showMeasurements, braaFirst, altOffsetX, altOffsetY)
     }
 
-    const prevGpPos = this.groups[this.groups.length - 1].getCenterOfMass(
-      this.props.dataStyle
-    )
-    const gpPos = this.groups[0].getCenterOfMass(this.props.dataStyle)
-    let widthNM = 0
+    const prevGpPos =
+      this.groups[this.groups.length - 1].getCenterOfMass(dataStyle)
+
+    const gpPos = this.groups[0].getCenterOfMass(dataStyle)
+    let widthNM = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
+    let fromPt = new Point(gpPos.x + 25, gpPos.y)
+    let toPt = new Point(gpPos.x + 25, prevGpPos.y)
     if (isNS) {
       widthNM = Math.floor((prevGpPos.x - gpPos.x) / PIXELS_TO_NM)
-      drawMeasurement(
-        this.ctx,
-        new Point(gpPos.x, gpPos.y - 25),
-        new Point(prevGpPos.x, gpPos.y - 25),
-        widthNM,
-        this.props.showMeasurements
-      )
-    } else {
-      widthNM = Math.floor((prevGpPos.y - gpPos.y) / PIXELS_TO_NM)
-      drawMeasurement(
-        this.ctx,
-        new Point(gpPos.x + 25, gpPos.y),
-        new Point(gpPos.x + 25, prevGpPos.y),
-        widthNM,
-        this.props.showMeasurements
-      )
+      fromPt = new Point(gpPos.x, gpPos.y - 25)
+      toPt = new Point(prevGpPos.x, gpPos.y - 25)
     }
+    drawMeasurement(this.ctx, fromPt, toPt, widthNM, showMeasurements)
     this.wide = widthNM
   }
 
