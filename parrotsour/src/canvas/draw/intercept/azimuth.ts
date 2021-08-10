@@ -16,7 +16,7 @@ import { getStartPos, PictureInfo } from "./pictureclamp"
 import { isAnchorNorth, isEchelon, picTrackDir } from "./picturehelpers"
 
 export default class DrawAzimuth extends DrawPic {
-  getNumGroups(): number {
+  chooseNumGroups(): number {
     return 2
   }
 

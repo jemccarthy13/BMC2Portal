@@ -15,7 +15,7 @@ import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawWall extends DrawPic {
-  getNumGroups(nCts: number): number {
+  chooseNumGroups(nCts: number): number {
     let maxGrps = 5
     if (nCts < 3) {
       maxGrps = 3

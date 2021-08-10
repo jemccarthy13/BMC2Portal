@@ -5,7 +5,6 @@ import ParrotSourCanvas from "../canvas/parrotsourcanvas"
 import {
   BlueInThe,
   PictureAnswer,
-  PictureDrawFunction,
   PictureCanvasState,
   PictureCanvasProps,
 } from "../canvas/canvastypes"
@@ -18,6 +17,7 @@ import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
 import { PaintBrush } from "./draw/paintbrush"
 import { PictureFactory } from "./draw/intercept/picturefactory"
+import { DrawPic } from "./draw/intercept/drawpic"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -93,16 +93,16 @@ export default class PictureCanvas extends ParrotSourCanvas {
     const { picType } = this.props
     const { desiredNumContacts } = this.props
 
-    const drawFunc: PictureDrawFunction = PictureFactory.getPictureDraw(
+    const drawFunc: DrawPic = PictureFactory.getPictureDraw(
       picType,
-      forced,
-      desiredNumContacts
+      desiredNumContacts,
+      forced
     )
 
-    const answer = drawFunc(
+    drawFunc.initialize(context, this.props, this.state)
+
+    const answer = drawFunc.draw(
       context,
-      this.props,
-      this.state,
       picType === "cap",
       desiredNumContacts,
       start

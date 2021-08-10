@@ -13,7 +13,7 @@ export default class DrawSingleGroup extends DrawPic {
   /**
    * @returns # of groups in this picture
    */
-  getNumGroups = (): number => {
+  chooseNumGroups = (): number => {
     return 1
   }
 

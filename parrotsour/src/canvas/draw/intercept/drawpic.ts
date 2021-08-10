@@ -3,15 +3,15 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
 import {
+  PictureAnswer,
   PictureCanvasProps,
   PictureCanvasState,
-  PictureDrawFunction,
 } from "../../canvastypes"
 import { checkCaps } from "./cap"
 import { PictureInfo } from "./pictureclamp"
 
 export abstract class DrawPic {
-  abstract getNumGroups(nCts: number): number
+  abstract chooseNumGroups(nCts: number): number
 
   abstract getPictureInfo(start?: Point): PictureInfo
 
@@ -34,20 +34,31 @@ export abstract class DrawPic {
   deep = 0
   wide = 0
 
-  draw: PictureDrawFunction = (
+  getNumGroups(): number {
+    return this.numGroups
+  }
+
+  initialize = (
     ctx: CanvasRenderingContext2D,
     props: PictureCanvasProps,
-    state: PictureCanvasState,
-    hasCaps: boolean,
-    desiredNumContacts: number,
-    start?: Point
-  ) => {
-    this.numGroups = this.getNumGroups(desiredNumContacts)
-    const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
-
+    state: PictureCanvasState
+  ): void => {
     this.ctx = ctx
     this.props = props
     this.state = state
+  }
+
+  draw = (
+    ctx: CanvasRenderingContext2D,
+    hasCaps: boolean,
+    desiredNumContacts: number,
+    start?: Point
+  ): PictureAnswer => {
+    this.numGroups = this.chooseNumGroups(desiredNumContacts)
+
+    const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
+
+    this.ctx = ctx
 
     console.log("getting picture info...")
     this.pInfo = this.getPictureInfo(start)
@@ -68,7 +79,7 @@ export abstract class DrawPic {
     checkCaps(hasCaps, this.groups)
 
     this.groups.forEach((grp) => {
-      grp.draw(ctx, props.dataStyle)
+      grp.draw(ctx, this.props.dataStyle)
     })
 
     this.drawInfo()

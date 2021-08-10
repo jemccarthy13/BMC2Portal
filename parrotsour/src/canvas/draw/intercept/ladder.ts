@@ -15,7 +15,7 @@ import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { picTrackDir } from "./picturehelpers"
 
 export default class DrawLadder extends DrawPic {
-  getNumGroups(nCts: number): number {
+  chooseNumGroups(nCts: number): number {
     let maxGrps = 5
     if (nCts < 3) {
       maxGrps = 3
