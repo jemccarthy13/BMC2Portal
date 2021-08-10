@@ -19,7 +19,6 @@ export class GroupFactory {
       : randomHeading(props.format, state.blueAir.getHeading())
     const startPos = startLoc
 
-    console.log("creating group with " + nContacts)
     const p = { sx: startPos.x, sy: startPos.y, hdg, ctx, nContacts }
     const grp = new AircraftGroup(p)
     return grp

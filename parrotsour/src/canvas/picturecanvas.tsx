@@ -14,21 +14,10 @@ import { Point } from "../classes/point"
 
 // Functions
 import { drawBullseye, drawFullInfo } from "./draw/drawutils"
-import { drawPackage } from "../canvas/draw/intercept/packages"
-import { drawLeadEdge } from "./draw/intercept/leadingedge"
-import { drawThreat } from "./draw/intercept/threat"
-import { drawEA } from "./draw/intercept/ea"
-import { drawPOD } from "./draw/intercept/pod"
 import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
 import { PaintBrush } from "./draw/paintbrush"
-import DrawSingleGroup from "./draw/intercept/singlegroup"
-import DrawAzimuth from "./draw/intercept/azimuth"
-import DrawRange from "./draw/intercept/range"
-import DrawWall from "./draw/intercept/wall"
-import DrawLadder from "./draw/intercept/ladder"
-import DrawChampagne from "./draw/intercept/champagne"
-import DrawVic from "./draw/intercept/vic"
+import { PictureFactory } from "./draw/intercept/picturefactory"
 
 /**
  * This component is the main control for drawing pictures for intercepts.
@@ -38,33 +27,6 @@ import DrawVic from "./draw/intercept/vic"
  * new 'draw' function that handles the drawing.
  */
 export default class PictureCanvas extends ParrotSourCanvas {
-  /**
-   * Pick a random picture type for drawing
-   * @param leadingEdge - true iff leading edge or packages. Set to true to
-   * limit the types of pictures to the standard (with caveat: wall is
-   * not allowed in lead edge/pkg due to separation requirement)
-   */
-  getRandomPicType = (
-    leadingEdge: boolean,
-    desiredNumContacts: number
-  ): string => {
-    //const numType = randomNumber(0, leadingEdge ? 3 : 8)
-    const type1 = ["singlegroup"]
-    const type2 = type1.concat(["range", "azimuth", "cap"])
-    const type3 = type2.concat(["vic", "champagne", "wall", "ladder"])
-    const type4 = type3.concat(["leading edge", "package"])
-
-    const types = [[], type1, type2, type3, type4]
-
-    if (desiredNumContacts === 0) {
-      desiredNumContacts = 4
-    }
-    const numType = randomNumber(0, types[desiredNumContacts].length - 1)
-
-    console.log(types[desiredNumContacts][numType])
-    return types[desiredNumContacts][numType]
-  }
-
   /**
    * On dataStyle change only re-draw the current picture.
    */
@@ -131,23 +93,11 @@ export default class PictureCanvas extends ParrotSourCanvas {
     const { picType } = this.props
     const { desiredNumContacts } = this.props
 
-    const isLeadEdge =
-      picType === "leading edge" || picType === "package" || picType === "ea"
-
-    let type = "azimuth"
-    if (forced) {
-      type = this.getRandomPicType(true, desiredNumContacts)
-    } else {
-      type =
-        picType === "random" || picType === "cap"
-          ? this.getRandomPicType(isLeadEdge, desiredNumContacts)
-          : picType
-    }
-
-    console.log("TYPE ---- " + type)
-
-    const drawFunc: PictureDrawFunction =
-      this.functions[type] || this.azimuthDraw.draw
+    const drawFunc: PictureDrawFunction = PictureFactory.getPictureDraw(
+      picType,
+      forced,
+      desiredNumContacts
+    )
 
     const answer = drawFunc(
       context,
@@ -159,48 +109,23 @@ export default class PictureCanvas extends ParrotSourCanvas {
     )
 
     const { blueAir } = this.state
+    const { dataStyle } = this.props
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
+
     blueAir.updateIntent({
-      desiredHeading: blueAir
-        .getCenterOfMass(this.props.dataStyle)
-        .getBR(answer.groups[0].getCenterOfMass(this.props.dataStyle))
+      desiredHeading: bluePos.getBR(answer.groups[0].getCenterOfMass(dataStyle))
         .bearingNum,
     })
 
     answer.groups.forEach((grp) => {
-      const bearingToBlue = grp
-        .getCenterOfMass(this.props.dataStyle)
-        .getBR(blueAir.getCenterOfMass(this.props.dataStyle)).bearingNum
+      const grpPos = grp.getCenterOfMass(dataStyle)
+      const bearingToBlue = grpPos.getBR(bluePos).bearingNum
       grp.updateIntent({
         desiredHeading: Math.round(bearingToBlue / 90.0) * 90,
       })
     })
 
     return answer
-  }
-
-  singleDraw = new DrawSingleGroup()
-  azimuthDraw = new DrawAzimuth()
-  rangeDraw = new DrawRange()
-  wallDraw = new DrawWall()
-  ladderDraw = new DrawLadder()
-  champDraw = new DrawChampagne()
-  vicDraw = new DrawVic()
-
-  // A list of all avaiable functions
-  functions: { [key: string]: PictureDrawFunction } = {
-    azimuth: this.azimuthDraw.draw,
-    range: this.rangeDraw.draw,
-    ladder: this.ladderDraw.draw,
-    wall: this.wallDraw.draw,
-    vic: this.vicDraw.draw,
-    champagne: this.champDraw.draw,
-    //cap: drawCap,
-    threat: drawThreat,
-    ea: drawEA,
-    pod: drawPOD,
-    "leading edge": drawLeadEdge,
-    package: drawPackage,
-    singlegroup: this.singleDraw.draw,
   }
 
   /**

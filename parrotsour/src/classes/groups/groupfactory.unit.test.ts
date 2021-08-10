@@ -45,6 +45,7 @@ describe("GroupFactory", () => {
     animate: false,
     resetCallback: jest.fn(),
     animateCallback: jest.fn(),
+    desiredNumContacts: 0,
   }
 
   const fakeState: PictureCanvasState = {
