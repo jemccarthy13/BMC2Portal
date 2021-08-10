@@ -73,9 +73,16 @@ export default class DrawAzimuth extends DrawPic {
   }
 
   drawInfo(): void {
+    const { dataStyle, showMeasurements, braaFirst } = this.props
+    const { blueAir, bullseye } = this.state
+
     const ng = this.groups[0]
     const sg = this.groups[1]
-    const nPos = ng.getCenterOfMass(this.props.dataStyle)
+
+    const nPos = ng.getCenterOfMass(dataStyle)
+    const sPos = sg.getCenterOfMass(dataStyle)
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
+
     const isNS = FightAxis.isNS(this.props.orientation.orient)
     let offsetX = 0
     let offsetY = 0
@@ -83,53 +90,37 @@ export default class DrawAzimuth extends DrawPic {
     let offsetY2 = 0
     let m2: Point
     if (isNS) {
-      m2 = new Point(sg.getCenterOfMass(this.props.dataStyle).x, nPos.y)
+      m2 = new Point(sPos.x, nPos.y)
       offsetX = -60
       offsetY = 40
       offsetX2 = 10
       offsetY2 = 10
     } else {
-      m2 = new Point(nPos.x, sg.getCenterOfMass(this.props.dataStyle).y)
+      m2 = new Point(nPos.x, sPos.y)
     }
 
     this.wide = m2.getBR(nPos).range
-    drawMeasurement(this.ctx, nPos, m2, this.wide, this.props.showMeasurements)
+    drawMeasurement(this.ctx, nPos, m2, this.wide, showMeasurements)
     drawAltitudes(this.ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
-    drawAltitudes(
-      this.ctx,
-      sg.getCenterOfMass(this.props.dataStyle),
-      sg.getAltitudes(),
-      offsetX2,
-      offsetY2
-    )
+    drawAltitudes(this.ctx, sPos, sg.getAltitudes(), offsetX2, offsetY2)
 
-    const ngBraaseye = new Braaseye(
-      ng.getCenterOfMass(this.props.dataStyle),
-      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-      this.state.bullseye
-    )
-    const sgBraaseye = new Braaseye(
-      sg.getCenterOfMass(this.props.dataStyle),
-      this.state.blueAir.getCenterOfMass(this.props.dataStyle),
-      this.state.bullseye
-    )
+    ng.setBraaseye(new Braaseye(nPos, bluePos, bullseye))
+    sg.setBraaseye(new Braaseye(sPos, bluePos, bullseye))
 
-    ngBraaseye.draw(
+    ng.getBraaseye().draw(
       this.ctx,
-      this.props.showMeasurements,
-      this.props.braaFirst,
+      showMeasurements,
+      braaFirst,
       offsetX,
       offsetY
     )
-    sgBraaseye.draw(
+    sg.getBraaseye().draw(
       this.ctx,
-      this.props.showMeasurements,
-      this.props.braaFirst,
+      showMeasurements,
+      braaFirst,
       offsetX2,
       offsetY2
     )
-    ng.setBraaseye(ngBraaseye)
-    sg.setBraaseye(sgBraaseye)
   }
 
   getAnswer(): string {

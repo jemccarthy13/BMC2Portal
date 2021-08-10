@@ -147,30 +147,15 @@ export default class DrawChampagne extends DrawPic {
 
     const { blueAir, bullseye } = this.state
     const { dataStyle, braaFirst } = this.props
+    const bluePos = blueAir.getCenterOfMass(dataStyle)
 
-    const tgBraaseye = new Braaseye(
-      tgPos,
-      blueAir.getCenterOfMass(dataStyle),
-      bullseye
-    )
-    const nlgBraaseye = new Braaseye(
-      nlgPos,
-      blueAir.getCenterOfMass(dataStyle),
-      bullseye
-    )
-    const slgBraaseye = new Braaseye(
-      slgPos,
-      blueAir.getCenterOfMass(dataStyle),
-      bullseye
-    )
+    tg.setBraaseye(new Braaseye(tgPos, bluePos, bullseye))
+    nlg.setBraaseye(new Braaseye(nlgPos, bluePos, bullseye))
+    slg.setBraaseye(new Braaseye(slgPos, bluePos, bullseye))
 
-    tgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetXTrail)
-    nlgBraaseye.draw(this.ctx, showMeasurements, braaFirst, offsetXNL)
-    slgBraaseye.draw(this.ctx, showMeasurements, braaFirst)
-
-    tg.setBraaseye(tgBraaseye)
-    nlg.setBraaseye(nlgBraaseye)
-    slg.setBraaseye(slgBraaseye)
+    tg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst, offsetXTrail)
+    nlg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst, offsetXNL)
+    slg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
   }
 
   getAnswer(): string {
