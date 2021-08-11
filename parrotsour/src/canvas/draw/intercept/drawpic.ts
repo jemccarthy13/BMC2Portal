@@ -54,28 +54,23 @@ export abstract class DrawPic {
     desiredNumContacts: number,
     start?: Point
   ): PictureAnswer => {
-    this.numGroups = this.chooseNumGroups(desiredNumContacts)
+    this.chooseNumGroups(desiredNumContacts)
 
     const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
 
     this.ctx = ctx
 
-    console.log("getting picture info...")
     this.pInfo = this.getPictureInfo(start)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.deep = this.pInfo.deep!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.wide = this.pInfo.wide!
 
-    console.log(this.deep, this.wide)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const startPos = this.pInfo.start!
 
-    console.log("startPos set: " + startPos)
-    console.log("creating groups...")
     this.groups = this.createGroups(startPos, contactList)
 
-    console.log("created.")
     checkCaps(hasCaps, this.groups)
 
     this.groups.forEach((grp) => {

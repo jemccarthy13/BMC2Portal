@@ -17,6 +17,7 @@ import { isAnchorNorth, isEchelon, picTrackDir } from "./picturehelpers"
 
 export default class DrawAzimuth extends DrawPic {
   chooseNumGroups(): number {
+    this.numGroups = 2
     return 2
   }
 

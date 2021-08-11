@@ -1,3 +1,4 @@
+import { randomNumber } from "../../../utils/psmath"
 import DrawSingleGroup from "./singlegroup"
 import DrawAzimuth from "./azimuth"
 import DrawRange from "./range"
@@ -8,10 +9,11 @@ import DrawVic from "./vic"
 import DrawThreat from "./threat"
 import DrawEA from "./ea"
 import DrawPOD from "./drawpod"
-import { randomNumber } from "../../../utils/psmath"
-import { drawLeadEdge } from "./leadingedge"
-import { drawPackage } from "./packages"
+import DrawPackage from "./drawpackage"
 import { DrawPic } from "./drawpic"
+
+import { drawLeadEdge } from "./leadingedge"
+import { PictureDrawer } from "./picturedrawer"
 
 export class PictureFactory {
   private static singleDraw = new DrawSingleGroup()
@@ -24,6 +26,12 @@ export class PictureFactory {
   private static threatDraw = new DrawThreat()
   private static eaDraw = new DrawEA()
   private static PODDraw = new DrawPOD()
+  private static packDraw = new DrawPackage()
+
+  // TODO -- generalize the map
+  // getPictureDrawer(type) should return a class
+  // to call new or 'create' on
+  //private map = new Map<string>(["azimuth", DrawAzimuth])
 
   private static DrawMap = new Map<string, DrawPic>([
     ["azimuth", PictureFactory.azimuthDraw],
@@ -36,9 +44,35 @@ export class PictureFactory {
     ["ea", PictureFactory.eaDraw],
     ["pod", PictureFactory.PODDraw],
     //["leading edge", drawLeadEdge],
-    //["package", drawPackage],
+    ["package", PictureFactory.packDraw],
     ["singlegroup", PictureFactory.singleDraw],
   ])
+
+  private static getDrawer(k: string) {
+    if (k === "azimuth") {
+      return new DrawAzimuth()
+    } else if (k === "range") {
+      return new DrawRange()
+    } else if (k === "ladder") {
+      return new DrawLadder()
+    } else if (k === "wall") {
+      return new DrawWall()
+    } else if (k === "vic") {
+      return new DrawVic()
+    } else if (k === "champagne") {
+      return new DrawChampagne()
+    } else if (k === "package") {
+      return new DrawPackage()
+    } else if (k === "threat") {
+      return new DrawThreat()
+    } else if (k === "ea") {
+      return new DrawEA()
+    } else if (k === "pod") {
+      return new DrawPOD()
+    } else if (k === "singlegroup") {
+      return new DrawSingleGroup()
+    }
+  }
 
   /**
    * Pick a random picture type for drawing
@@ -69,28 +103,27 @@ export class PictureFactory {
     desiredNumContacts?: number,
     forced?: boolean
   ): DrawPic {
-    const isLeadEdge = picType === "leading edge" || picType === "package"
-
     desiredNumContacts = desiredNumContacts ? desiredNumContacts : 0
 
     let complexity = desiredNumContacts
     if (complexity === 0) complexity = 4
     if (complexity > 4) complexity = 4
-    if (forced) complexity = 3
-    if (isLeadEdge) complexity = 3
+    if (forced) complexity = Math.min(desiredNumContacts, 3)
 
     let type = picType || "azimuth"
-    if (picType === "random" || picType === "cap" || isLeadEdge) {
+    if (picType === "random" || picType === "cap") {
       type = this._getRandomPicType(complexity)
     }
 
-    console.log("trying to find " + type)
+    // TODO -- need a way to generalize this
+    // const n = DrawAzimuth
+    // const b = new n()
+
     let drawFunc = this.DrawMap.get(type)
     if (drawFunc === undefined) {
       drawFunc = this.azimuthDraw
     }
 
-    console.log("USING TYPE ---- ", drawFunc)
     return drawFunc
   }
 }

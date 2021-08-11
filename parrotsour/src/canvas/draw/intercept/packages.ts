@@ -107,12 +107,11 @@ export const drawPackage: PictureDrawFunction = (
   //const isRange = randomNumber(0,120) < 50
   const isRange = false
 
-  let start1: Point
-  let start2: Point
-
   let lLbl = "WEST"
   let tLbl = "EAST"
 
+  let start1: Point
+  let start2: Point
   const isNS = FightAxis.isNS(props.orientation.orient)
   if (!isNS) {
     if (isRange) {

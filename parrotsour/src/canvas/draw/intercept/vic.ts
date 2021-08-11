@@ -15,6 +15,7 @@ import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawVic extends DrawPic {
   chooseNumGroups(): number {
+    this.numGroups = 3
     return 3
   }
 

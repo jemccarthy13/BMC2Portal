@@ -1,0 +1,227 @@
+import { AircraftGroup } from "../../../classes/groups/group"
+import { Point } from "../../../classes/point"
+import { randomNumber } from "../../../utils/psmath"
+import { FightAxis } from "../../canvastypes"
+import { drawBullseye, drawLine } from "../drawutils"
+import { DrawPic } from "./drawpic"
+import { PictureInfo } from "./pictureclamp"
+import { PictureFactory } from "./picturefactory"
+
+export default class DrawPackage extends DrawPic {
+  private nPkg!: DrawPic
+  private sPkg!: DrawPic
+
+  chooseNumGroups(nCts: number): number {
+    const nCt = Math.floor(nCts / 2)
+    const sCt = nCts - nCt
+
+    console.log("nPkg: " + nCt + " contacts")
+    console.log("sPkg: " + sCt + " contacts")
+
+    this.nPkg = PictureFactory.getPictureDraw("random", nCt, true)
+    this.sPkg = PictureFactory.getPictureDraw("random", sCt, true)
+
+    this.nPkg.initialize(this.ctx, this.props, this.state)
+    this.sPkg.initialize(this.ctx, this.props, this.state)
+
+    const grpCt =
+      this.nPkg.chooseNumGroups(nCt) + this.sPkg.chooseNumGroups(sCt)
+
+    this.numGroups = grpCt
+    return grpCt
+  }
+
+  private start2: Point = Point.DEFAULT
+  private isRange = false
+
+  getPictureInfo(): PictureInfo {
+    this.isRange = true //randomNumber(0, 120) < 50
+
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    let s1x = 0
+    let s1y = 0
+    let s2x = 0
+    let s2y = 0
+
+    if (isNS) {
+      if (this.isRange) {
+        // lLbl = "NORTH"
+        // tLbl = "SOUTH"
+        s1x = randomNumber(
+          this.ctx.canvas.width * 0.2,
+          this.ctx.canvas.width * 0.8
+        )
+        s1y = randomNumber(
+          this.ctx.canvas.height * 0.5,
+          this.ctx.canvas.height * 0.59
+        )
+
+        s2x = s1x
+        s2y = randomNumber(
+          this.ctx.canvas.height * 0.7,
+          this.ctx.canvas.height * 0.8
+        )
+      } else {
+        s1x = randomNumber(
+          this.ctx.canvas.width * 0.2,
+          this.ctx.canvas.width * 0.3
+        )
+        s1y = randomNumber(
+          this.ctx.canvas.height * 0.5,
+          this.ctx.canvas.height * 0.8
+        )
+
+        s2y = s1y
+        s2x = randomNumber(
+          this.ctx.canvas.width * 0.7,
+          this.ctx.canvas.width * 0.8
+        )
+      }
+    } else {
+      if (this.isRange) {
+        s1x = randomNumber(
+          this.ctx.canvas.width * 0.5,
+          this.ctx.canvas.width * 0.59
+        )
+        s1y = randomNumber(
+          this.ctx.canvas.height * 0.2,
+          this.ctx.canvas.width * 0.4
+        )
+
+        s2x = randomNumber(
+          this.ctx.canvas.width * 0.2,
+          this.ctx.canvas.width * 0.35
+        )
+        s2y = s1y
+      } else {
+        //     tLbl = "NORTH"
+        //     lLbl = "SOUTH"
+        s1x = randomNumber(
+          this.ctx.canvas.width * 0.25,
+          this.ctx.canvas.width * 0.5
+        )
+        s1y = randomNumber(
+          this.ctx.canvas.height * 0.6,
+          this.ctx.canvas.height * 0.7
+        )
+        s2x = s1x
+        s2y = randomNumber(
+          this.ctx.canvas.height * 0.25,
+          this.ctx.canvas.height * 0.4
+        )
+      }
+    }
+
+    const start1 = new Point(s1x, s1y)
+    const start2 = new Point(s2x, s2y)
+
+    const nPkgInfo = this.nPkg.getPictureInfo(start1)
+    this.nPkg.pInfo = nPkgInfo
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.nPkg.deep = nPkgInfo.deep!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.nPkg.wide = nPkgInfo.wide!
+
+    const sPkgInfo = this.sPkg.getPictureInfo(start2)
+    this.sPkg.pInfo = sPkgInfo
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.sPkg.deep = sPkgInfo.deep!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.sPkg.wide = sPkgInfo.wide!
+
+    this.start2 = start2
+
+    return {
+      start: start1,
+    }
+  }
+
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const nGrps = this.nPkg.createGroups(
+      startPos,
+      contactList.slice(0, this.nPkg.getNumGroups())
+    )
+    const sGrps = this.sPkg.createGroups(
+      this.start2,
+      contactList.slice(this.nPkg.getNumGroups())
+    )
+
+    this.nPkg.groups = nGrps
+    this.sPkg.groups = sGrps
+
+    console.log(this.nPkg.groups)
+    console.log(this.sPkg.groups)
+
+    return nGrps.concat(sGrps)
+  }
+
+  drawInfo(): void {
+    this.nPkg.drawInfo()
+    this.sPkg.drawInfo()
+  }
+
+  _getPicBull = (groups: AircraftGroup[]): Point => {
+    const { blueAir } = this.state
+    const { dataStyle, orientation } = this.props
+    let closestGroup = groups[0]
+
+    let closestRng = 9999
+    let sum = 0
+    const bPos = blueAir.getCenterOfMass(dataStyle)
+
+    const isNS = FightAxis.isNS(orientation.orient)
+    for (let x = 0; x < groups.length; x++) {
+      const gPos = groups[x].getCenterOfMass(dataStyle)
+
+      const BRAA = bPos.getBR(gPos)
+      if (BRAA.range < closestRng) {
+        closestGroup = groups[x]
+        closestRng = BRAA.range
+      }
+
+      if (isNS) {
+        sum += gPos.x
+      } else {
+        sum += gPos.y
+      }
+    }
+    console.log(sum)
+    console.log(groups.length)
+
+    // if it's wide (az) get center of mass
+    // it it's deep (rng) get lead pos (depends on orientation)
+    const cPos = closestGroup.getCenterOfMass(dataStyle)
+    drawLine(this.ctx, cPos.x, 0, cPos.x, sum / groups.length)
+    let retVal = new Point(sum / groups.length, cPos.y)
+    if (this.isRange === !isNS) {
+      retVal = new Point(cPos.x, sum / groups.length)
+    }
+    return retVal
+  }
+
+  getAnswer(): string {
+    console.log(this.nPkg.groups)
+    console.log(this.sPkg.groups)
+    const bull1 = this._getPicBull(this.nPkg.groups)
+    const bull2 = this._getPicBull(this.sPkg.groups)
+
+    const leadPackage = this.state.bullseye.getBR(bull1)
+    const trailPackage = this.state.bullseye.getBR(bull2)
+
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    drawBullseye(this.ctx, bull1, "green")
+    drawBullseye(this.ctx, bull2, "orange")
+    const rngBack = isNS
+      ? new Point(bull1.x, bull2.y).getBR(bull1)
+      : new Point(bull2.x, bull1.y).getBR(bull1)
+    if (this.isRange) {
+      //
+    }
+
+    return (
+      "2 PACKAGES " + (this.isRange ? " RANGE " : " AZIMUTH ") + rngBack.range
+    )
+  }
+}

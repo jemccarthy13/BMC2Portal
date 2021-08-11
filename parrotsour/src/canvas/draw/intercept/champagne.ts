@@ -16,6 +16,7 @@ import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawChampagne extends DrawPic {
   chooseNumGroups(): number {
+    this.numGroups = 3
     return 3
   }
 
@@ -60,8 +61,6 @@ export default class DrawChampagne extends DrawPic {
         this.props.format,
         this.state.blueAir.getHeading()
       )
-
-    console.log(this.wide, this.deep)
 
     let nlg: AircraftGroup
     if (isNS) {

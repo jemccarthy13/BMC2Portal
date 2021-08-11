@@ -29,7 +29,9 @@ export default class DrawEA extends DrawPic {
   chooseNumGroups(nCts: number): number {
     this.eaPic = PictureFactory.getPictureDraw("random", nCts)
     this.eaPic.initialize(this.ctx, this.props, this.state)
-    return this.eaPic.chooseNumGroups(nCts)
+    const grpCt = this.eaPic.chooseNumGroups(nCts)
+    this.numGroups = grpCt
+    return grpCt
   }
 
   getPictureInfo(start?: Point): PictureInfo {

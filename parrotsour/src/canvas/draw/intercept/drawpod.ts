@@ -10,7 +10,9 @@ import { PictureInfo } from "./pictureclamp"
 
 export default class DrawPOD extends DrawPic {
   chooseNumGroups(): number {
-    return randomNumber(3, 11)
+    const grpCt = randomNumber(3, 11)
+    this.numGroups = grpCt
+    return grpCt
   }
 
   getPictureInfo(start?: Point): PictureInfo {

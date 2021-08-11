@@ -17,6 +17,7 @@ import { picTrackDir } from "./picturehelpers"
 
 export default class DrawRange extends DrawPic {
   chooseNumGroups(): number {
+    this.numGroups = 2
     return 2
   }
 

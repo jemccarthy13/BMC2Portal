@@ -23,7 +23,9 @@ export default class DrawLadder extends DrawPic {
       maxGrps = nCts
     }
     if (nCts === 0) maxGrps = 5
-    return randomNumber(3, maxGrps)
+    const grpCt = randomNumber(3, maxGrps)
+    this.numGroups = grpCt
+    return grpCt
   }
 
   seps: number[] = [0]
