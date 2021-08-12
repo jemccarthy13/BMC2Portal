@@ -30,6 +30,20 @@ export default function VersionHistory(): JSX.Element {
   // the order in this list === display order
   const versionHistory: VersionList = [
     {
+      version: "4.0.5",
+      date: "12 Aug 2021",
+      features: [
+        "Can now select the number of contacts for red air via the XvX selector.",
+        "CAP supports all standard picture types.",
+        "Please report issues as you see them. The code behind PS has undergone significant changes recently!",
+      ],
+      fixes: [],
+      improvements: [
+        "Refactor of how pictures are drawn provides stability and reduces code " +
+          "cyclomatic complexity.",
+      ],
+    },
+    {
       version: "4.0.4",
       date: "20 May 2021",
       features: [

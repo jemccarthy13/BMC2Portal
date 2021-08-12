@@ -1,4 +1,6 @@
 /* eslint-disable react/jsx-no-bind */
+/* eslint-disable react/forbid-component-props */
+import { Tooltip } from "@material-ui/core"
 import React, { useState } from "react"
 
 interface CSProps {
@@ -20,8 +22,9 @@ export default function ContactSelector(props: CSProps): JSX.Element {
   return (
     <div>
       <label style={{ padding: "5px" }} htmlFor="numContacts">
-        Total number of contacts:{" "}
+        Fight: 4 v{" "}
       </label>
+
       <input
         id="numContacts"
         style={{
@@ -38,6 +41,17 @@ export default function ContactSelector(props: CSProps): JSX.Element {
           updateCount(parseInt(event.target.value))
         }}
       />
+
+      <Tooltip title="# of red contacts; 0 = random">
+        <button
+          style={{ padding: "0px" }}
+          className="helpicon"
+          id="alsaQTBtn"
+          type="button"
+        >
+          ?
+        </button>
+      </Tooltip>
     </div>
   )
 }

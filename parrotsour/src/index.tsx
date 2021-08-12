@@ -35,7 +35,7 @@ export default ReactDOM.render(
 /**
  *
  */
-const version = "4.0.0"
+const version = "4.0.5"
 const cookieIsNotSet =
   Cookies.get(version + "Notify") === undefined ||
   Cookies.get(version + "Notify") === "false"
@@ -52,7 +52,7 @@ if (cookieIsNotSet) {
         <>
           <Button
             onClick={() => {
-              window.location.href = "#/changelog.html#4.0.3"
+              window.location.href = "#/changelog.html#4.0.5"
               Cookies.set(version + "Notify", true, { expires: 365 })
               snackActions.closeSnackbar(key)
             }}
