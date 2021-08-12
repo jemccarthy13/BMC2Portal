@@ -15,6 +15,10 @@ import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 
 export default class DrawThreat extends DrawPic {
+  create(): DrawPic {
+    return new DrawThreat()
+  }
+
   chooseNumGroups(): number {
     this.numGroups = 1
     return 1

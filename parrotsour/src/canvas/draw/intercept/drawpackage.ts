@@ -11,6 +11,10 @@ export default class DrawPackage extends DrawPic {
   private nPkg!: DrawPic
   private sPkg!: DrawPic
 
+  create(): DrawPic {
+    return new DrawPackage()
+  }
+
   chooseNumGroups(nCts: number): number {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt

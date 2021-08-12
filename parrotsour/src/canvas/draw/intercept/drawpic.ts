@@ -11,6 +11,8 @@ import { checkCaps } from "./cap"
 import { PictureInfo } from "./pictureclamp"
 
 export abstract class DrawPic {
+  abstract create(): DrawPic
+
   abstract chooseNumGroups(nCts: number): number
 
   abstract getPictureInfo(start?: Point): PictureInfo

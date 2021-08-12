@@ -1,74 +1,76 @@
-// Interfaces
+import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
-import {
-  PictureAnswer,
-  PictureDrawFunction,
-  PictureCanvasProps,
-  PictureCanvasState,
-} from "../../canvastypes"
-
-// Functions
+import { GroupFactory } from "../../../classes/groups/groupfactory"
+import { Point } from "../../../classes/point"
+import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
 import { drawAltitudes, drawText } from "../drawutils"
 import { formatGroup } from "../formatutils"
-import { GroupFactory } from "../../../classes/groups/groupfactory"
-import { Braaseye } from "../../../classes/braaseye"
-import { randomNumber } from "../../../utils/psmath"
+import { DrawPic } from "./drawpic"
+import { PictureInfo } from "./pictureclamp"
 
-export const drawPOD: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState
-): PictureAnswer => {
-  if (!state.blueAir) {
-    return { pic: "", groups: [] }
-  }
-  const numGrps: number = randomNumber(3, 11)
-
-  const bPos = state.blueAir.getCenterOfMass(props.dataStyle)
-
-  drawText(ctx, '"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
-
-  const groups: AircraftGroup[] = []
-  for (let x = 0; x <= numGrps; x++) {
-    groups.push(GroupFactory.randomGroup(ctx, props, state))
-    groups[x].draw(ctx, props.dataStyle)
-
-    const grpPos = groups[x].getCenterOfMass(props.dataStyle)
-
-    new Braaseye(
-      grpPos,
-      state.blueAir.getCenterOfMass(props.dataStyle),
-      state.bullseye
-    ).draw(ctx, props.showMeasurements, props.braaFirst)
-    drawAltitudes(ctx, grpPos, groups[x].getAltitudes())
+export default class DrawPOD extends DrawPic {
+  create(): DrawPic {
+    return new DrawPOD()
   }
 
-  function sortFun(a: AircraftGroup, b: AircraftGroup) {
-    const bluePos = state.blueAir.getCenterOfMass(props.dataStyle)
-    const aBR = bluePos.getBR(a.getCenterOfMass(props.dataStyle))
-    const bBR = bluePos.getBR(b.getCenterOfMass(props.dataStyle))
-    return aBR.range > bBR.range ? 1 : -1
+  chooseNumGroups(): number {
+    const grpCt = randomNumber(3, 11)
+    this.numGroups = grpCt
+    return grpCt
   }
 
-  const closestGroups = groups.sort(sortFun).slice(0, 3)
-
-  let response = groups.length + " GROUPS, "
-
-  for (let z = 0; z < closestGroups.length; z++) {
-    const braaseye = new Braaseye(
-      closestGroups[z].getCenterOfMass(props.dataStyle),
-      state.blueAir.getCenterOfMass(props.dataStyle),
-      state.bullseye
-    )
-    closestGroups[z].setBraaseye(braaseye)
-    closestGroups[z].setLabel("GROUP")
-    response += formatGroup(props.format, groups[z], true)
+  getPictureInfo(start?: Point): PictureInfo {
+    return {
+      deep: 5 * PIXELS_TO_NM,
+      wide: 5 * PIXELS_TO_NM,
+      start,
+    }
   }
 
-  response +=
-    "\r\n\r\nNote: This is core; there may be a better answer, but POD is intended to get you thinking about 'what would you say if you saw...'"
-  return {
-    pic: response,
-    groups: closestGroups,
+  createGroups = (): AircraftGroup[] => {
+    const groups = []
+    for (let x = 0; x <= this.getNumGroups(); x++) {
+      groups.push(GroupFactory.randomGroup(this.ctx, this.props, this.state))
+    }
+    return groups
+  }
+
+  drawInfo(): void {
+    const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
+    drawText(this.ctx, '"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
+
+    const { showMeasurements, braaFirst } = this.props
+
+    this.groups.forEach((grp) => {
+      const grpPos = grp.getCenterOfMass(this.props.dataStyle)
+
+      grp.setLabel("GROUP")
+      grp.setBraaseye(new Braaseye(grpPos, bPos, this.state.bullseye))
+      grp.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
+      drawAltitudes(this.ctx, grpPos, grp.getAltitudes())
+    })
+  }
+
+  getAnswer(): string {
+    const { dataStyle } = this.props
+    const { blueAir } = this.state
+    function sortFun(a: AircraftGroup, b: AircraftGroup) {
+      const bluePos = blueAir.getCenterOfMass(dataStyle)
+      const aBR = bluePos.getBR(a.getCenterOfMass(dataStyle))
+      const bBR = bluePos.getBR(b.getCenterOfMass(dataStyle))
+      return aBR.range > bBR.range ? 1 : -1
+    }
+
+    const closestGroups = this.groups.sort(sortFun).slice(0, 3)
+
+    let response = this.groups.length + " GROUPS, "
+    for (let z = 0; z < closestGroups.length; z++) {
+      response += formatGroup(this.props.format, this.groups[z], true)
+    }
+    response += "\r\n\r\nNote: This is core; there may be a better answer, "
+    response += "but POD is intended to get you thinking about "
+    response += "'what would you say if you saw...'"
+
+    return response
   }
 }

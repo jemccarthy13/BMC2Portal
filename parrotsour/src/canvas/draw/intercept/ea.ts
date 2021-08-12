@@ -26,6 +26,10 @@ export default class DrawEA extends DrawPic {
   private eaInfo!: EAInfo
   private requestType = 0 // 0 = music, 1 = STR, 2 = BD
 
+  create(): DrawPic {
+    return new DrawEA()
+  }
+
   chooseNumGroups(nCts: number): number {
     this.eaPic = PictureFactory.getPictureDraw("random", nCts)
     this.eaPic.initialize(this.ctx, this.props, this.state)

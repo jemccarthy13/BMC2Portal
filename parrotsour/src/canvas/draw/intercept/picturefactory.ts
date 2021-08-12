@@ -8,17 +8,13 @@ import DrawChampagne from "./champagne"
 import DrawVic from "./vic"
 import DrawThreat from "./threat"
 import DrawEA from "./ea"
-import DrawPOD from "./drawpod"
+import DrawPOD from "./pod"
 import DrawPackage from "./drawpackage"
 import { DrawPic } from "./drawpic"
 
 import { drawLeadEdge } from "./leadingedge"
-import { PictureDrawer } from "./picturedrawer"
 
 export class PictureFactory {
-  private static singleDraw = new DrawSingleGroup()
-  private static azimuthDraw = new DrawAzimuth()
-  private static rangeDraw = new DrawRange()
   private static wallDraw = new DrawWall()
   private static ladderDraw = new DrawLadder()
   private static champDraw = new DrawChampagne()
@@ -33,19 +29,19 @@ export class PictureFactory {
   // to call new or 'create' on
   //private map = new Map<string>(["azimuth", DrawAzimuth])
 
-  private static DrawMap = new Map<string, DrawPic>([
-    ["azimuth", PictureFactory.azimuthDraw],
-    ["range", PictureFactory.rangeDraw],
-    ["ladder", PictureFactory.ladderDraw],
-    ["wall", PictureFactory.wallDraw],
-    ["vic", PictureFactory.vicDraw],
-    ["champagne", PictureFactory.champDraw],
-    ["threat", PictureFactory.threatDraw],
-    ["ea", PictureFactory.eaDraw],
-    ["pod", PictureFactory.PODDraw],
-    //["leading edge", drawLeadEdge],
-    ["package", PictureFactory.packDraw],
-    ["singlegroup", PictureFactory.singleDraw],
+  private static DrawMap = new Map<string, () => DrawPic>([
+    ["azimuth", new DrawAzimuth().create],
+    ["range", new DrawRange().create],
+    ["ladder", PictureFactory.ladderDraw.create],
+    ["wall", PictureFactory.wallDraw.create],
+    ["vic", PictureFactory.vicDraw.create],
+    ["champagne", PictureFactory.champDraw.create],
+    ["threat", PictureFactory.threatDraw.create],
+    ["ea", PictureFactory.eaDraw.create],
+    ["pod", PictureFactory.PODDraw.create],
+    //["leading edge", drawLeadEdge.create],
+    ["package", PictureFactory.packDraw.create],
+    ["singlegroup", new DrawSingleGroup().create],
   ])
 
   private static getDrawer(k: string) {
@@ -115,15 +111,10 @@ export class PictureFactory {
       type = this._getRandomPicType(complexity)
     }
 
-    // TODO -- need a way to generalize this
-    // const n = DrawAzimuth
-    // const b = new n()
-
     let drawFunc = this.DrawMap.get(type)
     if (drawFunc === undefined) {
-      drawFunc = this.azimuthDraw
+      drawFunc = new DrawAzimuth().create
     }
-
-    return drawFunc
+    return drawFunc()
   }
 }

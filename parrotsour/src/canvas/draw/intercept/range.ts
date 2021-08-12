@@ -16,6 +16,10 @@ import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { picTrackDir } from "./picturehelpers"
 
 export default class DrawRange extends DrawPic {
+  create(): DrawPic {
+    return new DrawRange()
+  }
+
   chooseNumGroups(): number {
     this.numGroups = 2
     return 2

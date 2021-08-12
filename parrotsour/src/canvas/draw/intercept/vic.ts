@@ -14,6 +14,10 @@ import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawVic extends DrawPic {
+  create(): DrawPic {
+    return new DrawVic()
+  }
+
   chooseNumGroups(): number {
     this.numGroups = 3
     return 3

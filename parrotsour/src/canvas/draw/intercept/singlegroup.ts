@@ -10,6 +10,10 @@ import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 
 export default class DrawSingleGroup extends DrawPic {
+  create(): DrawPic {
+    return new DrawSingleGroup()
+  }
+
   /**
    * @returns # of groups in this picture
    */

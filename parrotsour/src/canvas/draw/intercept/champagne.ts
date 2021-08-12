@@ -15,6 +15,10 @@ import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawChampagne extends DrawPic {
+  create(): DrawPic {
+    return new DrawChampagne()
+  }
+
   chooseNumGroups(): number {
     this.numGroups = 3
     return 3
