@@ -11,7 +11,7 @@ import DrawEA from "./ea"
 import DrawPOD from "./pod"
 import DrawPackage from "./packages"
 import { DrawPic } from "./drawpic"
-import DrawLeadEdge from "./drawleadedge"
+import DrawLeadEdge from "./leadingedge"
 
 export class PictureFactory {
   private static DrawMap = new Map<string, () => DrawPic>([
