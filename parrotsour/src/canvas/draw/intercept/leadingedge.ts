@@ -1,113 +1,173 @@
-// Interfaces
-import {
-  PictureAnswer,
-  PictureDrawFunction,
-  PictureCanvasProps,
-  PictureCanvasState,
-  FightAxis,
-} from "../../../canvas/canvastypes"
-
-// Functions
-import { drawMeasurement } from "../drawutils"
+import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { getRestrictedStartPos } from "./pictureclamp"
 import { FORMAT } from "../../../classes/supportedformats"
+import { PictureAnswer } from "../../canvastypes"
+import { drawBullseye } from "../drawutils"
+import { DrawPic } from "./drawpic"
+import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
+import { PictureFactory } from "./picturefactory"
 
-export const drawLeadEdge: PictureDrawFunction = (
-  ctx: CanvasRenderingContext2D,
-  props: PictureCanvasProps,
-  state: PictureCanvasState,
-  hasCaps: boolean,
-  desiredNumContacts: number,
-  start?: Point | undefined
-): PictureAnswer => {
-  const isNS = FightAxis.isNS(props.orientation.orient)
+export default class DrawLeadEdge extends DrawPic {
+  private leadEdge!: DrawPic
+  private followOn!: DrawPic
 
-  // // Draw the first picture (i.e. the leading edge)
-  const pic1StartPos = getRestrictedStartPos(
-    ctx,
-    state.blueAir,
-    props.orientation.orient,
-    props.dataStyle,
-    45,
-    100,
-    { start }
-  )
-  const answer1 = state.reDraw(ctx, true, pic1StartPos, hasCaps)
-  const groups1 = answer1.groups
+  private furthestLeadGroup!: AircraftGroup
 
-  let furthestPic1Group = groups1[0]
-  let furthestRange = 0
-  groups1.forEach((grp) => {
-    const grpRange = grp
-      .getCenterOfMass(props.dataStyle)
-      .getBR(state.blueAir.getCenterOfMass(props.dataStyle)).range
-    if (grpRange > furthestRange) {
-      furthestPic1Group = grp
-      furthestRange = grpRange
-    }
-  })
-
-  //
-  // For a picture to be 'leading edge', the leading edge must be
-  // at least 5 miles away from follow-on groups and no more than 40,
-  // as 40 nm separation would be a package picture.
-  //
-  // This logic builds the required separation and gets the
-  // second picture starting point
-  //
-
-  // TODO -- LEAD EDGE -- this restricted start pos should be based on the
-  // first picture. but it should be directional (getRestrictedStartPos is not?)
-  // and should be rngBack (distStraightNM).. if lead edge is in front return (neg?)
-  // and clamp; if lead edge is behind, make sure it's at least 5 nm.
-  //
-
-  const pic2StartPos = getRestrictedStartPos(
-    ctx,
-    furthestPic1Group,
-    props.orientation.orient,
-    props.dataStyle,
-    25,
-    40
-  )
-  const answer2 = state.reDraw(ctx, true, pic2StartPos, hasCaps)
-  const groups2 = answer2.groups
-
-  let closestPic2Group = groups2[0]
-  let closestRange = Number.MAX_VALUE
-  groups2.forEach((grp) => {
-    const grpRange = grp
-      .getCenterOfMass(props.dataStyle)
-      .getBR(state.blueAir.getCenterOfMass(props.dataStyle)).range
-    if (grpRange < closestRange) {
-      closestPic2Group = grp
-      closestRange = grpRange
-    }
-  })
-
-  const pic2Pos = closestPic2Group.getCenterOfMass(props.dataStyle)
-  const pic1Pos = furthestPic1Group.getCenterOfMass(props.dataStyle)
-
-  const rngBack = pic1Pos.straightDistNM(pic2Pos, props.orientation.orient)
-
-  const drawXTo = isNS ? pic1Pos.x : pic2Pos.x
-  const drawYTo = isNS ? pic2Pos.y : pic1Pos.y
-  const drawTo = new Point(drawXTo, drawYTo)
-  drawMeasurement(ctx, pic1Pos, drawTo, rngBack, true)
-
-  const finalAnswer = {
-    pic:
-      groups1.length +
-      groups2.length +
-      " GROUPS, LEADING EDGE " +
-      answer1.pic +
-      " FOLLOW ON " +
-      (props.format === FORMAT.IPE ? " GROUPS " : "") +
-      rngBack +
-      (props.format === FORMAT.IPE ? " MILES " : ""),
-    groups: groups1.concat(groups2),
+  create(): DrawPic {
+    return new DrawLeadEdge()
   }
 
-  return finalAnswer
+  chooseNumGroups(nCts: number): number {
+    const nCt = Math.floor(nCts / 2)
+    const sCt = nCts - nCt
+
+    console.log("lead edge has " + nCt)
+    console.log("follow on has " + sCt)
+    this.leadEdge = PictureFactory.getPictureDraw("random", nCt, true)
+    this.followOn = PictureFactory.getPictureDraw("random", sCt, true)
+
+    this.leadEdge.initialize(this.ctx, this.props, this.state)
+    this.followOn.initialize(this.ctx, this.props, this.state)
+
+    const grpCt =
+      this.leadEdge.chooseNumGroups(nCt) + this.followOn.chooseNumGroups(sCt)
+
+    this.numGroups = grpCt
+    return grpCt
+  }
+
+  getPictureInfo(start?: Point): PictureInfo {
+    // // Draw the first picture (i.e. the leading edge)
+    const pic1StartPos = getRestrictedStartPos(
+      this.ctx,
+      this.state.blueAir,
+      this.props.orientation.orient,
+      this.props.dataStyle,
+      45,
+      100,
+      { start }
+    )
+    const leadInfo = this.leadEdge.getPictureInfo(pic1StartPos)
+    this.leadEdge.pInfo = leadInfo
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.leadEdge.deep = leadInfo.deep!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.leadEdge.wide = leadInfo.wide!
+
+    const followInfo = this.followOn.getPictureInfo(pic1StartPos)
+    this.followOn.pInfo = followInfo
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.followOn.deep = followInfo.deep!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.followOn.wide = followInfo.wide!
+
+    return {
+      deep: 0,
+      wide: 0,
+      start: pic1StartPos,
+    }
+  }
+
+  createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
+    const { dataStyle } = this.props
+    const { blueAir } = this.state
+
+    const leadGrps = this.leadEdge.createGroups(
+      startPos,
+      contactList.slice(0, this.leadEdge.getNumGroups())
+    )
+    this.leadEdge.groups = leadGrps
+
+    console.log(this.leadEdge.groups)
+    let furthestPic1Group = this.leadEdge.groups[0]
+    let furthestRange = 0
+    this.leadEdge.groups.forEach((grp) => {
+      const grpRange = grp
+        .getCenterOfMass(dataStyle)
+        .getBR(blueAir.getCenterOfMass(dataStyle)).range
+      if (grpRange > furthestRange) {
+        furthestPic1Group = grp
+        furthestRange = grpRange
+      }
+    })
+
+    this.furthestLeadGroup = furthestPic1Group
+
+    const pic2StartPos = getRestrictedStartPos(
+      this.ctx,
+      furthestPic1Group,
+      this.props.orientation.orient,
+      dataStyle,
+      25,
+      40
+    )
+    this.followOn.pInfo.start = pic2StartPos
+
+    const followGrps = this.followOn.createGroups(
+      pic2StartPos,
+      contactList.slice(this.leadEdge.getNumGroups())
+    )
+
+    this.followOn.groups = followGrps
+
+    return leadGrps.concat(followGrps)
+  }
+
+  drawInfo(): void {
+    this.leadEdge.drawInfo()
+    this.followOn.drawInfo()
+  }
+
+  tryAgain(): PictureAnswer {
+    const nPkgContacts = this.leadEdge.groups
+      .map((grp) => grp.getStrength())
+      .reduce((a, b) => a + b)
+    const sPkgContacts = this.followOn.groups
+      .map((grp) => grp.getStrength())
+      .reduce((a, b) => a + b)
+    const nCts = nPkgContacts + sPkgContacts
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    drawBullseye(this.ctx, this.state.bullseye)
+    this.state.blueAir.draw(this.ctx, this.props.dataStyle)
+    return this.draw(this.ctx, false, nCts)
+  }
+
+  getAnswer(): string {
+    const { dataStyle } = this.props
+    const { blueAir } = this.state
+    const groups2 = this.followOn.groups
+
+    let closestFollowOn = groups2[0]
+    let closestRange = Number.MAX_VALUE
+    groups2.forEach((grp) => {
+      const grpRange = grp
+        .getCenterOfMass(dataStyle)
+        .getBR(blueAir.getCenterOfMass(dataStyle)).range
+      if (grpRange < closestRange) {
+        closestFollowOn = grp
+        closestRange = grpRange
+      }
+    })
+
+    const pic2Pos = closestFollowOn.getCenterOfMass(dataStyle)
+    const pic1Pos = this.furthestLeadGroup.getCenterOfMass(dataStyle)
+
+    const rngBack = pic1Pos.straightDistNM(
+      pic2Pos,
+      this.props.orientation.orient
+    )
+    let answer = ""
+
+    if (rngBack > 40) {
+      answer = this.tryAgain().pic
+    } else {
+      answer = this.getNumGroups() + " GROUPS, "
+      answer += "LEADING EDGE " + this.leadEdge.getAnswer()
+      answer += " FOLLOW ON "
+      answer += this.props.format === FORMAT.IPE ? " GROUPS " : ""
+      answer += rngBack
+      answer += this.props.format === FORMAT.IPE ? " MILES " : ""
+    }
+    return answer
+  }
 }
