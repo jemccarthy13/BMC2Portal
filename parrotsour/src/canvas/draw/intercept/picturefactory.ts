@@ -9,7 +9,7 @@ import DrawVic from "./vic"
 import DrawThreat from "./threat"
 import DrawEA from "./ea"
 import DrawPOD from "./pod"
-import DrawPackage from "./drawpackage"
+import DrawPackage from "./packages"
 import { DrawPic } from "./drawpic"
 
 export class PictureFactory {
