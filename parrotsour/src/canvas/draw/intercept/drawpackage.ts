@@ -1,8 +1,8 @@
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
-import { FightAxis } from "../../canvastypes"
-import { drawBullseye, drawLine } from "../drawutils"
+import { FightAxis, PictureAnswer } from "../../canvastypes"
+import { drawBullseye } from "../drawutils"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
@@ -18,9 +18,6 @@ export default class DrawPackage extends DrawPic {
   chooseNumGroups(nCts: number): number {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt
-
-    console.log("nPkg: " + nCt + " contacts")
-    console.log("sPkg: " + sCt + " contacts")
 
     this.nPkg = PictureFactory.getPictureDraw("random", nCt, true)
     this.sPkg = PictureFactory.getPictureDraw("random", sCt, true)
@@ -39,7 +36,7 @@ export default class DrawPackage extends DrawPic {
   private isRange = false
 
   getPictureInfo(): PictureInfo {
-    this.isRange = true //randomNumber(0, 120) < 50
+    this.isRange = false //randomNumber(0, 100) < 50
 
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
@@ -190,42 +187,73 @@ export default class DrawPackage extends DrawPic {
         sum += gPos.y
       }
     }
-    console.log(sum)
-    console.log(groups.length)
 
     // if it's wide (az) get center of mass
     // it it's deep (rng) get lead pos (depends on orientation)
     const cPos = closestGroup.getCenterOfMass(dataStyle)
-    drawLine(this.ctx, cPos.x, 0, cPos.x, sum / groups.length)
     let retVal = new Point(sum / groups.length, cPos.y)
-    if (this.isRange === !isNS) {
+    if (!isNS) {
       retVal = new Point(cPos.x, sum / groups.length)
     }
     return retVal
   }
 
+  tryAgain(): PictureAnswer {
+    console.log("need to redraw pkgs")
+    const nPkgContacts = this.nPkg.groups
+      .map((grp) => grp.getStrength())
+      .reduce((a, b) => a + b)
+    const sPkgContacts = this.sPkg.groups
+      .map((grp) => grp.getStrength())
+      .reduce((a, b) => a + b)
+    const nCts = nPkgContacts + sPkgContacts
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+    drawBullseye(this.ctx, this.state.bullseye)
+    this.state.blueAir.draw(this.ctx, this.props.dataStyle)
+    return this.draw(this.ctx, false, nCts)
+  }
+
   getAnswer(): string {
-    console.log(this.nPkg.groups)
-    console.log(this.sPkg.groups)
     const bull1 = this._getPicBull(this.nPkg.groups)
     const bull2 = this._getPicBull(this.sPkg.groups)
 
-    const leadPackage = this.state.bullseye.getBR(bull1)
-    const trailPackage = this.state.bullseye.getBR(bull2)
+    const nPkgBe = this.state.bullseye.getBR(bull1)
+    const sPkgBe = this.state.bullseye.getBR(bull2)
 
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-    drawBullseye(this.ctx, bull1, "green")
-    drawBullseye(this.ctx, bull2, "orange")
-    const rngBack = isNS
+    // default deep
+    let rngBack = isNS
       ? new Point(bull1.x, bull2.y).getBR(bull1)
       : new Point(bull2.x, bull1.y).getBR(bull1)
-    if (this.isRange) {
-      //
+    // measure wide if az
+    if (!this.isRange) {
+      rngBack = isNS
+        ? new Point(bull2.x, bull1.y).getBR(bull1)
+        : new Point(bull1.x, bull2.y).getBR(bull1)
     }
 
-    return (
-      "2 PACKAGES " + (this.isRange ? " RANGE " : " AZIMUTH ") + rngBack.range
-    )
+    let answer = ""
+    if (rngBack.range < 40) {
+      answer = this.tryAgain().pic
+    } else {
+      let nLbl = "SOUTH"
+      let sLbl = "NORTH"
+      if (this.isRange) {
+        nLbl = "LEAD"
+        sLbl = "TRAIL"
+      }
+
+      // TODO -- anchoring P's for closer package
+
+      answer = "2 PACKAGES "
+      answer += (this.isRange ? " RANGE " : " AZIMUTH ") + rngBack.range + " "
+      answer +=
+        nLbl + " PACKAGE BULLSEYE " + nPkgBe.bearing + "/" + nPkgBe.range
+      answer += " "
+      answer +=
+        sLbl + " PACKAGE BULLSEYE " + sPkgBe.bearing + "/" + sPkgBe.range
+    }
+    return answer
   }
 }
