@@ -11,6 +11,7 @@ import DrawEA from "./ea"
 import DrawPOD from "./pod"
 import DrawPackage from "./packages"
 import { DrawPic } from "./drawpic"
+import DrawLeadEdge from "./drawleadedge"
 
 export class PictureFactory {
   private static DrawMap = new Map<string, () => DrawPic>([
@@ -23,7 +24,7 @@ export class PictureFactory {
     ["threat", new DrawThreat().create],
     ["ea", new DrawEA().create],
     ["pod", new DrawPOD().create],
-    //["leading edge", drawLeadEdge.create],
+    ["leading edge", new DrawLeadEdge().create],
     ["package", new DrawPackage().create],
     ["singlegroup", new DrawSingleGroup().create],
   ])
@@ -36,7 +37,7 @@ export class PictureFactory {
    */
   private static _getRandomPicType = (complexity: number): string => {
     const type1 = ["singlegroup"]
-    const type2 = type1.concat(["range", "azimuth", "cap"])
+    const type2 = type1.concat(["range", "azimuth"])
     const type3 = type2.concat(["vic", "champagne", "wall", "ladder"])
     const type4 = type3.concat(["leading edge", "package"])
 
@@ -63,6 +64,7 @@ export class PictureFactory {
     if (complexity === 0) complexity = 4
     if (complexity > 4) complexity = 4
     if (forced) complexity = Math.min(desiredNumContacts, 3)
+    if (picType === "cap") complexity = 2
 
     let type = picType || "azimuth"
     if (picType === "random" || picType === "cap") {

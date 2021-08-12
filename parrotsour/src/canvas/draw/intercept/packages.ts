@@ -151,9 +151,6 @@ export default class DrawPackage extends DrawPic {
     this.nPkg.groups = nGrps
     this.sPkg.groups = sGrps
 
-    console.log(this.nPkg.groups)
-    console.log(this.sPkg.groups)
-
     return nGrps.concat(sGrps)
   }
 
