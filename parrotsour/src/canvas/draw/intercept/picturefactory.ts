@@ -12,63 +12,21 @@ import DrawPOD from "./pod"
 import DrawPackage from "./drawpackage"
 import { DrawPic } from "./drawpic"
 
-import { drawLeadEdge } from "./leadingedge"
-
 export class PictureFactory {
-  private static wallDraw = new DrawWall()
-  private static ladderDraw = new DrawLadder()
-  private static champDraw = new DrawChampagne()
-  private static vicDraw = new DrawVic()
-  private static threatDraw = new DrawThreat()
-  private static eaDraw = new DrawEA()
-  private static PODDraw = new DrawPOD()
-  private static packDraw = new DrawPackage()
-
-  // TODO -- generalize the map
-  // getPictureDrawer(type) should return a class
-  // to call new or 'create' on
-  //private map = new Map<string>(["azimuth", DrawAzimuth])
-
   private static DrawMap = new Map<string, () => DrawPic>([
     ["azimuth", new DrawAzimuth().create],
     ["range", new DrawRange().create],
-    ["ladder", PictureFactory.ladderDraw.create],
-    ["wall", PictureFactory.wallDraw.create],
-    ["vic", PictureFactory.vicDraw.create],
-    ["champagne", PictureFactory.champDraw.create],
-    ["threat", PictureFactory.threatDraw.create],
-    ["ea", PictureFactory.eaDraw.create],
-    ["pod", PictureFactory.PODDraw.create],
+    ["ladder", new DrawLadder().create],
+    ["wall", new DrawWall().create],
+    ["vic", new DrawVic().create],
+    ["champagne", new DrawChampagne().create],
+    ["threat", new DrawThreat().create],
+    ["ea", new DrawEA().create],
+    ["pod", new DrawPOD().create],
     //["leading edge", drawLeadEdge.create],
-    ["package", PictureFactory.packDraw.create],
+    ["package", new DrawPackage().create],
     ["singlegroup", new DrawSingleGroup().create],
   ])
-
-  private static getDrawer(k: string) {
-    if (k === "azimuth") {
-      return new DrawAzimuth()
-    } else if (k === "range") {
-      return new DrawRange()
-    } else if (k === "ladder") {
-      return new DrawLadder()
-    } else if (k === "wall") {
-      return new DrawWall()
-    } else if (k === "vic") {
-      return new DrawVic()
-    } else if (k === "champagne") {
-      return new DrawChampagne()
-    } else if (k === "package") {
-      return new DrawPackage()
-    } else if (k === "threat") {
-      return new DrawThreat()
-    } else if (k === "ea") {
-      return new DrawEA()
-    } else if (k === "pod") {
-      return new DrawPOD()
-    } else if (k === "singlegroup") {
-      return new DrawSingleGroup()
-    }
-  }
 
   /**
    * Pick a random picture type for drawing
