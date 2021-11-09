@@ -102,9 +102,8 @@ describe("AircraftGroup", () => {
       grp.updateIntent({ desiredHeading: 90 })
       expect(grp.getTrackDir()).toEqual("EAST")
 
-      grp.setPicDir("WEST")
+      grp.setUseTrackDir(false)
       expect(grp.getTrackDir()).toEqual(undefined)
-      expect(grp.getPicDir()).toEqual("WEST")
 
       grp.doNextRouting()
       expect(grp.isCapping()).toEqual(true)

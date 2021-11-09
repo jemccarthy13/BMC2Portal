@@ -3,7 +3,6 @@ import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { FORMAT } from "../../../classes/supportedformats"
-import { getAspect } from "../../../utils/mathutilities"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -88,7 +87,7 @@ export default class DrawThreat extends DrawPic {
     const { blueAir } = this.state
     const { dataStyle } = this.props
 
-    const aspectH = getAspect(blueAir, sg, dataStyle)
+    const aspectH = blueAir.getAspect(sg, dataStyle)
     const trackDir = sg.getTrackDir()
     const braaseye = sg.getBraaseye()
 

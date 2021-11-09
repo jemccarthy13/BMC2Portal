@@ -173,7 +173,7 @@ export default class DrawWall extends DrawPic {
     let answer =
       this.numGroups + " GROUP WALL " + this.wide + " WIDE " + openClose + ", "
 
-    answer += picTrackDir(this.props.format, this.groups)
+    answer += picTrackDir(this.props, this.groups, this.state.blueAir)
 
     const anchorNorth = isAnchorNorth(
       this.groups[0],

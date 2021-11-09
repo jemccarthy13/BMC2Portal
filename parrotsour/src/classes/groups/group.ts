@@ -9,7 +9,6 @@ import { FORMAT } from "../supportedformats"
 
 import { AltStack, getAltStack } from "../altstack"
 // Functions
-import { trackDirFromHdg } from "../../utils/mathutilities"
 import {
   headingToRadians,
   PIXELS_TO_NM,
@@ -17,6 +16,8 @@ import {
 } from "../../utils/psmath"
 import { drawGroupCap } from "./groupcap"
 import { Braaseye } from "../braaseye"
+import { Aspect, aspectFromCATA, trackDirFromHdg } from "../../utils/aspect"
+import { BRAA } from "../braa"
 
 /**
  * The types of data that can be used to seed a group.
@@ -48,7 +49,7 @@ export interface GroupParams {
 export class AircraftGroup extends Array<Aircraft> {
   private startPos: Point = Point.DEFAULT
   private label = "GROUP"
-  private picDir: string | undefined
+  private useTrackDir = true
   private braaseye!: Braaseye
 
   private maneuvers = 0
@@ -156,6 +157,28 @@ export class AircraftGroup extends Array<Aircraft> {
   /*************************************************************************
    * Heading and track direction/aspect
    *************************************************************************/
+
+  /**
+   * Get 'aspect' (HOT/FLANK/BEAM, etc) to another group
+   *
+   * Aspect is calculated by taking the angle difference between
+   * other a/c heading, and the reciprocal bearing between this group
+   * and other a/c.
+   *
+   * @param otherGrp other aircraft
+   */
+  getAspect(otherGrp: AircraftGroup, dataStyle: SensorType): Aspect {
+    const recipBrg: BRAA = otherGrp
+      .getCenterOfMass(dataStyle)
+      .getBR(this.getCenterOfMass(dataStyle))
+
+    let dist = (otherGrp.getHeading() - parseInt(recipBrg.bearing) + 360) % 360
+    if (dist > 180) dist = 360 - dist
+    const cata = dist
+
+    return aspectFromCATA(cata)
+  }
+
   /**
    * @returns Current heading of the Group. Currently assumes all Aicraft are
    * following the same heading, therefore only returns first Aircraft's heading.
@@ -177,31 +200,23 @@ export class AircraftGroup extends Array<Aircraft> {
    * returns undefined. Otherwise, cardinal direction from heading.
    */
   getTrackDir(): string | undefined {
+    let trackDir = undefined
     if (this.isCapping()) {
-      return "CAP"
-    } else if (this.picDir) {
-      return undefined
+      trackDir = "CAP"
+    } else if (this.useTrackDir) {
+      trackDir = "TRACK " + trackDirFromHdg(this.getHeading())
     }
-    return trackDirFromHdg(this.getHeading())
+    return trackDir
   }
 
   /**
-   * @returns Picture direction if set (i.e. all groups track West)
+   * Set the useTrackDir flag, whether or not to include track direction
+   * in group formatting
    */
-  getPicDir(): string | undefined {
-    return this.picDir
+  setUseTrackDir(newVal: boolean): void {
+    this.useTrackDir = newVal
   }
 
-  /**
-   * Set the picture direction (all groups) for formatting.
-   *
-   * If all groups track same direction, it's (2 grp az track W) instead of
-   * (2 grp az, ng ... track West, sg ... track East)
-   * @param newDir New picture track direction
-   */
-  setPicDir(newDir: string | undefined): void {
-    this.picDir = newDir
-  }
   /**
    * Update maneuver count
    * @param newNumManeuvers New number of maneuvers remaining

@@ -1,10 +1,14 @@
-import { BlueInThe, FightAxis } from "../../../canvas/canvastypes"
+import {
+  BlueInThe,
+  FightAxis,
+  PictureCanvasProps,
+} from "../../../canvas/canvastypes"
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { FORMAT } from "../../../classes/supportedformats"
-import { trackDirFromHdg } from "../../../utils/mathutilities"
+import { Aspect, trackDirFromHdg } from "../../../utils/aspect"
 
 /**
  * TODO --
@@ -65,23 +69,44 @@ export const isEchelon = (
   return ech
 }
 
+/**
+ * If all groups are tracking the same direction, get the picture track direction
+ * and set it for all groups (formatting).
+ *
+ * Side effect- set the picDir member variable in each group.
+ *
+ * @param props current PictureCanvasProps
+ * @param groups all red air AircraftGroups
+ * @param blueAir blue air AircraftGroup (for aspect)
+ * @returns {string} Track direction of the picture | "" if track dirs are different
+ */
 export const picTrackDir = (
-  format: FORMAT,
-  groups: AircraftGroup[]
+  props: PictureCanvasProps,
+  groups: AircraftGroup[],
+  blueAir: AircraftGroup
 ): string => {
+  let answer = "" // set default return
+
+  // determine if all groups track same direction
   const trackDir: string | undefined = groups[0].getTrackDir()
   const sameTrackDir: boolean = groups.every((group) => {
     return trackDir === group.getTrackDir()
   })
-  let answer = ""
-  if (format !== FORMAT.IPE && sameTrackDir) {
-    answer = " TRACK " + trackDir + ". "
+
+  // Picture track direction is included in answer iff
+  // all groups track same direction and the Aspect isn't HOT
+  const asp = blueAir.getAspect(groups[0], props.dataStyle)
+  if (props.format !== FORMAT.IPE) {
+    if (sameTrackDir && asp !== Aspect.HOT) {
+      answer = trackDir + ". "
+    }
   }
+
+  // ** Side effect **
+  // Set whether to use track direction in group formatting
   groups.forEach((group) => {
-    if (!sameTrackDir) {
-      group.setPicDir(undefined)
-    } else {
-      group.setPicDir(group.getTrackDir())
+    if (sameTrackDir) {
+      group.setUseTrackDir(false)
     }
   })
   return answer

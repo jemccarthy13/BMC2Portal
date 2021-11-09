@@ -148,7 +148,7 @@ export default class DrawAzimuth extends DrawPic {
       sg
     )
 
-    answer += picTrackDir(this.props.format, [ng, sg])
+    answer += picTrackDir(this.props, [ng, sg], this.state.blueAir)
 
     const anchorN = isAnchorNorth(ng, sg)
 
@@ -165,15 +165,13 @@ export default class DrawAzimuth extends DrawPic {
         secondGroup.setLabel("NORTH GROUP")
       }
     } else {
+      firstGroup = ng
+      secondGroup = sg
       if (isNS) {
-        firstGroup = ng
         firstGroup.setLabel("WEST GROUP")
-        secondGroup = sg
         secondGroup.setLabel("EAST GROUP")
       } else {
-        firstGroup = ng
         firstGroup.setLabel("NORTH GROUP")
-        secondGroup = sg
         secondGroup.setLabel("SOUTH GROUP")
       }
     }

@@ -2,7 +2,7 @@ import { AltStack } from "../../../classes/altstack"
 import { BRAA } from "../../../classes/braa"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { getAspect, trackDirFromHdg } from "../../../utils/mathutilities"
+import { Aspect, trackDirFromHdg } from "../../../utils/aspect"
 import { randomNumber } from "../../../utils/psmath"
 import { drawText } from "../drawutils"
 import { formatGroup } from "../formatutils"
@@ -162,7 +162,7 @@ export default class DrawEA extends DrawPic {
   formatStrobe(): string {
     const { grp } = this.eaInfo
     const altStack = grp.getAltStack(this.props.format)
-    const aspectH = getAspect(this.state.blueAir, grp, this.props.dataStyle)
+    const aspectH = this.state.blueAir.getAspect(grp, this.props.dataStyle)
     const trackDir = trackDirFromHdg(grp.getHeading())
     return (
       "EAGLE01 STROBE RANGE " +
@@ -186,10 +186,10 @@ export default class DrawEA extends DrawPic {
 
     const altStack = cGrp.getAltStack(this.props.format)
 
-    const aspectH = getAspect(this.state.blueAir, cGrp, this.props.dataStyle)
+    const aspectH = this.state.blueAir.getAspect(cGrp, this.props.dataStyle)
 
-    let aspect = aspectH
-    aspect += aspectH !== "HOT" ? trackDirFromHdg(cGrp.getHeading()) : ""
+    let aspect = aspectH.toString()
+    aspect += aspectH !== Aspect.HOT ? trackDirFromHdg(cGrp.getHeading()) : ""
     let response: string = cGrp.getLabel()
     response += " BRAA " + braa.bearing + "/" + braa.range + " "
     response += altStack.stack + ", "

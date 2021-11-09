@@ -199,7 +199,7 @@ export default class DrawChampagne extends DrawPic {
       answer += " WEIGHTED " + sLbl + ", "
     }
 
-    answer += picTrackDir(this.props.format, [nlg, slg, tg])
+    answer += picTrackDir(this.props, [nlg, slg, tg], this.state.blueAir)
 
     const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
 

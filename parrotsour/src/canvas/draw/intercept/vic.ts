@@ -180,7 +180,7 @@ export default class DrawVic extends DrawPic {
 
     // TODO -- SPEED -- Opening/closing pic with range component
 
-    answer += picTrackDir(format, [ntg, stg, lg])
+    answer += picTrackDir(this.props, [ntg, stg, lg], this.state.blueAir)
 
     answer += formatGroup(format, lg, true) + " "
 

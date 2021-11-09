@@ -54,12 +54,9 @@ export function formatGroup(
   const altStack = group.getAltStack(format)
   answer += altStack.stack
 
-  // format track direction (if given)
+  // format track direction
   const trackDir = group.getTrackDir()
-  answer +=
-    trackDir !== undefined
-      ? (trackDir === "CAP" ? " " : " TRACK ") + trackDir
-      : ""
+  answer += trackDir !== undefined ? trackDir : ""
 
   // apply ID
   answer += " HOSTILE"

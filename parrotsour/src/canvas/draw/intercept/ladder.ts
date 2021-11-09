@@ -176,7 +176,7 @@ export default class DrawLadder extends DrawPic {
 
     let answer = this.numGroups + " GROUP LADDER " + this.deep + " DEEP, "
 
-    answer += picTrackDir(this.props.format, this.groups)
+    answer += picTrackDir(this.props, this.groups, this.state.blueAir)
 
     //console.log("CHECK FOR ECHELON LADDER?");
 

@@ -2,7 +2,7 @@ import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-import { trackDirFromHdg } from "../../../utils/mathutilities"
+import { trackDirFromHdg } from "../../../utils/aspect"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -152,7 +152,7 @@ export default class DrawRange extends DrawPic {
       }
     }
 
-    answer += picTrackDir(this.props.format, [tg, lg])
+    answer += picTrackDir(this.props, [tg, lg], this.state.blueAir)
 
     // TODO -- DETERMINE IF OPENING/CLOSING
 
