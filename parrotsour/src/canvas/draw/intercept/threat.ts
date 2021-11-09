@@ -18,9 +18,8 @@ export default class DrawThreat extends DrawPic {
     return new DrawThreat()
   }
 
-  chooseNumGroups(): number {
+  chooseNumGroups(): void {
     this.numGroups = 1
-    return 1
   }
 
   getPictureInfo(start?: Point): PictureInfo {

@@ -13,7 +13,7 @@ import { PictureInfo } from "./pictureclamp"
 export abstract class DrawPic {
   abstract create(): DrawPic
 
-  abstract chooseNumGroups(nCts: number): number
+  abstract chooseNumGroups(nCts: number): void
 
   abstract getPictureInfo(start?: Point): PictureInfo
 

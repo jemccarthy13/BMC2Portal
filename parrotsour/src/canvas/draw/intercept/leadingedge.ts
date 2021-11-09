@@ -17,7 +17,7 @@ export default class DrawLeadEdge extends DrawPic {
     return new DrawLeadEdge()
   }
 
-  chooseNumGroups(nCts: number): number {
+  chooseNumGroups(nCts: number): void {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt
 
@@ -29,11 +29,9 @@ export default class DrawLeadEdge extends DrawPic {
     this.leadEdge.initialize(this.ctx, this.props, this.state)
     this.followOn.initialize(this.ctx, this.props, this.state)
 
-    const grpCt =
-      this.leadEdge.chooseNumGroups(nCt) + this.followOn.chooseNumGroups(sCt)
-
-    this.numGroups = grpCt
-    return grpCt
+    this.leadEdge.chooseNumGroups(nCt)
+    this.followOn.chooseNumGroups(sCt)
+    this.numGroups = this.leadEdge.numGroups + this.followOn.numGroups
   }
 
   getPictureInfo(start?: Point): PictureInfo {

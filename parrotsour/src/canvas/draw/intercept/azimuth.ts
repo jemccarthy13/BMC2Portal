@@ -20,9 +20,8 @@ export default class DrawAzimuth extends DrawPic {
     return new DrawAzimuth()
   }
 
-  chooseNumGroups(): number {
+  chooseNumGroups(): void {
     this.numGroups = 2
-    return 2
   }
 
   getPictureInfo(start?: Point): PictureInfo {

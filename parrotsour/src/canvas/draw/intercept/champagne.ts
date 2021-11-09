@@ -19,9 +19,8 @@ export default class DrawChampagne extends DrawPic {
     return new DrawChampagne()
   }
 
-  chooseNumGroups(): number {
+  chooseNumGroups(): void {
     this.numGroups = 3
-    return 3
   }
 
   getPictureInfo(start?: Point): PictureInfo {

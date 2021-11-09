@@ -19,7 +19,7 @@ export default class DrawLadder extends DrawPic {
     return new DrawLadder()
   }
 
-  chooseNumGroups(nCts: number): number {
+  chooseNumGroups(nCts: number): void {
     let maxGrps = 5
     if (nCts < 3) {
       maxGrps = 3
@@ -27,9 +27,7 @@ export default class DrawLadder extends DrawPic {
       maxGrps = nCts
     }
     if (nCts === 0) maxGrps = 5
-    const grpCt = randomNumber(3, maxGrps)
-    this.numGroups = grpCt
-    return grpCt
+    this.numGroups = randomNumber(3, maxGrps)
   }
 
   seps: number[] = [0]

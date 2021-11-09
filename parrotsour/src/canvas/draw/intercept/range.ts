@@ -20,9 +20,8 @@ export default class DrawRange extends DrawPic {
     return new DrawRange()
   }
 
-  chooseNumGroups(): number {
+  chooseNumGroups(): void {
     this.numGroups = 2
-    return 2
   }
 
   getPictureInfo(start?: Point): PictureInfo {

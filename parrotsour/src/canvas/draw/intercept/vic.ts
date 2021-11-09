@@ -18,9 +18,8 @@ export default class DrawVic extends DrawPic {
     return new DrawVic()
   }
 
-  chooseNumGroups(): number {
+  chooseNumGroups(): void {
     this.numGroups = 3
-    return 3
   }
 
   getPictureInfo(start?: Point): PictureInfo {

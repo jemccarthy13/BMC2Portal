@@ -17,9 +17,8 @@ export default class DrawSingleGroup extends DrawPic {
   /**
    * @returns # of groups in this picture
    */
-  chooseNumGroups = (): number => {
+  chooseNumGroups = (): void => {
     this.numGroups = 1
-    return 1
   }
 
   /**

@@ -15,7 +15,7 @@ export default class DrawPackage extends DrawPic {
     return new DrawPackage()
   }
 
-  chooseNumGroups(nCts: number): number {
+  chooseNumGroups(nCts: number): void {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt
 
@@ -25,11 +25,10 @@ export default class DrawPackage extends DrawPic {
     this.nPkg.initialize(this.ctx, this.props, this.state)
     this.sPkg.initialize(this.ctx, this.props, this.state)
 
-    const grpCt =
-      this.nPkg.chooseNumGroups(nCt) + this.sPkg.chooseNumGroups(sCt)
+    this.nPkg.chooseNumGroups(nCt)
+    this.sPkg.chooseNumGroups(sCt)
 
-    this.numGroups = grpCt
-    return grpCt
+    this.numGroups = this.nPkg.numGroups + this.sPkg.numGroups
   }
 
   private start2: Point = Point.DEFAULT

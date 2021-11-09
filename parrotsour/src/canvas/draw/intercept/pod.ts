@@ -13,10 +13,8 @@ export default class DrawPOD extends DrawPic {
     return new DrawPOD()
   }
 
-  chooseNumGroups(): number {
-    const grpCt = randomNumber(3, 11)
-    this.numGroups = grpCt
-    return grpCt
+  chooseNumGroups(): void {
+    this.numGroups = randomNumber(3, 11)
   }
 
   getPictureInfo(start?: Point): PictureInfo {
