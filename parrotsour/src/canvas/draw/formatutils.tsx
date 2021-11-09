@@ -56,6 +56,7 @@ export function formatGroup(
 
   // format track direction
   const trackDir = group.getTrackDir()
+  answer += " "
   answer += trackDir !== undefined ? trackDir : ""
 
   // apply ID
@@ -70,7 +71,7 @@ export function formatGroup(
 
   // apply fill-ins (HI/FAST/etc)
   answer += " " + altStack.fillIns
-  return answer
+  return answer.replace(/ {2}/g, " ")
 }
 
 /**

@@ -178,6 +178,6 @@ export default class DrawAzimuth extends DrawPic {
 
     answer += " " + formatGroup(this.props.format, secondGroup, includeBull)
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

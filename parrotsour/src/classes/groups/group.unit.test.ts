@@ -100,7 +100,7 @@ describe("AircraftGroup", () => {
       })
       expect(grp.getStrength()).toBeGreaterThanOrEqual(1)
       grp.updateIntent({ desiredHeading: 90 })
-      expect(grp.getTrackDir()).toEqual("EAST")
+      expect(grp.getTrackDir()).toEqual("TRACK EAST")
 
       grp.setUseTrackDir(false)
       expect(grp.getTrackDir()).toEqual(undefined)
