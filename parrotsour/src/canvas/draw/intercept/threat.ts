@@ -114,6 +114,6 @@ export default class DrawThreat extends DrawPic {
 
     answer += sgAlts.fillIns
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

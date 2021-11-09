@@ -167,6 +167,6 @@ export default class DrawRange extends DrawPic {
 
     answer += formatGroup(this.props.format, secondGroup, false)
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

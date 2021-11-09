@@ -166,6 +166,6 @@ export default class DrawLeadEdge extends DrawPic {
       answer += rngBack
       answer += this.props.format === FORMAT.IPE ? " MILES " : ""
     }
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

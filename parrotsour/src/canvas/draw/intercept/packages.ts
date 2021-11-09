@@ -299,6 +299,6 @@ export default class DrawPackage extends DrawPic {
       answer +=
         sLbl + " PACKAGE BULLSEYE " + sPkgBe.bearing + "/" + sPkgBe.range
     }
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

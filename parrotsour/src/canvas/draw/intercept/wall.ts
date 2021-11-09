@@ -194,6 +194,6 @@ export default class DrawWall extends DrawPic {
         ) + " "
     }
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

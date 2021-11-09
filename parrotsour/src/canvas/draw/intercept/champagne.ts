@@ -212,6 +212,6 @@ export default class DrawChampagne extends DrawPic {
     }
     answer += formatGroup(this.props.format, tg, false)
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

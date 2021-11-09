@@ -193,6 +193,6 @@ export default class DrawVic extends DrawPic {
       answer += formatGroup(format, ntg, false)
     }
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

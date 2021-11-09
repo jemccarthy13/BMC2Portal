@@ -199,6 +199,6 @@ export default class DrawLadder extends DrawPic {
         ) + " "
     }
 
-    return answer
+    return answer.replace(/\s+/g, " ").trim()
   }
 }

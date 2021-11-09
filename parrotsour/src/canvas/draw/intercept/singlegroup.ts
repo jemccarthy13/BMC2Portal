@@ -90,6 +90,6 @@ export default class DrawSingleGroup extends DrawPic {
 
   getAnswer = (): string => {
     const sg = this.groups[0]
-    return formatGroup(this.props.format, sg, true)
+    return formatGroup(this.props.format, sg, true).replace(/\s+/g, " ").trim()
   }
 }
