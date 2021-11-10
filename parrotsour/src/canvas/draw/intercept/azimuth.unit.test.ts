@@ -1,7 +1,7 @@
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { BlueInThe, CanvasOrient, PictureCanvasState } from "../../canvastypes"
+import { BlueInThe, PictureCanvasState } from "../../canvastypes"
 import DrawAzimuth from "./azimuth"
 import { testProps } from "./mockutils.unit.test"
 
@@ -148,6 +148,64 @@ describe("DrawAzimuth", () => {
       "TWO GROUPS AZIMUTH 12 TRACK NORTH. " +
         "EAST GROUP BULLSEYE 331/70, 15k HOSTILE HEAVY 4 CONTACTS " +
         "WEST GROUP BULLSEYE 322/77, 20k HOSTILE HEAVY 4 CONTACTS"
+    )
+  })
+
+  it("includes_stacks", () => {
+    azimuth.initialize(ctx, testProps, testState)
+
+    const ng = new AircraftGroup({
+      ...p,
+      sx: 200,
+      sy: 200,
+      hdg: 1,
+      nContacts: 3,
+      alts: [45, 35, 25],
+    })
+    const sg = new AircraftGroup({
+      ...p,
+      sx: 250,
+      sy: 200,
+      hdg: 1,
+      nContacts: 2,
+      alts: [36, 24],
+    })
+
+    azimuth.groups = [ng, sg]
+    azimuth.drawInfo()
+    expect(azimuth.getAnswer()).toEqual(
+      "TWO GROUPS AZIMUTH 11 TRACK NORTH. " +
+        "EAST GROUP BULLSEYE 327/66, STACK 36k AND 24k HOSTILE 2 CONTACTS " +
+        "WEST GROUP BULLSEYE 319/73, STACK 45k 35k AND 25k HOSTILE HEAVY 3 CONTACTS"
+    )
+  })
+
+  it("includes_stacks", () => {
+    azimuth.initialize(ctx, testProps, testState)
+
+    const ng = new AircraftGroup({
+      ...p,
+      sx: 200,
+      sy: 200,
+      hdg: 1,
+      nContacts: 4,
+      alts: [46, 45, 35, 25],
+    })
+    const sg = new AircraftGroup({
+      ...p,
+      sx: 250,
+      sy: 200,
+      hdg: 1,
+      nContacts: 1,
+      alts: [36],
+    })
+
+    azimuth.groups = [ng, sg]
+    azimuth.drawInfo()
+    expect(azimuth.getAnswer()).toEqual(
+      "TWO GROUPS AZIMUTH 9 TRACK NORTH. " +
+        "EAST GROUP BULLSEYE 326/67, 36k HOSTILE " +
+        "WEST GROUP STACK 46k 35k AND 25k HOSTILE HEAVY 4 CONTACTS 2 HIGH 1 MEDIUM 1 LOW"
     )
   })
 })
