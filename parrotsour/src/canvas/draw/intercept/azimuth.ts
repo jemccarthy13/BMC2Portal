@@ -13,7 +13,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
-import { isAnchorNorth, isEchelon, picTrackDir } from "./picturehelpers"
 
 export default class DrawAzimuth extends DrawPic {
   create(): DrawPic {
@@ -138,18 +137,11 @@ export default class DrawAzimuth extends DrawPic {
 
     answer += getOpenCloseAzimuth(ng, sg)
 
-    answer += isEchelon(
-      this.props.orientation.orient,
-      this.props.dataStyle,
-      ng.getBraaseye(),
-      sg.getBraaseye(),
-      ng,
-      sg
-    )
+    answer += this.isEchelon(ng, sg)
 
-    answer += picTrackDir(this.props, [ng, sg], this.state.blueAir)
+    answer += this.picTrackDir()
 
-    const anchorN = isAnchorNorth(ng, sg)
+    const anchorN = this.isAnchorNorth(ng, sg)
 
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 

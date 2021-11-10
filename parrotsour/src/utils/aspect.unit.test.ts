@@ -1,7 +1,7 @@
 import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 import { IDMatrix } from "../classes/aircraft/id"
 import { AircraftGroup } from "../classes/groups/group"
-import { trackDirFromHdg } from "./aspect"
+import { toCardinal } from "./aspect"
 
 describe("Aspect", () => {
   const blueAir = new AircraftGroup({
@@ -45,6 +45,6 @@ describe("Aspect", () => {
   })
 
   it("calculates_track_dir_from_hdg", () => {
-    expect(trackDirFromHdg(blueAir.getHeading())).toEqual("WEST")
+    expect(toCardinal(blueAir.getHeading())).toEqual("WEST")
   })
 })

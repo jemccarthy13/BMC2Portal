@@ -2,7 +2,7 @@ import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-import { trackDirFromHdg } from "../../../utils/aspect"
+import { toCardinal } from "../../../utils/aspect"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -13,7 +13,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { picTrackDir } from "./picturehelpers"
 
 export default class DrawRange extends DrawPic {
   create(): DrawPic {
@@ -143,15 +142,13 @@ export default class DrawRange extends DrawPic {
       (isNS && tgPos.getBR(new Point(lgPos.x, tgPos.y)).range > 5)
     ) {
       if (!isNS) {
-        answer +=
-          " ECHELON " + trackDirFromHdg(lgPos.getBR(tgPos).bearingNum) + ", "
+        answer += " ECHELON " + toCardinal(lgPos.getBR(tgPos).bearingNum) + ", "
       } else {
-        answer +=
-          " ECHELON " + trackDirFromHdg(tgPos.getBR(lgPos).bearingNum) + ", "
+        answer += " ECHELON " + toCardinal(tgPos.getBR(lgPos).bearingNum) + ", "
       }
     }
 
-    answer += picTrackDir(this.props, [tg, lg], this.state.blueAir)
+    answer += this.picTrackDir()
 
     // TODO -- DETERMINE IF OPENING/CLOSING
 

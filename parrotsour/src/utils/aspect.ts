@@ -23,10 +23,12 @@ export function aspectFromCATA(cata: number): Aspect {
 }
 
 /**
- * Converts a heading to a cardinal direction
- * @param heading - heading to translate to track direction
+ * Converts a heading/bearing to a cardinal direction
+ *
+ * @param {number} degrees - Heading/compass direction (degrees) to translate
+ * to cardinal compass direction
  */
-export function trackDirFromHdg(heading: number): string {
+export function toCardinal(degrees: number): string {
   const arr = [
     "NORTH",
     "NORTHEAST",
@@ -47,6 +49,6 @@ export function trackDirFromHdg(heading: number): string {
   ]
   // the compass is divided every 20 degrees, so find the 'box' of degrees the
   // current heading is in
-  const val = Math.floor(heading / (360 / arr.length) + 0.5)
+  const val = Math.floor(degrees / (360 / arr.length) + 0.5)
   return arr[val % arr.length]
 }

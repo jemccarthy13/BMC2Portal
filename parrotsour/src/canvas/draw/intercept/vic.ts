@@ -11,7 +11,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawVic extends DrawPic {
   create(): DrawPic {
@@ -179,11 +178,11 @@ export default class DrawVic extends DrawPic {
 
     // TODO -- SPEED -- Opening/closing pic with range component
 
-    answer += picTrackDir(this.props, [ntg, stg, lg], this.state.blueAir)
+    answer += this.picTrackDir()
 
     answer += formatGroup(format, lg, true) + " "
 
-    const anchorN = isAnchorNorth(ntg, stg)
+    const anchorN = this.isAnchorNorth(ntg, stg)
 
     if (anchorN) {
       answer += formatGroup(format, ntg, false) + " "

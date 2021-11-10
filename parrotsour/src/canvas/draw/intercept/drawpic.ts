@@ -3,27 +3,25 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
 import {
+  FightAxis,
   PictureAnswer,
   PictureCanvasProps,
   PictureCanvasState,
 } from "../../canvastypes"
 import { checkCaps } from "./cap"
 import { PictureInfo } from "./pictureclamp"
+import { Aspect, toCardinal } from "../../../utils/aspect"
+import { FORMAT } from "../../../classes/supportedformats"
 
 export abstract class DrawPic {
   abstract create(): DrawPic
-
   abstract chooseNumGroups(nCts: number): void
-
   abstract getPictureInfo(start?: Point): PictureInfo
-
   abstract createGroups: (
     startPos: Point,
     contactList: number[]
   ) => AircraftGroup[]
-
   abstract drawInfo(): void
-
   abstract getAnswer(): string
 
   numGroups = 0
@@ -115,5 +113,99 @@ export abstract class DrawPic {
       cntSoFar += nCts
     }
     return answer
+  }
+
+  /**
+   * Determine if two groups are echelon
+   *
+   * @param {AircraftGroup} priGroup The anchored group (highest Pri)
+   * @param {AircraftGroup} nonPriGroup The non-priority group
+   */
+  isEchelon = (priGroup: AircraftGroup, nonPriGroup: AircraftGroup): string => {
+    const nPos = priGroup.getCenterOfMass(this.props.dataStyle)
+    const sPos = nonPriGroup.getCenterOfMass(this.props.dataStyle)
+
+    const ngBraaseye = priGroup.getBraaseye()
+    const sgBraaseye = nonPriGroup.getBraaseye()
+
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const isEchX = !isNS && nPos.getBR(new Point(sPos.x, nPos.y)).range > 5
+    const isEchY = isNS && nPos.getBR(new Point(nPos.x, sPos.y)).range > 5
+    let ech = ""
+    if (isEchX || isEchY) {
+      if (ngBraaseye.braa.range < sgBraaseye.braa.range) {
+        ech = " ECHELON " + toCardinal(nPos.getBR(sPos).bearingNum) + ", "
+      } else {
+        ech = " ECHELON " + toCardinal(nPos.getBR(nPos).bearingNum) + ", "
+      }
+    }
+    return ech
+  }
+
+  /**
+   * If all groups are tracking the same direction, get the picture track direction
+   * and set it for all groups (formatting).
+   *
+   * Side effect- set the picDir member variable in each group.
+   *
+   * @returns {string} Track direction of the picture | "" if track dirs are different
+   */
+  picTrackDir = (): string => {
+    let answer = "" // set default return
+
+    const { blueAir } = this.state
+    const { dataStyle, format } = this.props
+
+    // determine if all groups track same direction
+    const trackDir: string | undefined = this.groups[0].getTrackDir()
+    const sameTrackDir: boolean = this.groups.every((group) => {
+      return trackDir === group.getTrackDir()
+    })
+
+    // Picture track direction is included in answer iff
+    // all groups track same direction and the Aspect isn't HOT
+    const asp = blueAir.getAspect(this.groups[0], dataStyle)
+    if (format !== FORMAT.IPE) {
+      if (sameTrackDir && asp !== Aspect.HOT) {
+        answer = trackDir + ". "
+      }
+    }
+
+    // ** Side effect **
+    // Set whether to use track direction in group formatting
+    this.groups.forEach((group) => {
+      if (sameTrackDir) {
+        group.setUseTrackDir(false)
+      }
+    })
+    return answer
+  }
+
+  /**
+   * TODO -- comment
+   */
+  isAnchorNorth = (ng: AircraftGroup, sg: AircraftGroup): boolean => {
+    let anchorN = false
+    const ngBraaseye = ng.getBraaseye()
+    const sgBraaseye = sg.getBraaseye()
+    if (ngBraaseye.braa.range < sgBraaseye.braa.range) {
+      anchorN = true
+    } else if (ngBraaseye.braa.range === sgBraaseye.braa.range) {
+      const altN: number = ng.getAltitudes().sort((a: number, b: number) => {
+        return b - a
+      })[0]
+      const altS: number = sg.getAltitudes().sort((a: number, b: number) => {
+        return b - a
+      })[0]
+
+      if (altN > altS) {
+        anchorN = true
+      } else if (altN === altS) {
+        if (ng.getStrength() >= sg.getStrength()) {
+          anchorN = true
+        }
+      }
+    }
+    return anchorN
   }
 }

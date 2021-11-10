@@ -12,7 +12,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawChampagne extends DrawPic {
   create(): DrawPic {
@@ -198,11 +197,11 @@ export default class DrawChampagne extends DrawPic {
       answer += " WEIGHTED " + sLbl + ", "
     }
 
-    answer += picTrackDir(this.props, [nlg, slg, tg], this.state.blueAir)
+    answer += this.picTrackDir()
 
     const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
 
-    const anchorN = isAnchorNorth(nlg, slg)
+    const anchorN = this.isAnchorNorth(nlg, slg)
     if (anchorN) {
       answer += formatGroup(this.props.format, nlg, true) + " "
       answer += formatGroup(this.props.format, slg, includeBull) + " "

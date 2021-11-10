@@ -16,7 +16,7 @@ import {
 } from "../../utils/psmath"
 import { drawGroupCap } from "./groupcap"
 import { Braaseye } from "../braaseye"
-import { Aspect, aspectFromCATA, trackDirFromHdg } from "../../utils/aspect"
+import { Aspect, aspectFromCATA, toCardinal } from "../../utils/aspect"
 import { BRAA } from "../braa"
 
 /**
@@ -47,11 +47,11 @@ export interface GroupParams {
  * "groups" var to split groups. Should be 'easy'
  */
 export class AircraftGroup extends Array<Aircraft> {
+  private braaseye!: Braaseye
+
   private startPos: Point = Point.DEFAULT
   private label = "GROUP"
   private useTrackDir = true
-  private braaseye!: Braaseye
-
   private maneuvers = 0
 
   /**
@@ -204,7 +204,7 @@ export class AircraftGroup extends Array<Aircraft> {
     if (this.isCapping()) {
       trackDir = "CAP"
     } else if (this.useTrackDir) {
-      trackDir = "TRACK " + trackDirFromHdg(this.getHeading())
+      trackDir = "TRACK " + toCardinal(this.getHeading())
     }
     return trackDir
   }

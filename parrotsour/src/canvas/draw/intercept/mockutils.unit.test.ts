@@ -28,3 +28,9 @@ export const testProps: PictureCanvasProps = {
   animate: false,
   animateCallback: jest.fn(),
 }
+
+describe("must_have_test", () => {
+  it("one_test", () => {
+    expect(true).toEqual(true)
+  })
+})

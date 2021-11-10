@@ -12,7 +12,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { picTrackDir } from "./picturehelpers"
 
 export default class DrawLadder extends DrawPic {
   create(): DrawPic {
@@ -174,9 +173,7 @@ export default class DrawLadder extends DrawPic {
 
     let answer = this.numGroups + " GROUP LADDER " + this.deep + " DEEP, "
 
-    answer += picTrackDir(this.props, this.groups, this.state.blueAir)
-
-    //console.log("CHECK FOR ECHELON LADDER?");
+    answer += this.picTrackDir()
 
     const rangeBack = {
       label: this.props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
@@ -190,6 +187,9 @@ export default class DrawLadder extends DrawPic {
     }
 
     for (let g = this.groups.length - 1; g >= 0; g--) {
+      if (g !== this.groups.length - 1) {
+        // TODO - check echelon from prev group to cur group
+      }
       answer +=
         formatGroup(
           this.props.format,

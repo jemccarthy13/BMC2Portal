@@ -12,7 +12,6 @@ import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
-import { isAnchorNorth, picTrackDir } from "./picturehelpers"
 
 export default class DrawWall extends DrawPic {
   create(): DrawPic {
@@ -171,9 +170,9 @@ export default class DrawWall extends DrawPic {
     let answer =
       this.numGroups + " GROUP WALL " + this.wide + " WIDE " + openClose + ", "
 
-    answer += picTrackDir(this.props, this.groups, this.state.blueAir)
+    answer += this.picTrackDir()
 
-    const anchorNorth = isAnchorNorth(
+    const anchorNorth = this.isAnchorNorth(
       this.groups[0],
       this.groups[this.groups.length - 1]
     )
