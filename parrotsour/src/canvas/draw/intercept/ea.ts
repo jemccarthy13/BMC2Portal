@@ -24,7 +24,7 @@ interface EAInfo {
 export default class DrawEA extends DrawPic {
   private eaPic!: DrawPic
   private eaInfo!: EAInfo
-  private requestType = 0 // 0 = music, 1 = STR, 2 = BD
+  public requestType = 0 // 0 = music, 1 = STR, 2 = BD
 
   create(): DrawPic {
     return new DrawEA()
@@ -68,7 +68,7 @@ export default class DrawEA extends DrawPic {
   /**
    * @returns the closest group to blue air
    */
-  getClosestGroup(): AircraftGroup {
+  private _getClosestGroup(): AircraftGroup {
     // find the closest group
     let closestGrp: AircraftGroup = this.groups[0]
     let closestRng = 9999
@@ -97,7 +97,7 @@ export default class DrawEA extends DrawPic {
    * @returns Object containing closest group, closest braa, query
    * text, strobe range, and group matching the query
    */
-  initializeEAInfo(): void {
+  private _initializeEAInfo(): void {
     const { blueAir } = this.state
     const { dataStyle } = this.props
     const bluePos = blueAir.getCenterOfMass(dataStyle)
@@ -125,7 +125,7 @@ export default class DrawEA extends DrawPic {
     this.eaPic.drawInfo()
     this.eaPic.getAnswer()
 
-    this.initializeEAInfo()
+    this._initializeEAInfo()
 
     this.requestType = randomNumber(0, 2)
     let request = '"EAGLE01, MUSIC ' + this.eaInfo.grp.getLabel() + '"'
@@ -177,7 +177,7 @@ export default class DrawEA extends DrawPic {
    * Return a formatted BRAA response
    */
   formatBRAA(): string {
-    const cGrp = this.getClosestGroup()
+    const cGrp = this._getClosestGroup()
     const braa = this.state.blueAir
       .getCenterOfMass(this.props.dataStyle)
       .getBR(cGrp.getCenterOfMass(this.props.dataStyle))
