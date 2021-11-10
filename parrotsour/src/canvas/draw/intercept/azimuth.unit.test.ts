@@ -23,11 +23,9 @@ beforeAll(() => {
     blueAir: new AircraftGroup({ sx: 600, sy: 400, hdg: 270, nContacts: 4 }),
     answer: { pic: "2 grps az", groups: [] },
     reDraw: jest.fn(),
-    ctx: ctx,
   }
 
   p = {
-    ctx,
     dataTrailType: SensorType.ARROW,
     sx: 200,
     sy: 200,
