@@ -10,7 +10,6 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -160,9 +159,12 @@ export default class DrawRange extends DrawPic {
       secondGroup = lg
       secondGroup.setLabel("TRAIL GROUP")
     }
-    answer += formatGroup(this.props.format, firstGroup, true) + " "
 
-    answer += formatGroup(this.props.format, secondGroup, false)
+    firstGroup.setUseBull(true)
+    secondGroup.setUseBull(false)
+
+    answer += firstGroup.format(this.props.format) + " "
+    answer += secondGroup.format(this.props.format)
 
     return answer.replace(/\s+/g, " ").trim()
   }

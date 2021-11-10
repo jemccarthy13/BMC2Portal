@@ -8,7 +8,7 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -180,16 +180,17 @@ export default class DrawVic extends DrawPic {
 
     answer += this.picTrackDir()
 
-    answer += formatGroup(format, lg, true) + " "
+    lg.setAnchor(true)
+    answer += lg.format(format) + " "
 
-    const anchorN = this.isAnchorNorth(ntg, stg)
+    this.checkAnchor(ntg, stg)
 
-    if (anchorN) {
-      answer += formatGroup(format, ntg, false) + " "
-      answer += formatGroup(format, stg, false)
+    if (ntg.isAnchor()) {
+      answer += ntg.format(format) + " "
+      answer += stg.format(format)
     } else {
-      answer += formatGroup(format, stg, false) + " "
-      answer += formatGroup(format, ntg, false)
+      answer += stg.format(format) + " "
+      answer += ntg.format(format)
     }
 
     return answer.replace(/\s+/g, " ").trim()

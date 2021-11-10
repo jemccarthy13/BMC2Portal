@@ -10,7 +10,7 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 
@@ -141,7 +141,7 @@ export default class DrawAzimuth extends DrawPic {
 
     answer += this.picTrackDir()
 
-    const anchorN = this.isAnchorNorth(ng, sg)
+    this.checkAnchor(ng, sg)
 
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
@@ -150,7 +150,7 @@ export default class DrawAzimuth extends DrawPic {
     let secondGroup = ng
     firstGroup.setLabel("EAST GROUP")
     secondGroup.setLabel("WEST GROUP")
-    if (!anchorN) {
+    if (!ng.isAnchor()) {
       if (!isNS) {
         firstGroup.setLabel("SOUTH GROUP")
         secondGroup.setLabel("NORTH GROUP")
@@ -166,9 +166,11 @@ export default class DrawAzimuth extends DrawPic {
         secondGroup.setLabel("SOUTH GROUP")
       }
     }
-    answer += formatGroup(this.props.format, firstGroup, true)
 
-    answer += " " + formatGroup(this.props.format, secondGroup, includeBull)
+    secondGroup.setUseBull(includeBull)
+
+    answer += firstGroup.format(this.props.format)
+    answer += " " + secondGroup.format(this.props.format)
 
     return answer.replace(/\s+/g, " ").trim()
   }

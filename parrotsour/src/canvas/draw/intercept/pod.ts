@@ -4,7 +4,6 @@ import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
 import { drawAltitudes, drawText } from "../drawutils"
-import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 
@@ -63,7 +62,8 @@ export default class DrawPOD extends DrawPic {
 
     let response = this.groups.length + " GROUPS, "
     for (let z = 0; z < closestGroups.length; z++) {
-      response += formatGroup(this.props.format, this.groups[z], true)
+      this.groups[z].setUseBull(true)
+      response += this.groups[z].format(this.props.format)
     }
     response += "\r\n\r\nNote: This is core; there may be a better answer, "
     response += "but POD is intended to get you thinking about "

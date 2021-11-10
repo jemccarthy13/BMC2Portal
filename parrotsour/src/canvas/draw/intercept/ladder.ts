@@ -9,7 +9,6 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -190,13 +189,8 @@ export default class DrawLadder extends DrawPic {
       if (g !== this.groups.length - 1) {
         // TODO - check echelon from prev group to cur group
       }
-      answer +=
-        formatGroup(
-          this.props.format,
-          this.groups[g],
-          g === this.groups.length - 1,
-          g === this.groups.length - 2 ? rangeBack : undefined
-        ) + " "
+      const rngBackToUse = g === this.groups.length - 2 ? rangeBack : undefined
+      answer += this.groups[g].format(this.props.format, rngBackToUse) + " "
     }
 
     return answer.replace(/\s+/g, " ").trim()

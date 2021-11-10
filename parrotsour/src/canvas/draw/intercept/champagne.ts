@@ -9,7 +9,7 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -199,17 +199,24 @@ export default class DrawChampagne extends DrawPic {
 
     answer += this.picTrackDir()
 
-    const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
+    const anchorOutriggers = this.wide >= 10 && this.props.format !== FORMAT.IPE
 
-    const anchorN = this.isAnchorNorth(nlg, slg)
-    if (anchorN) {
-      answer += formatGroup(this.props.format, nlg, true) + " "
-      answer += formatGroup(this.props.format, slg, includeBull) + " "
+    this.checkAnchor(nlg, slg)
+
+    let group1 = nlg
+    let group2 = slg
+
+    if (nlg.isAnchor()) {
+      slg.setUseBull(anchorOutriggers)
     } else {
-      answer += formatGroup(this.props.format, slg, true) + " "
-      answer += formatGroup(this.props.format, nlg, includeBull) + " "
+      slg.setUseBull(true)
+      nlg.setUseBull(anchorOutriggers)
+      group1 = slg
+      group2 = nlg
     }
-    answer += formatGroup(this.props.format, tg, false)
+    answer += group1.format(this.props.format)
+    answer += group2.format(this.props.format)
+    answer += tg.format(this.props.format)
 
     return answer.replace(/\s+/g, " ").trim()
   }

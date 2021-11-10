@@ -37,6 +37,11 @@ export interface GroupParams {
   type?: ACType
 }
 
+type RangeBack = {
+  label: string
+  range: number
+}
+
 /**
  * An AircraftGroup is an array of 1+ Aircraft.
  *
@@ -53,6 +58,8 @@ export class AircraftGroup extends Array<Aircraft> {
   private label = "GROUP"
   private useTrackDir = true
   private maneuvers = 0
+  private anchor = false
+  private useBull = false
 
   /**
    * Construct an AircraftGroup from the given parameters.Group will initialize
@@ -93,6 +100,70 @@ export class AircraftGroup extends Array<Aircraft> {
     if (randomNumber(0, 100) < 20) {
       this.maneuvers = 1
     }
+  }
+
+  /*************************************************************************
+   * Formatting
+   *************************************************************************/
+  setAnchor(b: boolean): void {
+    this.anchor = b
+    this.useBull = b
+  }
+
+  isAnchor(): boolean {
+    return this.anchor
+  }
+
+  setUseBull(b: boolean): void {
+    this.useBull = b
+  }
+
+  getUseBull(): boolean {
+    return this.useBull
+  }
+
+  /**
+ * Return the string formatted answer for this group based on properties of the group
+
+ */
+  format(format: FORMAT, rangeBack?: RangeBack): string {
+    // format label
+    let answer = this.getLabel() + " "
+
+    // format separation
+    if (rangeBack !== null && rangeBack !== undefined) {
+      answer += rangeBack.label + " " + rangeBack.range + " "
+    }
+
+    // format bullseye if anchor priority
+    const braaseye = this.getBraaseye()
+    if (this.useBull || false) {
+      answer +=
+        "BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
+    }
+
+    // format altitude stack
+    const altStack = this.getAltStack(format)
+    answer += altStack.stack
+
+    // format track direction
+    const trackDir = this.getTrackDir()
+    answer += " "
+    answer += trackDir !== undefined ? trackDir : ""
+
+    // apply ID
+    answer += " HOSTILE"
+
+    // apply fill-in for # contacts
+    const numContacts = this.getStrength()
+    if (numContacts > 1) {
+      answer +=
+        " " + (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
+    }
+
+    // apply fill-ins (HI/FAST/etc)
+    answer += " " + altStack.fillIns
+    return answer.replace(/ {2}/g, " ")
   }
 
   /*************************************************************************

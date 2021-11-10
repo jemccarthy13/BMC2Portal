@@ -5,7 +5,6 @@ import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes } from "../drawutils"
-import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 
@@ -90,6 +89,7 @@ export default class DrawSingleGroup extends DrawPic {
 
   getAnswer = (): string => {
     const sg = this.groups[0]
-    return formatGroup(this.props.format, sg, true).replace(/\s+/g, " ").trim()
+    sg.setUseBull(true)
+    return sg.format(this.props.format).replace(/\s+/g, " ").trim()
   }
 }

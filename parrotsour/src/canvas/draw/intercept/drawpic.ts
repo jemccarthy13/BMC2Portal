@@ -182,30 +182,31 @@ export abstract class DrawPic {
   }
 
   /**
-   * TODO -- comment
+   * Check for anchoring priorities between two groups and set the flag for
+   * the priority group.
+   *
+   * @param {AircraftGroup} group1 One of the groups
+   * @param {AircraftGroup} group2 The other group
    */
-  isAnchorNorth = (ng: AircraftGroup, sg: AircraftGroup): boolean => {
+  checkAnchor = (group1: AircraftGroup, group2: AircraftGroup): void => {
     let anchorN = false
-    const ngBraaseye = ng.getBraaseye()
-    const sgBraaseye = sg.getBraaseye()
+    const ngBraaseye = group1.getBraaseye()
+    const sgBraaseye = group2.getBraaseye()
     if (ngBraaseye.braa.range < sgBraaseye.braa.range) {
       anchorN = true
     } else if (ngBraaseye.braa.range === sgBraaseye.braa.range) {
-      const altN: number = ng.getAltitudes().sort((a: number, b: number) => {
-        return b - a
-      })[0]
-      const altS: number = sg.getAltitudes().sort((a: number, b: number) => {
-        return b - a
-      })[0]
+      const altN: number = group1.getAltitude()
+      const altS: number = group2.getAltitude()
 
       if (altN > altS) {
         anchorN = true
       } else if (altN === altS) {
-        if (ng.getStrength() >= sg.getStrength()) {
+        if (group1.getStrength() >= group2.getStrength()) {
           anchorN = true
         }
       }
     }
-    return anchorN
+    group1.setAnchor(anchorN)
+    group2.setAnchor(!anchorN)
   }
 }

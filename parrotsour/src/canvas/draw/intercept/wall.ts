@@ -9,7 +9,7 @@ import {
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
 import { drawAltitudes, drawMeasurement } from "../drawutils"
-import { formatGroup, getOpenCloseAzimuth } from "../formatutils"
+import { getOpenCloseAzimuth } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -172,25 +172,20 @@ export default class DrawWall extends DrawPic {
 
     answer += this.picTrackDir()
 
-    const anchorNorth = this.isAnchorNorth(
-      this.groups[0],
-      this.groups[this.groups.length - 1]
-    )
+    this.checkAnchor(this.groups[0], this.groups[this.groups.length - 1])
 
     // TODO -- WEIGHTED WALL
     // since we have all the seps[], we could check if any are within weighted criteria
 
-    const includeBull = this.wide > 10 && this.props.format !== FORMAT.IPE
+    const anchorOutriggers = this.wide > 10 && this.props.format !== FORMAT.IPE
 
     for (let g = 0; g < this.numGroups; g++) {
-      const idx: number = anchorNorth ? g : this.numGroups - 1 - g
+      const idx: number = this.groups[0].isAnchor() ? g : this.numGroups - 1 - g
       const group = this.groups[idx]
-      answer +=
-        formatGroup(
-          this.props.format,
-          group,
-          g === 0 || (g === this.numGroups - 1 && includeBull) || false
-        ) + " "
+      group.setUseBull(
+        g === 0 || (g === this.numGroups - 1 && anchorOutriggers)
+      )
+      answer += group.format(this.props.format) + " "
     }
 
     return answer.replace(/\s+/g, " ").trim()

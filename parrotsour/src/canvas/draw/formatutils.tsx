@@ -4,12 +4,6 @@
 import { AircraftGroup } from "../../classes/groups/group"
 import { toRadians } from "../../utils/psmath"
 import { ArrowDataTrail } from "../../classes/aircraft/datatrail/arrowdatatrail"
-import { FORMAT } from "../../classes/supportedformats"
-
-type RangeBack = {
-  label: string
-  range: number
-}
 
 /**
  * Convert an altitude to a 3-digit flight level
@@ -17,61 +11,6 @@ type RangeBack = {
  */
 export function formatAlt(alt: number): string {
   return (alt * 10).toString().substring(0, 3).padStart(3, "0")
-}
-
-/**
- * Return the string formatted answer for this group based on properties of the group
- * @param label The Group Label
- * @param braaseye BRAA from blue and bullseye
- * @param altitudes Altitudes for each contact in the group
- * @param numContacts Number of contacts in the group
- * @param anchor true iff group is anchoring priority
- * @param trackDir track direction of the group
- * @param rangeBack separation, if included
- */
-export function formatGroup(
-  format: FORMAT,
-  group: AircraftGroup,
-  anchor: boolean,
-  rangeBack?: RangeBack
-): string {
-  // format label
-  let answer = group.getLabel() + " "
-
-  // format separation
-  if (rangeBack !== null && rangeBack !== undefined) {
-    answer += rangeBack.label + " " + rangeBack.range + " "
-  }
-
-  // format bullseye if anchor priority
-  const braaseye = group.getBraaseye()
-  if (anchor || false) {
-    answer +=
-      "BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
-  }
-
-  // format altitude stack
-  const altStack = group.getAltStack(format)
-  answer += altStack.stack
-
-  // format track direction
-  const trackDir = group.getTrackDir()
-  answer += " "
-  answer += trackDir !== undefined ? trackDir : ""
-
-  // apply ID
-  answer += " HOSTILE"
-
-  // apply fill-in for # contacts
-  const numContacts = group.getStrength()
-  if (numContacts > 1) {
-    answer +=
-      " " + (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
-  }
-
-  // apply fill-ins (HI/FAST/etc)
-  answer += " " + altStack.fillIns
-  return answer.replace(/ {2}/g, " ")
 }
 
 /**

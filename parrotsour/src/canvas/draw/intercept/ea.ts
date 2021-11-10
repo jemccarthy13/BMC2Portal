@@ -5,7 +5,6 @@ import { Point } from "../../../classes/point"
 import { Aspect, toCardinal } from "../../../utils/aspect"
 import { randomNumber } from "../../../utils/psmath"
 import { drawText } from "../drawutils"
-import { formatGroup } from "../formatutils"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
@@ -145,7 +144,8 @@ export default class DrawEA extends DrawPic {
   formatMusic(): string {
     const { grp } = this.eaInfo
 
-    let answer = formatGroup(this.props.format, grp, true)
+    grp.setUseBull(true)
+    let answer = grp.format(this.props.format)
     if (grp.getStrength() > 1) {
       answer += " LINE ABREAST 3 "
     }
