@@ -1,7 +1,7 @@
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { PictureCanvasState } from "../../canvastypes"
+import { BlueInThe, CanvasOrient, PictureCanvasState } from "../../canvastypes"
 import DrawAzimuth from "./azimuth"
 import { testProps } from "./mockutils.unit.test"
 
@@ -93,6 +93,61 @@ describe("DrawAzimuth", () => {
       "TWO GROUPS AZIMUTH 12 " +
         "SOUTH GROUP BULLSEYE 295/44, 15k TRACK SOUTH HOSTILE HEAVY 4 CONTACTS " +
         "NORTH GROUP BULLSEYE 305/53, 20k TRACK EAST HOSTILE HEAVY 4 CONTACTS"
+    )
+  })
+
+  it("labels_EW", () => {
+    const updatedProps = testProps
+    updatedProps.orientation.orient = BlueInThe.NORTH
+
+    azimuth.initialize(ctx, updatedProps, testState)
+
+    const ng = new AircraftGroup({ ...p, sx: 200, sy: 200, hdg: 1 })
+    const sg = new AircraftGroup({
+      ...p,
+      sx: 150,
+      sy: 200,
+      hdg: 1,
+      alts: [15, 15, 15, 15],
+    })
+
+    azimuth.groups = [ng, sg]
+    azimuth.drawInfo()
+    expect(azimuth.getAnswer()).toEqual(
+      "TWO GROUPS AZIMUTH 12 TRACK NORTH. " +
+        "WEST GROUP BULLSEYE 320/73, 20k HOSTILE HEAVY 4 CONTACTS " +
+        "EAST GROUP BULLSEYE 313/81, 15k HOSTILE HEAVY 4 CONTACTS"
+    )
+  })
+
+  it("EW_anchor_pris", () => {
+    const updatedProps = testProps
+    updatedProps.orientation.orient = BlueInThe.NORTH
+
+    const updatedState = testState
+    updatedState.blueAir = new AircraftGroup({
+      sx: 400,
+      sy: 50,
+      hdg: 270,
+      nContacts: 4,
+    })
+    azimuth.initialize(ctx, updatedProps, testState)
+
+    const ng = new AircraftGroup({ ...p, sx: 200, sy: 180, hdg: 1 })
+    const sg = new AircraftGroup({
+      ...p,
+      sx: 250,
+      sy: 180,
+      hdg: 1,
+      alts: [15, 15, 15, 15],
+    })
+
+    azimuth.groups = [ng, sg]
+    azimuth.drawInfo()
+    expect(azimuth.getAnswer()).toEqual(
+      "TWO GROUPS AZIMUTH 12 TRACK NORTH. " +
+        "EAST GROUP BULLSEYE 331/70, 15k HOSTILE HEAVY 4 CONTACTS " +
+        "WEST GROUP BULLSEYE 322/77, 20k HOSTILE HEAVY 4 CONTACTS"
     )
   })
 })

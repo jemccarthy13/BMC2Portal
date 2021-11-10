@@ -30,6 +30,19 @@ export default function VersionHistory(): JSX.Element {
   // the order in this list === display order
   const versionHistory: VersionList = [
     {
+      version: "4.0.6",
+      date: "09 Nov 2021",
+      features: [],
+      fixes: [
+        "September 2021 ALSA - hot is assumed for pictures where all groups track hot",
+      ],
+      improvements: [
+        "Minor edits to internal functions reduce probability of error",
+        "Some restructuring was done to help for future ALSA updates",
+        "Minor formatting change to answers to reduce unneccessary white spaces",
+      ],
+    },
+    {
       version: "4.0.5",
       date: "12 Aug 2021",
       features: [
