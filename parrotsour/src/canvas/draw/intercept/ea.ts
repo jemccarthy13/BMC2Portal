@@ -4,7 +4,7 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { Aspect, toCardinal } from "../../../utils/aspect"
 import { randomNumber } from "../../../utils/psmath"
-import { drawText } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
@@ -31,22 +31,20 @@ export default class DrawEA extends DrawPic {
 
   chooseNumGroups(nCts: number): void {
     this.eaPic = PictureFactory.getPictureDraw("random", nCts)
-    this.eaPic.initialize(this.ctx, this.props, this.state)
+    this.eaPic.initialize(this.props, this.state)
     this.eaPic.chooseNumGroups(nCts)
   }
 
   getPictureInfo(start?: Point): PictureInfo {
+    const ctx = PaintBrush.getContext()
     // force draw to happen on the right side of the screen
     if (start === undefined) {
       start = new Point(
-        randomNumber(this.ctx.canvas.width * 0.6, this.ctx.canvas.width * 0.65),
-        randomNumber(this.ctx.canvas.width * 0.2, this.ctx.canvas.height * 0.8)
+        randomNumber(ctx.canvas.width * 0.6, ctx.canvas.width * 0.65),
+        randomNumber(ctx.canvas.width * 0.2, ctx.canvas.height * 0.8)
       )
     } else if (start.x === undefined) {
-      start.x = randomNumber(
-        this.ctx.canvas.width * 0.6,
-        this.ctx.canvas.width * 0.65
-      )
+      start.x = randomNumber(ctx.canvas.width * 0.6, ctx.canvas.width * 0.65)
     }
 
     const picInfo = this.eaPic.getPictureInfo(start)
@@ -135,7 +133,8 @@ export default class DrawEA extends DrawPic {
     }
 
     // draw the query
-    drawText(this.ctx, request, this.ctx.canvas.width / 2, 20)
+    const ctx = PaintBrush.getContext()
+    PaintBrush.drawText(request, ctx.canvas.width / 2, 20)
   }
 
   /**

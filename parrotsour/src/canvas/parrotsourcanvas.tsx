@@ -15,6 +15,7 @@ import { AnimationHandler } from "../animation/animationhandler"
 
 // Functions
 import { Point } from "../classes/point"
+import { PaintBrush } from "./draw/paintbrush"
 
 /**
  * This component is the main Component for PS Canvases.
@@ -52,13 +53,12 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
 
     if (oldAnimate !== animate) {
       const { animate, resetCallback } = this.props
-      const { ctx, animateCanvas, answer } = this.state
-      if (ctx) {
+      const { animateCanvas, answer } = this.state
+      if (PaintBrush.getContext()) {
         if (animate) {
           if (animateCanvas) {
             this.animationHandler.continueAnimate = true
             this.animationHandler.animate(
-              ctx,
               this.props,
               this.state,
               answer.groups,
@@ -87,10 +87,7 @@ export default abstract class ParrotSourCanvas extends React.PureComponent<
 
   animationHandler: AnimationHandler
 
-  draw = async (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _ctx: CanvasRenderingContext2D
-  ): Promise<void> => {
+  draw = async (): Promise<void> => {
     return undefined
   }
 

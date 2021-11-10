@@ -3,6 +3,7 @@ import { ACType, Aircraft } from "./aircraft"
 import { SensorType } from "./datatrail/sensortype"
 import { IDMatrix } from "./id"
 import Tasking from "../taskings/tasking"
+import { PaintBrush } from "../../canvas/draw/paintbrush"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const canvasSerializer = require("jest-canvas-snapshot-serializer")
 expect.addSnapshotSerializer(canvasSerializer)
@@ -25,6 +26,7 @@ describe("Aircraft", () => {
   const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!
   ctx.fillStyle = "white"
   ctx.fillRect(0, 0, 0, 0)
+  PaintBrush.use(ctx)
 
   describe("constructors", () => {
     it("constructs_FTR_correctly", () => {
@@ -52,7 +54,7 @@ describe("Aircraft", () => {
   describe("center_of_mass", () => {
     it("computes_for_arrows", () => {
       const bluePos = new Point(50, 50)
-      const acft = new Aircraft({ sx: bluePos.x, sy: bluePos.y, ctx: ctx })
+      const acft = new Aircraft({ sx: bluePos.x, sy: bluePos.y })
       expect(acft.getCenterOfMass()).toEqual({ x: 74, y: 50 })
 
       acft.setHeading(180)
@@ -74,10 +76,9 @@ describe("Aircraft", () => {
       const acft = new Aircraft({
         sx: bluePos.x,
         sy: bluePos.y,
-        ctx: ctx,
         hdg: 180,
       })
-      acft.draw(ctx, SensorType.ARROW)
+      acft.draw(SensorType.ARROW)
       expect(canvas).toMatchSnapshot()
     })
     it("suspect", () => {
@@ -85,11 +86,10 @@ describe("Aircraft", () => {
       const acft = new Aircraft({
         sx: bluePos.x,
         sy: bluePos.y,
-        ctx: ctx,
         hdg: 180,
       })
       acft.setIDMatrix(IDMatrix.SUSPECT)
-      acft.draw(ctx, SensorType.ARROW)
+      acft.draw(SensorType.ARROW)
       expect(canvas).toMatchSnapshot()
     })
     it("neutral", () => {
@@ -97,11 +97,10 @@ describe("Aircraft", () => {
       const acft = new Aircraft({
         sx: bluePos.x,
         sy: bluePos.y,
-        ctx: ctx,
         hdg: 180,
       })
       acft.setIDMatrix(IDMatrix.NEUTRAL)
-      acft.draw(ctx, SensorType.ARROW)
+      acft.draw(SensorType.ARROW)
       expect(canvas).toMatchSnapshot()
     })
     it("assume_friend", () => {
@@ -109,11 +108,10 @@ describe("Aircraft", () => {
       const acft = new Aircraft({
         sx: bluePos.x,
         sy: bluePos.y,
-        ctx: ctx,
         hdg: 180,
       })
       acft.setIDMatrix(IDMatrix.ASSUME_FRIEND)
-      acft.draw(ctx, SensorType.ARROW)
+      acft.draw(SensorType.ARROW)
       expect(canvas).toMatchSnapshot()
     })
   })
@@ -124,7 +122,6 @@ describe("Aircraft", () => {
       const acft = new Aircraft({
         sx: bluePos.x,
         sy: bluePos.y,
-        ctx: ctx,
         hdg: 180,
         alt: 30,
       })

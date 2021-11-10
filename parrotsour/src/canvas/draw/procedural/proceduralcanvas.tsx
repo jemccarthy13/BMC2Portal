@@ -4,7 +4,6 @@ import DrawingCanvas from "../../drawingcanvas"
 
 import { PictureAnswer, PictureCanvasProps } from "../../../canvas/canvastypes"
 
-import { drawLine, drawText } from "../drawutils"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
 import { Point } from "../../../classes/point"
@@ -12,6 +11,7 @@ import { getStartPos } from "../../../canvas/draw/intercept/pictureclamp"
 import { IDMatrix } from "../../../classes/aircraft/id"
 import ParrotSourCanvas from "../../parrotsourcanvas"
 import { ProceduralAnimationHandler } from "../../../animation/proceduralanimator"
+import { PaintBrush } from "../paintbrush"
 
 /**
  * This component is the main control for drawing pictures for procedural control
@@ -44,17 +44,13 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
    * @param forced true iff picture type should be forced as random, !lead edge and !packages
    * @param start (optional) start position for the picture
    */
-  drawPicture = (
-    ctx: CanvasRenderingContext2D,
-    forced?: boolean,
-    start?: Point
-  ): PictureAnswer => {
+  drawPicture = (forced?: boolean, start?: Point): PictureAnswer => {
     const { orientation, dataStyle } = this.props
     const { blueAir } = this.state
 
     blueAir.setCapping(true)
 
-    const startPos = getStartPos(ctx, blueAir, orientation.orient, dataStyle, {
+    const startPos = getStartPos(blueAir, orientation.orient, dataStyle, {
       start,
     })
 
@@ -73,30 +69,31 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
       desiredAlt: grp.getAltitude(),
     })
 
-    grp.draw(ctx, dataStyle)
+    grp.draw(dataStyle)
 
     const grpPos = grp.getCenterOfMass(dataStyle)
 
-    drawText(ctx, grp.getLabel(), grpPos.x, grpPos.y + 35, 12)
+    PaintBrush.drawText(grp.getLabel(), grpPos.x, grpPos.y + 35, 12)
     return {
       pic: "",
       groups: [grp],
     }
   }
 
-  drawCGRSGrid = (ctx: CanvasRenderingContext2D): void => {
+  drawCGRSGrid = (): void => {
+    const ctx = PaintBrush.getContext()
     for (let x = 0; x < ctx.canvas.width; x += 10 * PIXELS_TO_NM) {
       if (x % (30 * PIXELS_TO_NM) === 0) {
-        drawLine(ctx, x, 0, x, ctx.canvas.height)
+        PaintBrush.drawLine(x, 0, x, ctx.canvas.height)
       } else {
-        drawLine(ctx, x, 0, x, ctx.canvas.height, "gray")
+        PaintBrush.drawLine(x, 0, x, ctx.canvas.height, "gray")
       }
     }
     for (let y = 0; y < ctx.canvas.height; y += 10 * PIXELS_TO_NM) {
       if (y % (30 * PIXELS_TO_NM) === 0) {
-        drawLine(ctx, 0, y, ctx.canvas.width, y)
+        PaintBrush.drawLine(0, y, ctx.canvas.width, y)
       } else {
-        drawLine(ctx, 0, y, ctx.canvas.width, y, "gray")
+        PaintBrush.drawLine(0, y, ctx.canvas.width, y, "gray")
       }
     }
 
@@ -123,8 +120,7 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
           off++
           colC = 0
         }
-        drawText(
-          ctx,
+        PaintBrush.drawText(
           rowC + chr(startCol1 + off) + chr(col2Chr + colC),
           x + 33,
           y + 60,
@@ -145,24 +141,21 @@ export default class ProceduralCanvas extends ParrotSourCanvas {
    * (i.e. blue arrows, bullseye, and image 'snap' for mouse draw)
    * @param context the drawing context to draw in
    */
-  draw = async (
-    ctx: CanvasRenderingContext2D | null | undefined
-  ): Promise<void> => {
-    if (ctx === null || ctx === undefined) return
+  draw = async (): Promise<void> => {
+    this.drawCGRSGrid()
 
-    this.drawCGRSGrid(ctx)
-
+    const ctx = PaintBrush.getContext()
     const imageData = ctx.getImageData(
       0,
       0,
       ctx.canvas.width,
       ctx.canvas.height
     )
-    const answer: PictureAnswer = this.drawPicture(ctx)
+    const answer: PictureAnswer = this.drawPicture()
 
     const { setAnswer } = this.props
     setAnswer(answer)
-    this.setState({ ctx, answer, animateCanvas: imageData })
+    this.setState({ answer, animateCanvas: imageData })
   }
 
   render(): ReactElement {

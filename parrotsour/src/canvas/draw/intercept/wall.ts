@@ -8,8 +8,8 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { getOpenCloseAzimuth } from "../formatutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -47,7 +47,6 @@ export default class DrawWall extends DrawPic {
       deep,
     }
     const startPos = getRestrictedStartPos(
-      this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
@@ -81,7 +80,6 @@ export default class DrawWall extends DrawPic {
         )
 
       const grp = new AircraftGroup({
-        ctx: this.ctx,
         sx: isNS ? startPos.x + totalArrowOffset : startPos.x,
         sy: isNS ? startPos.y : startPos.y + totalArrowOffset,
         hdg: heading + offsetHeading,
@@ -109,8 +107,7 @@ export default class DrawWall extends DrawPic {
       }
       const grp = this.groups[x]
       const grpPos = grp.getCenterOfMass(dataStyle)
-      drawAltitudes(
-        this.ctx,
+      PaintBrush.drawAltitudes(
         grpPos,
         grp.getAltitudes(),
         altOffsetX,
@@ -119,7 +116,7 @@ export default class DrawWall extends DrawPic {
       grp.setBraaseye(new Braaseye(grpPos, bluePos, this.state.bullseye))
       grp
         .getBraaseye()
-        .draw(this.ctx, showMeasurements, braaFirst, altOffsetX, altOffsetY)
+        .draw(showMeasurements, braaFirst, altOffsetX, altOffsetY)
     }
 
     const prevGpPos =
@@ -134,7 +131,7 @@ export default class DrawWall extends DrawPic {
       fromPt = new Point(gpPos.x, gpPos.y - 25)
       toPt = new Point(prevGpPos.x, gpPos.y - 25)
     }
-    drawMeasurement(this.ctx, fromPt, toPt, widthNM, showMeasurements)
+    PaintBrush.drawMeasurement(fromPt, toPt, widthNM, showMeasurements)
     this.wide = widthNM
   }
 

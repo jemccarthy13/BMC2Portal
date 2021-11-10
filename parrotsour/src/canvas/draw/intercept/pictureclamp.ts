@@ -3,6 +3,7 @@ import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
+import { PaintBrush } from "../paintbrush"
 
 export type Bounds = {
   lowX: number
@@ -35,10 +36,10 @@ export const _howFarOut = (x: number, min: number, max: number): number => {
 }
 
 export const _clampPictureInContext = (
-  ctx: CanvasRenderingContext2D,
   pInfo: PictureInfo,
   orientation: BlueInThe
 ): Point => {
+  const ctx = PaintBrush.getContext()
   if (!pInfo.start) {
     console.warn(
       "Without a starting point to clamp, _clampPictureInContext will generate a random point."
@@ -65,7 +66,6 @@ export const _clampPictureInContext = (
 }
 
 export const getRestrictedStartPos = (
-  ctx: CanvasRenderingContext2D,
   blueAir: AircraftGroup,
   orientation: BlueInThe,
   dataStyle: SensorType,
@@ -73,6 +73,7 @@ export const getRestrictedStartPos = (
   maxNMFromBlue: number,
   pInfo?: PictureInfo
 ): Point => {
+  const ctx = PaintBrush.getContext()
   const blueLoc = blueAir.getCenterOfMass(dataStyle)
 
   let limitLine = blueLoc.x
@@ -117,25 +118,24 @@ export const getRestrictedStartPos = (
     start: new Point(startX, startY),
   }
 
-  const point = _clampPictureInContext(ctx, pInfo, orientation)
+  const point = _clampPictureInContext(pInfo, orientation)
 
   return point
 }
 
 export const getStartPos = (
-  ctx: CanvasRenderingContext2D,
   blueAir: AircraftGroup,
   orientation: BlueInThe,
   dataStyle: SensorType,
   pInfo?: PictureInfo
 ): Point => {
+  const ctx = PaintBrush.getContext()
   let canvasSize = ctx.canvas.width
   if (orientation === BlueInThe.NORTH || orientation === BlueInThe.SOUTH) {
     canvasSize = ctx.canvas.height
   }
   const maxMiles = canvasSize / PIXELS_TO_NM
   return getRestrictedStartPos(
-    ctx,
     blueAir,
     orientation,
     dataStyle,

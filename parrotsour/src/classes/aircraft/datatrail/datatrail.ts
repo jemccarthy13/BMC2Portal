@@ -21,9 +21,5 @@ export abstract class DataTrail {
 
   abstract getCenterOfMass(heading: number): Point
 
-  abstract draw(
-    ctx: CanvasRenderingContext2D,
-    heading: number,
-    id: IDMatrix
-  ): void
+  abstract draw(heading: number, id: IDMatrix): void
 }

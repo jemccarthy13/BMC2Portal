@@ -2,13 +2,13 @@ import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { PictureCanvasState } from "../../canvastypes"
+import { PaintBrush } from "../paintbrush"
 import DrawEA from "./ea"
 import { testProps } from "./mockutils.unit.test"
 import { PictureFactory } from "./picturefactory"
 
 describe("DrawEA", () => {
   let testState: PictureCanvasState
-  let ctx: CanvasRenderingContext2D
   let p: Partial<GroupParams>
   let draw: DrawEA
 
@@ -20,14 +20,14 @@ describe("DrawEA", () => {
     jest.spyOn(console, "warn").mockImplementation()
     const canvas = document.createElement("canvas")
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    ctx = canvas.getContext("2d")!
+    const ctx = canvas.getContext("2d")!
     canvas.width = 800
     canvas.height = 500
 
+    PaintBrush.use(ctx)
     const startX = 200
     const startY = 200
     p = {
-      ctx,
       dataTrailType: SensorType.ARROW,
       sx: startX,
       sy: startY,
@@ -40,11 +40,10 @@ describe("DrawEA", () => {
       blueAir: new AircraftGroup({ sx: 600, sy: 400, hdg: 270, nContacts: 4 }),
       answer: { pic: "2 grps az", groups: [] },
       reDraw: jest.fn(),
-      ctx: ctx,
     }
 
     draw = PictureFactory.getPictureDraw("ea") as DrawEA
-    draw.initialize(ctx, testProps, testState)
+    draw.initialize(testProps, testState)
     draw.chooseNumGroups(1)
     draw.createGroups(new Point(startX, startY), [1])
     draw.drawInfo()

@@ -1,3 +1,4 @@
+import { PaintBrush } from "../../../canvas/draw/paintbrush"
 import { headingToRadians, PIXELS_TO_NM } from "../../../utils/psmath"
 import { Point } from "../../point"
 import { IDMatrix } from "../id"
@@ -17,7 +18,8 @@ export class ArrowDataTrail extends DataTrail {
     )
   }
 
-  draw(ctx: CanvasRenderingContext2D, heading: number, id: IDMatrix): void {
+  draw(heading: number, id: IDMatrix): void {
+    const ctx = PaintBrush.getContext()
     ctx.lineWidth = 1
     ctx.fillStyle = id
 

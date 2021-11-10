@@ -1,5 +1,4 @@
 import { Point } from "../../point"
-import { IDMatrix } from "../id"
 import { RadarDataTrail } from "./radardatatrail"
 
 // const canvas = document.createElement("canvas")

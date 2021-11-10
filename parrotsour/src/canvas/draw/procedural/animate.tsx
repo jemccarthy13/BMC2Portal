@@ -8,9 +8,9 @@ import {
 import PSAlert from "../../../pscomponents/alert/psalert"
 
 // Functions
-import { drawAltitudes, drawText } from "../drawutils"
 import { randomNumber } from "../../../utils/psmath"
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
+import { PaintBrush } from "../paintbrush"
 
 let continueAnimation = false
 
@@ -101,7 +101,7 @@ function doAnimation(
     groups[x].updateAltitude()
 
     if (!groups[x].isCapping() && !groups[x].hasRouting()) {
-      groups[x].draw(ctx, props.dataStyle)
+      groups[x].draw(props.dataStyle)
 
       groups[x].move()
 
@@ -118,7 +118,7 @@ function doAnimation(
       })
     } else {
       // const sPos = groups[x].getCenterOfMass(props.dataStyle)
-      groups[x].draw(ctx, props.dataStyle)
+      groups[x].draw(props.dataStyle)
       // drawGroupCap(
       //   ctx,
       //   props.orientation.orient,
@@ -129,7 +129,7 @@ function doAnimation(
       // )
     }
     const sPos = groups[x].getCenterOfMass(props.dataStyle)
-    drawText(ctx, groups[x].getLabel(), sPos.x - 10, sPos.y + 20, 12)
+    PaintBrush.drawText(groups[x].getLabel(), sPos.x - 10, sPos.y + 20, 12)
   }
 
   if (continueAnimation) {
@@ -148,8 +148,7 @@ function doAnimation(
     window.requestAnimationFrame(animate)
 
     for (let y = 0; y < groups.length; y++) {
-      drawAltitudes(
-        ctx,
+      PaintBrush.drawAltitudes(
         groups[y].getCenterOfMass(props.dataStyle),
         groups[y].getAltitudes()
       )

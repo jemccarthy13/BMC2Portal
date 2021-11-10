@@ -40,7 +40,6 @@ export interface PictureCanvasState {
   blueAir: AircraftGroup
   answer: PictureAnswer
   reDraw: PictureReDrawFunction
-  ctx?: CanvasRenderingContext2D
   animateCanvas?: ImageData
 }
 
@@ -78,10 +77,5 @@ export interface PictureDrawFunction {
 }
 
 export interface PictureReDrawFunction {
-  (
-    context: CanvasRenderingContext2D,
-    forced?: boolean,
-    start?: Point,
-    hasCaps?: boolean
-  ): PictureAnswer
+  (forced?: boolean, start?: Point, hasCaps?: boolean): PictureAnswer
 }

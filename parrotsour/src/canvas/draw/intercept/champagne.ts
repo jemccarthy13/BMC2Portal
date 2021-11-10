@@ -8,8 +8,8 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { getOpenCloseAzimuth } from "../formatutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -30,7 +30,6 @@ export default class DrawChampagne extends DrawPic {
     }
 
     const startPos = getRestrictedStartPos(
-      this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
@@ -50,7 +49,6 @@ export default class DrawChampagne extends DrawPic {
       this.state.blueAir.getHeading()
     )
     const tg = new AircraftGroup({
-      ctx: this.ctx,
       sx: startPos.x,
       sy: startPos.y,
       hdg: heading + randomNumber(-10, 10),
@@ -67,7 +65,6 @@ export default class DrawChampagne extends DrawPic {
     let nlg: AircraftGroup
     if (isNS) {
       nlg = new AircraftGroup({
-        ctx: this.ctx,
         sx: startPos.x - this.wide / 2,
         sy: startPos.y - this.deep,
         hdg: heading + randomNumber(-10, 10),
@@ -75,7 +72,6 @@ export default class DrawChampagne extends DrawPic {
       })
     } else {
       nlg = new AircraftGroup({
-        ctx: this.ctx,
         sx: startPos.x + this.deep,
         sy: startPos.y - this.wide / 2,
         hdg: heading + randomNumber(-10, 10),
@@ -92,7 +88,6 @@ export default class DrawChampagne extends DrawPic {
     let slg
     if (isNS) {
       slg = new AircraftGroup({
-        ctx: this.ctx,
         sx: startPos.x + this.wide / 2,
         sy: startPos.y - this.deep,
         hdg: heading + randomNumber(-10, 10),
@@ -102,7 +97,6 @@ export default class DrawChampagne extends DrawPic {
       slg.setLabel("EAST LEAD GROUP")
     } else {
       slg = new AircraftGroup({
-        ctx: this.ctx,
         sx: startPos.x + this.deep,
         sy: startPos.y + this.wide / 2,
         hdg: heading + randomNumber(-10, 10),
@@ -137,14 +131,14 @@ export default class DrawChampagne extends DrawPic {
     }
     this.wide = wPt.getBR(nlgPos).range
     this.deep = dPt.getBR(tgPos).range
-    drawMeasurement(this.ctx, nlgPos, wPt, this.wide, showMeasurements)
-    drawMeasurement(this.ctx, tgPos, dPt, this.deep, showMeasurements)
+    PaintBrush.drawMeasurement(nlgPos, wPt, this.wide, showMeasurements)
+    PaintBrush.drawMeasurement(tgPos, dPt, this.deep, showMeasurements)
 
     const offsetXTrail = !isNS ? -100 : 0
     const offsetXNL = isNS ? -100 : 0
-    drawAltitudes(this.ctx, tgPos, tg.getAltitudes(), offsetXTrail)
-    drawAltitudes(this.ctx, slgPos, slg.getAltitudes())
-    drawAltitudes(this.ctx, nlgPos, nlg.getAltitudes(), offsetXNL)
+    PaintBrush.drawAltitudes(tgPos, tg.getAltitudes(), offsetXTrail)
+    PaintBrush.drawAltitudes(slgPos, slg.getAltitudes())
+    PaintBrush.drawAltitudes(nlgPos, nlg.getAltitudes(), offsetXNL)
 
     const { blueAir, bullseye } = this.state
     const { dataStyle, braaFirst } = this.props
@@ -154,9 +148,9 @@ export default class DrawChampagne extends DrawPic {
     nlg.setBraaseye(new Braaseye(nlgPos, bluePos, bullseye))
     slg.setBraaseye(new Braaseye(slgPos, bluePos, bullseye))
 
-    tg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst, offsetXTrail)
-    nlg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst, offsetXNL)
-    slg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
+    tg.getBraaseye().draw(showMeasurements, braaFirst, offsetXTrail)
+    nlg.getBraaseye().draw(showMeasurements, braaFirst, offsetXNL)
+    slg.getBraaseye().draw(showMeasurements, braaFirst)
   }
 
   getAnswer(): string {
@@ -180,7 +174,7 @@ export default class DrawChampagne extends DrawPic {
     const nLbl = isNS ? "WEST" : "NORTH"
     const sLbl = isNS ? "EAST" : "SOUTH"
 
-    nlg.draw(this.ctx, this.props.dataStyle)
+    nlg.draw(this.props.dataStyle)
     const nlgPos = nlg.getCenterOfMass(this.props.dataStyle)
     const slgPos = slg.getCenterOfMass(this.props.dataStyle)
     const tgPos = tg.getCenterOfMass(this.props.dataStyle)

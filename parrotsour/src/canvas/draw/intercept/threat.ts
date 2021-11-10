@@ -9,7 +9,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 
@@ -54,7 +54,6 @@ export default class DrawThreat extends DrawPic {
     )
 
     const sg = new AircraftGroup({
-      ctx: this.ctx,
       sx: startPos.x,
       sy: startPos.y,
       hdg: heading,
@@ -72,10 +71,10 @@ export default class DrawThreat extends DrawPic {
     const sgPos = sg.getCenterOfMass(dataStyle)
     const bluePos = blueAir.getCenterOfMass(dataStyle)
 
-    drawAltitudes(this.ctx, sgPos, sg.getAltitudes())
+    PaintBrush.drawAltitudes(sgPos, sg.getAltitudes())
 
     sg.setBraaseye(new Braaseye(sgPos, bluePos, bullseye))
-    sg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
+    sg.getBraaseye().draw(showMeasurements, braaFirst)
   }
 
   getAnswer(): string {

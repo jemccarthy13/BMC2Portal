@@ -23,8 +23,8 @@ export class RawDataTrail extends DataTrail {
     this.rdrDataTrail.move(heading)
   }
 
-  draw(ctx: CanvasRenderingContext2D, heading: number, id: IDMatrix): void {
-    this.iffDataTrail.draw(ctx, heading, id)
-    this.rdrDataTrail.draw(ctx, heading, id)
+  draw(heading: number, id: IDMatrix): void {
+    this.iffDataTrail.draw(heading, id)
+    this.rdrDataTrail.draw(heading, id)
   }
 }

@@ -7,8 +7,8 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { getOpenCloseAzimuth } from "../formatutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -28,7 +28,6 @@ export default class DrawVic extends DrawPic {
       deep: randomNumber(7 * PIXELS_TO_NM, 30 * PIXELS_TO_NM),
     }
     const startPos = getRestrictedStartPos(
-      this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
@@ -50,7 +49,6 @@ export default class DrawVic extends DrawPic {
     let sy = startPos.y
     let heading: number = randomHeading(format, blueAir.getHeading())
     const ntg = new AircraftGroup({
-      ctx: this.ctx,
       sx,
       sy,
       hdg: heading + randomNumber(-10, 10),
@@ -65,7 +63,6 @@ export default class DrawVic extends DrawPic {
       sy = startPos.y + this.wide
     }
     const stg = new AircraftGroup({
-      ctx: this.ctx,
       sx,
       sy,
       hdg: heading + randomNumber(-10, 10),
@@ -81,7 +78,6 @@ export default class DrawVic extends DrawPic {
       sy = startPos.y + this.wide / 2
     }
     const lg = new AircraftGroup({
-      ctx: this.ctx,
       sx,
       sy,
       hdg: heading,
@@ -118,20 +114,20 @@ export default class DrawVic extends DrawPic {
     const realWidth = wPt.getBR(stgPos).range
     this.deep = realDepth
     this.wide = realWidth
-    drawMeasurement(this.ctx, lgPos, dPt, realDepth, showMeasurements)
-    drawMeasurement(this.ctx, stgPos, wPt, realWidth, showMeasurements)
+    PaintBrush.drawMeasurement(lgPos, dPt, realDepth, showMeasurements)
+    PaintBrush.drawMeasurement(stgPos, wPt, realWidth, showMeasurements)
 
-    drawAltitudes(this.ctx, lgPos, lg.getAltitudes())
-    drawAltitudes(this.ctx, stgPos, stg.getAltitudes())
-    drawAltitudes(this.ctx, ntgPos, ntg.getAltitudes(), offsetX)
+    PaintBrush.drawAltitudes(lgPos, lg.getAltitudes())
+    PaintBrush.drawAltitudes(stgPos, stg.getAltitudes())
+    PaintBrush.drawAltitudes(ntgPos, ntg.getAltitudes(), offsetX)
 
     lg.setBraaseye(new Braaseye(lgPos, bluePos, bullseye))
     stg.setBraaseye(new Braaseye(stgPos, bluePos, bullseye))
     ntg.setBraaseye(new Braaseye(ntgPos, bluePos, bullseye))
 
-    lg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
-    stg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
-    ntg.getBraaseye().draw(this.ctx, showMeasurements, braaFirst, offsetX)
+    lg.getBraaseye().draw(showMeasurements, braaFirst)
+    stg.getBraaseye().draw(showMeasurements, braaFirst)
+    ntg.getBraaseye().draw(showMeasurements, braaFirst, offsetX)
   }
 
   getAnswer(): string {

@@ -1,3 +1,4 @@
+import { PaintBrush } from "../../../canvas/draw/paintbrush"
 import { headingToRadians, PIXELS_TO_NM } from "../../../utils/psmath"
 import { Point } from "../../point"
 import { IDMatrix } from "../id"
@@ -61,7 +62,8 @@ export class IFFDataTrail extends DataTrail {
     this.iffPoints = newIFFPts
   }
 
-  draw(ctx: CanvasRenderingContext2D, heading: number, id: IDMatrix): void {
+  draw(heading: number, id: IDMatrix): void {
+    const ctx = PaintBrush.getContext()
     if (id !== IDMatrix.SUSPECT && id !== IDMatrix.HOSTILE) {
       ctx.strokeStyle = "blue"
       ctx.lineWidth = 1

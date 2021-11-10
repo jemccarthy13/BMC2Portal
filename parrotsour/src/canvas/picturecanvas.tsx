@@ -12,7 +12,6 @@ import { AircraftGroup } from "../classes/groups/group"
 import { Point } from "../classes/point"
 
 // Functions
-import { drawBullseye, drawFullInfo } from "./draw/drawutils"
 import { IDMatrix } from "../classes/aircraft/id"
 import { randomNumber } from "../utils/psmath"
 import { PaintBrush } from "./draw/paintbrush"
@@ -54,20 +53,19 @@ export default class PictureCanvas extends ParrotSourCanvas {
       }
       ctx.fillStyle = "white"
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      drawBullseye(PaintBrush.getContext(), this.state.bullseye)
+      PaintBrush.drawBullseye(this.state.bullseye)
       animateImage = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
       this.state.answer.groups.forEach((grp) => {
-        grp.draw(ctx, this.props.dataStyle)
+        grp.draw(this.props.dataStyle)
       })
-      this.state.blueAir.draw(PaintBrush.getContext(), this.props.dataStyle)
-      drawFullInfo(ctx, this.state, this.props, this.state.answer.groups)
+      this.state.blueAir.draw(this.props.dataStyle)
+      PaintBrush.drawFullInfo(this.state, this.props, this.state.answer.groups)
       if (
         this.props.animate === prevProps.animate &&
         prevProps.animate === true
       ) {
         this.animationHandler.animate(
-          ctx,
           this.props,
           this.state,
           this.state.answer.groups,
@@ -85,11 +83,7 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * @param forced true iff picture type should be forced as random, !lead edge and !packages
    * @param start (optional) start position for the picture
    */
-  drawPicture = (
-    context: CanvasRenderingContext2D,
-    forced?: boolean,
-    start?: Point
-  ): PictureAnswer => {
+  drawPicture = (forced?: boolean, start?: Point): PictureAnswer => {
     const { picType } = this.props
     const { desiredNumContacts } = this.props
 
@@ -99,14 +93,9 @@ export default class PictureCanvas extends ParrotSourCanvas {
       forced
     )
 
-    drawFunc.initialize(context, this.props, this.state)
+    drawFunc.initialize(this.props, this.state)
 
-    const answer = drawFunc.draw(
-      context,
-      picType === "cap",
-      desiredNumContacts,
-      start
-    )
+    const answer = drawFunc.draw(picType === "cap", desiredNumContacts, start)
 
     const { blueAir } = this.state
     const { dataStyle } = this.props
@@ -133,9 +122,10 @@ export default class PictureCanvas extends ParrotSourCanvas {
    * (i.e. blue arrows, bullseye, and image 'snap' for mouse draw)
    * @param context the Context to draw in
    */
-  draw = async (ctx: CanvasRenderingContext2D): Promise<void> => {
-    const bullseye = drawBullseye(ctx)
+  draw = async (): Promise<void> => {
+    const bullseye = PaintBrush.drawBullseye()
 
+    const ctx = PaintBrush.getContext()
     let xPos = ctx.canvas.width - 20
     let yPos = randomNumber(ctx.canvas.height * 0.33, ctx.canvas.height * 0.66)
     let heading = 270
@@ -149,7 +139,6 @@ export default class PictureCanvas extends ParrotSourCanvas {
     }
 
     const blueAir = new AircraftGroup({
-      ctx,
       sx: xPos,
       sy: yPos,
       hdg: heading,
@@ -161,12 +150,12 @@ export default class PictureCanvas extends ParrotSourCanvas {
 
     const blueOnly = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-    const answer: PictureAnswer = this.drawPicture(ctx)
+    const answer: PictureAnswer = this.drawPicture()
     this.props.setAnswer(answer)
 
-    blueAir.draw(ctx, this.props.dataStyle)
+    blueAir.draw(this.props.dataStyle)
 
-    this.setState({ ctx, answer, animateCanvas: blueOnly })
+    this.setState({ answer, animateCanvas: blueOnly })
   }
 
   state: PictureCanvasState = {

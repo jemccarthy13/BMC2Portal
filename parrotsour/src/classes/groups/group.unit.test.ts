@@ -6,12 +6,21 @@ import { IDMatrix } from "../aircraft/id"
 import { SensorType } from "../aircraft/datatrail/sensortype"
 import Tasking from "../taskings/tasking"
 import { FORMAT } from "../supportedformats"
+import { PaintBrush } from "../../canvas/draw/paintbrush"
 
 /**
  * TODO -- TESTING -- Underlying random utility
  * https://luetkemj.github.io/170421/mocking-modules-in-jest
  */
 describe("AircraftGroup", () => {
+  let canvas: HTMLCanvasElement
+  beforeAll(() => {
+    canvas = document.createElement("canvas")
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const ctx = canvas.getContext("2d")!
+    PaintBrush.use(ctx)
+  })
+
   describe("accessor_functions", () => {
     it("constructor_and_aircraft_functions", () => {
       const startPt = new Point(20, 20)
@@ -130,17 +139,13 @@ describe("AircraftGroup", () => {
 
   describe("draw_group", () => {
     it("draws_all_groups", () => {
-      const canvas = document.createElement("canvas")
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const ctx = canvas.getContext("2d")!
-
       const grp = new AircraftGroup({
         nContacts: 4,
         hdg: 135,
         id: IDMatrix.FRIEND,
       })
       const myMock = jest.spyOn(Aircraft.prototype, "draw")
-      grp.draw(ctx, SensorType.ARROW)
+      grp.draw(SensorType.ARROW)
       expect(myMock).toHaveBeenCalledTimes(4)
       expect(canvas).toMatchSnapshot()
     })

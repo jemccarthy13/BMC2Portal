@@ -3,7 +3,7 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM, randomNumber } from "../../../utils/psmath"
-import { drawAltitudes, drawText } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 
@@ -27,14 +27,14 @@ export default class DrawPOD extends DrawPic {
   createGroups = (): AircraftGroup[] => {
     const groups = []
     for (let x = 0; x <= this.getNumGroups(); x++) {
-      groups.push(GroupFactory.randomGroup(this.ctx, this.props, this.state))
+      groups.push(GroupFactory.randomGroup(this.props, this.state))
     }
     return groups
   }
 
   drawInfo(): void {
     const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
-    drawText(this.ctx, '"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
+    PaintBrush.drawText('"DARKSTAR, EAGLE01, PICTURE"', bPos.x - 200, 20)
 
     const { showMeasurements, braaFirst } = this.props
 
@@ -43,8 +43,8 @@ export default class DrawPOD extends DrawPic {
 
       grp.setLabel("GROUP")
       grp.setBraaseye(new Braaseye(grpPos, bPos, this.state.bullseye))
-      grp.getBraaseye().draw(this.ctx, showMeasurements, braaFirst)
-      drawAltitudes(this.ctx, grpPos, grp.getAltitudes())
+      grp.getBraaseye().draw(showMeasurements, braaFirst)
+      PaintBrush.drawAltitudes(grpPos, grp.getAltitudes())
     })
   }
 

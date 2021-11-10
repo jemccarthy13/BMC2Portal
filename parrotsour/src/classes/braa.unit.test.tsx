@@ -1,3 +1,4 @@
+import { PaintBrush } from "../canvas/draw/paintbrush"
 import { BRAA } from "./braa"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -15,6 +16,7 @@ describe("BRAA", () => {
     ctx = canvas.getContext("2d")!
     canvas.height = 20
     canvas.width = 50
+    PaintBrush.use(ctx)
   })
 
   afterEach(() => {
@@ -36,13 +38,13 @@ describe("BRAA", () => {
 
   it("draws_correctly", () => {
     const br = new BRAA(90, 20)
-    br.draw(ctx, 10, 10, "black", true)
+    br.draw(10, 10, "black", true)
     expect(canvas).toMatchSnapshot()
   })
 
   it("draws_only_when_showmeasure_true", () => {
     const br = new BRAA(90, 20)
-    br.draw(ctx, 10, 10, "black", false)
+    br.draw(10, 10, "black", false)
     expect(canvas).toMatchSnapshot()
   })
 })

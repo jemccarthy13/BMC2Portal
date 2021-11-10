@@ -7,7 +7,9 @@ import { BlueInThe, PictureCanvasProps } from "./canvastypes"
 import ParrotSourCanvas from "./parrotsourcanvas"
 import DrawingCanvas from "./drawingcanvas"
 import { PicAnimationHandler } from "../animation/picanimator"
+import { PaintBrush } from "./draw/paintbrush"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const picAnimator = jest.mock("../animation/picanimator")
 const animatorAnimate = jest.spyOn(PicAnimationHandler.prototype, "animate")
 const animatorPause = jest.spyOn(PicAnimationHandler.prototype, "pauseFight")
@@ -21,6 +23,7 @@ canvas.height = 30
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!
 ctx.fillStyle = "white"
 ctx.fillRect(0, 0, 0, 0)
+PaintBrush.use(ctx)
 
 describe("ParrotSourCanvas", () => {
   const testProps: PictureCanvasProps = {
@@ -41,20 +44,12 @@ describe("ParrotSourCanvas", () => {
     animate: true,
     animateCallback: jest.fn(),
     resetCallback: resetFn,
+    desiredNumContacts: 4,
   }
 
   it("renders", () => {
     const wrapper = shallow(<ParrotSourCanvas {...testProps} />)
     expect(wrapper.find(DrawingCanvas)).toHaveLength(1)
-  })
-
-  it("does_nothing_no_context", () => {
-    const wrapper = shallow(<ParrotSourCanvas {...testProps} />)
-    expect(animatorAnimate).not.toHaveBeenCalled()
-    expect(animatorPause).not.toHaveBeenCalled()
-    wrapper.setProps({ animate: false })
-    expect(animatorAnimate).not.toHaveBeenCalled()
-    expect(animatorPause).not.toHaveBeenCalled()
   })
 
   it("handles_animation_toggled_false", () => {

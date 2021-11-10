@@ -9,8 +9,8 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
 import { getOpenCloseAzimuth } from "../formatutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 
@@ -31,7 +31,6 @@ export default class DrawAzimuth extends DrawPic {
       deep: -1,
       wide: drawDistance,
       start: getStartPos(
-        this.ctx,
         this.state.blueAir,
         this.props.orientation.orient,
         this.props.dataStyle,
@@ -48,7 +47,6 @@ export default class DrawAzimuth extends DrawPic {
 
     // Create the first group
     const ng = GroupFactory.randomGroupAtLoc(
-      this.ctx,
       this.props,
       this.state,
       startPos,
@@ -64,7 +62,6 @@ export default class DrawAzimuth extends DrawPic {
 
     const ngStPos = ng.getStartPos()
     const sg = new AircraftGroup({
-      ctx: this.ctx,
       sx: isNS ? ngStPos.x + this.wide : ngStPos.x,
       sy: isNS ? ngStPos.y : ngStPos.y + this.wide,
       hdg: heading,
@@ -103,27 +100,15 @@ export default class DrawAzimuth extends DrawPic {
     }
 
     this.wide = m2.getBR(nPos).range
-    drawMeasurement(this.ctx, nPos, m2, this.wide, showMeasurements)
-    drawAltitudes(this.ctx, nPos, ng.getAltitudes(), offsetX, offsetY)
-    drawAltitudes(this.ctx, sPos, sg.getAltitudes(), offsetX2, offsetY2)
+    PaintBrush.drawMeasurement(nPos, m2, this.wide, showMeasurements)
+    PaintBrush.drawAltitudes(nPos, ng.getAltitudes(), offsetX, offsetY)
+    PaintBrush.drawAltitudes(sPos, sg.getAltitudes(), offsetX2, offsetY2)
 
     ng.setBraaseye(new Braaseye(nPos, bluePos, bullseye))
     sg.setBraaseye(new Braaseye(sPos, bluePos, bullseye))
 
-    ng.getBraaseye().draw(
-      this.ctx,
-      showMeasurements,
-      braaFirst,
-      offsetX,
-      offsetY
-    )
-    sg.getBraaseye().draw(
-      this.ctx,
-      showMeasurements,
-      braaFirst,
-      offsetX2,
-      offsetY2
-    )
+    ng.getBraaseye().draw(showMeasurements, braaFirst, offsetX, offsetY)
+    sg.getBraaseye().draw(showMeasurements, braaFirst, offsetX2, offsetY2)
   }
 
   getAnswer(): string {

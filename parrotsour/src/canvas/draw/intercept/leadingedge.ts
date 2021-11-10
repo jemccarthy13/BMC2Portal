@@ -2,7 +2,7 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { FORMAT } from "../../../classes/supportedformats"
 import { PictureAnswer } from "../../canvastypes"
-import { drawBullseye } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
@@ -26,8 +26,8 @@ export default class DrawLeadEdge extends DrawPic {
     this.leadEdge = PictureFactory.getPictureDraw("random", nCt, true)
     this.followOn = PictureFactory.getPictureDraw("random", sCt, true)
 
-    this.leadEdge.initialize(this.ctx, this.props, this.state)
-    this.followOn.initialize(this.ctx, this.props, this.state)
+    this.leadEdge.initialize(this.props, this.state)
+    this.followOn.initialize(this.props, this.state)
 
     this.leadEdge.chooseNumGroups(nCt)
     this.followOn.chooseNumGroups(sCt)
@@ -37,7 +37,6 @@ export default class DrawLeadEdge extends DrawPic {
   getPictureInfo(start?: Point): PictureInfo {
     // // Draw the first picture (i.e. the leading edge)
     const pic1StartPos = getRestrictedStartPos(
-      this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
@@ -92,7 +91,6 @@ export default class DrawLeadEdge extends DrawPic {
     this.furthestLeadGroup = furthestPic1Group
 
     const pic2StartPos = getRestrictedStartPos(
-      this.ctx,
       furthestPic1Group,
       this.props.orientation.orient,
       dataStyle,
@@ -124,10 +122,12 @@ export default class DrawLeadEdge extends DrawPic {
       .map((grp) => grp.getStrength())
       .reduce((a, b) => a + b)
     const nCts = nPkgContacts + sPkgContacts
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-    drawBullseye(this.ctx, this.state.bullseye)
-    this.state.blueAir.draw(this.ctx, this.props.dataStyle)
-    return this.draw(this.ctx, false, nCts)
+
+    PaintBrush.clearCanvas()
+
+    PaintBrush.drawBullseye(this.state.bullseye)
+    this.state.blueAir.draw(this.props.dataStyle)
+    return this.draw(false, nCts)
   }
 
   getAnswer(): string {

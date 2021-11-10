@@ -1,3 +1,4 @@
+import { PaintBrush } from "../../../canvas/draw/paintbrush"
 import {
   headingToRadians,
   PIXELS_TO_NM,
@@ -69,7 +70,8 @@ export class RadarDataTrail extends DataTrail {
     this.radarPoints = newRdrPts
   }
 
-  draw(ctx: CanvasRenderingContext2D, heading: number, id: IDMatrix): void {
+  draw(heading: number, id: IDMatrix): void {
+    const ctx = PaintBrush.getContext()
     // Draw radar dots
     ctx.strokeStyle = "#FF8C00"
     ctx.lineWidth = 2

@@ -4,7 +4,7 @@ import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
 import { PIXELS_TO_NM } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getStartPos, PictureInfo } from "./pictureclamp"
 
@@ -31,7 +31,6 @@ export default class DrawSingleGroup extends DrawPic {
    */
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
     const sg = GroupFactory.randomGroupAtLoc(
-      this.ctx,
       this.props,
       this.state,
       startPos,
@@ -47,7 +46,6 @@ export default class DrawSingleGroup extends DrawPic {
       deep: -1,
       wide: -1,
       start: getStartPos(
-        this.ctx,
         this.state.blueAir,
         this.props.orientation.orient,
         this.props.dataStyle,
@@ -74,12 +72,11 @@ export default class DrawSingleGroup extends DrawPic {
       offsetY = 40
     }
     const sgPos = sg.getCenterOfMass(this.props.dataStyle)
-    drawAltitudes(this.ctx, sgPos, sg.getAltitudes(), offsetX, offsetY)
+    PaintBrush.drawAltitudes(sgPos, sg.getAltitudes(), offsetX, offsetY)
 
     sg.setBraaseye(new Braaseye(sgPos, bluePos, bullseye))
 
     sg.getBraaseye().draw(
-      this.ctx,
       this.props.showMeasurements,
       this.props.braaFirst,
       offsetX,

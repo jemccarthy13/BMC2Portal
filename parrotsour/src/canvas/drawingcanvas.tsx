@@ -6,7 +6,6 @@ import React, {
   TouchEvent,
 } from "react"
 
-import { drawLine, drawText } from "./draw/drawutils"
 import { DrawCanvasProps } from "./canvastypes"
 import { Braaseye } from "../classes/braaseye"
 import { Point } from "../classes/point"
@@ -102,8 +101,11 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
    * @param isDown true to draw BRAAseye, false to draw just bullseye hover
    */
   function drawMouse(start: Point, end: Point) {
+    const prevCtx = PaintBrush.getContext()
+    PaintBrush.use(mouseCvCtx.current)
+
     if (mousePressed && mouseCvCtx.current) {
-      drawLine(mouseCvCtx.current, start.x, start.y, end.x, end.y)
+      PaintBrush.drawLine(start.x, start.y, end.x, end.y)
     }
 
     const b = new Braaseye(end, start, bullseye)
@@ -124,10 +126,11 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
 
     if (mouseCvCtx.current) {
       if (mousePressed) {
-        b.braa.draw(mouseCvCtx.current, drawBRPos.x, drawBRPos.y, "blue", true)
+        b.braa.draw(drawBRPos.x, drawBRPos.y, "blue", true)
       }
-      b.bull.draw(mouseCvCtx.current, drawBEPos.x, drawBEPos.y, "black", true)
+      b.bull.draw(drawBEPos.x, drawBEPos.y, "black", true)
     }
+    PaintBrush.use(prevCtx)
   }
 
   /**
@@ -189,11 +192,14 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
       const startY = 120
       const bootStartY = ctx.canvas.height - startY
       ctx.fillRect(0, bootStartY, 50, startY)
-      drawLine(ctx, 0, bootStartY, 50, bootStartY)
-      drawLine(ctx, 50, bootStartY, 50, ctx.canvas.height)
+      const prevCtx = PaintBrush.getContext()
+      PaintBrush.use(ctx)
+      PaintBrush.drawLine(0, bootStartY, 50, bootStartY)
+      PaintBrush.drawLine(50, bootStartY, 50, ctx.canvas.height)
       alts.forEach((alt, idx) => {
-        drawText(ctx, formatAlt(alt), 10, bootStartY + 20 + 20 * idx)
+        PaintBrush.drawText(formatAlt(alt), 10, bootStartY + 20 + 20 * idx)
       })
+      PaintBrush.use(prevCtx)
     }
   }
 
@@ -216,13 +222,14 @@ export default function DrawingCanvas(props: DrawCanvasProps): ReactElement {
     })
 
     if (grps.length > 0) {
-      const ctx = mouseCvCtx.current
-
-      if (ctx) {
-        drawText(ctx, "Hdg:", 20, 20)
-        drawText(ctx, grps[0].getHeading().toString(), 50, 20)
-        drawText(ctx, "Alt:", 20, 40)
-        drawText(ctx, formatAlt(grps[0].getAltitude()), 50, 40)
+      if (mouseCvCtx.current) {
+        const prevCtx = PaintBrush.getContext()
+        PaintBrush.use(mouseCvCtx.current)
+        PaintBrush.drawText("Hdg:", 20, 20)
+        PaintBrush.drawText(grps[0].getHeading().toString(), 50, 20)
+        PaintBrush.drawText("Alt:", 20, 40)
+        PaintBrush.drawText(formatAlt(grps[0].getAltitude()), 50, 40)
+        PaintBrush.use(prevCtx)
       }
     }
   }

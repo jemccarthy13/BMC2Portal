@@ -98,9 +98,6 @@ export class Aircraft {
     }
     this.altitude = p.alt || randomNumber(low, hi)
 
-    // Attach this group to a drawing context, if given
-    this.ctx = p.ctx || undefined
-
     // Current matches desired initially
     this.intent.setDesiredHeading(this.heading)
   }
@@ -218,10 +215,10 @@ export class Aircraft {
    * @param context  Current drawing style
    * @param dataStyle The SensorType of the DataTrail
    */
-  draw(ctx: CanvasRenderingContext2D, dataStyle: SensorType): void {
+  draw(dataStyle: SensorType): void {
     const dataTrail = this.dataTrail.get(dataStyle)
     if (dataTrail) {
-      dataTrail.draw(ctx, this.getHeading(), this.getIDMatrix())
+      dataTrail.draw(this.getHeading(), this.getIDMatrix())
     }
   }
 

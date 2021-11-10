@@ -45,6 +45,7 @@ describe("PictureCanvas", () => {
       width: 200,
       orient: BlueInThe.EAST,
     },
+    desiredNumContacts: 0,
   }
 
   it("full_renders_mouse_and_pic_canvas", () => {
@@ -71,7 +72,7 @@ describe("PictureCanvas", () => {
     const wrapper = mount(<PictureCanvas {...testProps} />)
     expect(wrapper.find("canvas")).toHaveLength(2)
     const instance = wrapper.instance() as PictureCanvas
-    instance.drawPicture(PaintBrush.getContext(), true)
+    instance.drawPicture(true)
   })
 
   it("stops_animate_when_hardmode_changed", () => {

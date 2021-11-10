@@ -3,6 +3,7 @@ import {
   PictureCanvasProps,
   PictureCanvasState,
 } from "../../canvas/canvastypes"
+import { PaintBrush } from "../../canvas/draw/paintbrush"
 import { SensorType } from "../aircraft/datatrail/sensortype"
 import { Point } from "../point"
 import { FORMAT } from "../supportedformats"
@@ -30,6 +31,7 @@ describe("GroupFactory", () => {
   const canvas = document.createElement("canvas")
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const ctx = canvas.getContext("2d")!
+  PaintBrush.use(ctx)
 
   const fakeProps: PictureCanvasProps = {
     format: FORMAT.ALSA,
@@ -58,7 +60,6 @@ describe("GroupFactory", () => {
   it("creates_random_grp_at_loc", () => {
     const startPt = new Point(50, 50)
     const group = GroupFactory.randomGroupAtLoc(
-      ctx,
       fakeProps,
       fakeState,
       new Point(50, 50),
@@ -70,24 +71,19 @@ describe("GroupFactory", () => {
 
   it("creates_random_grp_at_loc_random_hdg", () => {
     const startPt = new Point(50, 50)
-    const group = GroupFactory.randomGroupAtLoc(
-      ctx,
-      fakeProps,
-      fakeState,
-      startPt
-    )
+    const group = GroupFactory.randomGroupAtLoc(fakeProps, fakeState, startPt)
     expect(group.getHeading()).toEqual(96)
     expect(group.getStartPos()).toEqual(startPt)
   })
 
   it("creates_default_random_group", () => {
-    const grp = GroupFactory.randomGroup(ctx, fakeProps, fakeState)
+    const grp = GroupFactory.randomGroup(fakeProps, fakeState)
     expect(grp.getStartPos()).toEqual(randomPt)
     expect(grp.getHeading()).toEqual(96)
   })
 
   it("creates_default_random_group_with_hdg", () => {
-    const grp = GroupFactory.randomGroup(ctx, fakeProps, fakeState, 237)
+    const grp = GroupFactory.randomGroup(fakeProps, fakeState, 237)
     expect(grp.getStartPos()).toEqual(randomPt)
     expect(grp.getHeading()).toEqual(237)
   })

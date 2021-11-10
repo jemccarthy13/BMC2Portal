@@ -5,6 +5,7 @@ import { SensorType } from "../classes/aircraft/datatrail/sensortype"
 
 // Functions
 import { sleep } from "../utils/pstime"
+import { PaintBrush } from "../canvas/draw/paintbrush"
 
 /**
  * This class is the parent class for Animation.
@@ -49,18 +50,14 @@ export abstract class AnimationHandler {
    * Internal function to see if a group is near the canvas boundary.
    *
    * Used to change group logic when approaching the edge of the canvas
-   * @param ctx The current drawing context
    * @param group The group to check against boundaries
    * @param dataStyle The current DataTrail type
    */
-  public _isNearBounds(
-    ctx: CanvasRenderingContext2D,
-    group: AircraftGroup,
-    dataStyle: SensorType
-  ): boolean {
+  public _isNearBounds(group: AircraftGroup, dataStyle: SensorType): boolean {
     const buffer = 40
     const sX = group.getCenterOfMass(dataStyle).x
     const sY = group.getCenterOfMass(dataStyle).y
+    const ctx = PaintBrush.getContext()
     return (
       sX < buffer ||
       sX > ctx.canvas.width - buffer ||
@@ -79,8 +76,7 @@ export abstract class AnimationHandler {
   abstract applyBlueLogic(
     blueAir: AircraftGroup,
     groups: AircraftGroup[],
-    dataStyle: SensorType,
-    ctx?: CanvasRenderingContext2D
+    dataStyle: SensorType
   ): void
 
   /**
@@ -100,8 +96,7 @@ export abstract class AnimationHandler {
     grp: AircraftGroup,
     state: PictureCanvasState,
     dataStyle: SensorType,
-    resetCallback?: () => void,
-    ctx?: CanvasRenderingContext2D
+    resetCallback?: () => void
   ): void
 
   /**
@@ -120,15 +115,14 @@ export abstract class AnimationHandler {
    * @param resetCallback optional function to perform at the end of animation
    */
   async animate(
-    context: CanvasRenderingContext2D,
     props: PictureCanvasProps,
     state: PictureCanvasState,
     groups: AircraftGroup[],
     animateCanvas?: ImageData,
     resetCallback?: () => void
   ): Promise<void> {
-    if (!context || !state.blueAir || !animateCanvas) return
-    context.putImageData(animateCanvas, 0, 0)
+    if (!state.blueAir || !animateCanvas) return
+    PaintBrush.getContext().putImageData(animateCanvas, 0, 0)
 
     // For each group:
     //   - draw current arrows
@@ -139,13 +133,13 @@ export abstract class AnimationHandler {
       const grp = groups[x]
 
       grp.move()
-      grp.draw(context, props.dataStyle)
-      this.applyLogic(grp, state, props.dataStyle, resetCallback, context)
+      grp.draw(props.dataStyle)
+      this.applyLogic(grp, state, props.dataStyle, resetCallback)
     }
 
     state.blueAir.move()
-    this.applyBlueLogic(state.blueAir, groups, props.dataStyle, context)
-    state.blueAir.draw(context, props.dataStyle)
+    this.applyBlueLogic(state.blueAir, groups, props.dataStyle)
+    state.blueAir.draw(props.dataStyle)
 
     // get slider speed/default speed
     const slider: HTMLInputElement = document.getElementById(
@@ -161,7 +155,7 @@ export abstract class AnimationHandler {
     if (this.continueAnimate) {
       const binding = this.animate.bind(this)
       const slpObj = sleep(delay, () => {
-        binding(context, props, state, groups, animateCanvas, resetCallback)
+        binding(props, state, groups, animateCanvas, resetCallback)
       })
       this.setSleepCancel(slpObj.cancel)
     }

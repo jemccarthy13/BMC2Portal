@@ -2,7 +2,7 @@ import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
 import { FightAxis, PictureAnswer } from "../../canvastypes"
-import { drawBullseye } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
@@ -22,8 +22,8 @@ export default class DrawPackage extends DrawPic {
     this.nPkg = PictureFactory.getPictureDraw("random", nCt, true)
     this.sPkg = PictureFactory.getPictureDraw("random", sCt, true)
 
-    this.nPkg.initialize(this.ctx, this.props, this.state)
-    this.sPkg.initialize(this.ctx, this.props, this.state)
+    this.nPkg.initialize(this.props, this.state)
+    this.sPkg.initialize(this.props, this.state)
 
     this.nPkg.chooseNumGroups(nCt)
     this.sPkg.chooseNumGroups(sCt)
@@ -44,72 +44,38 @@ export default class DrawPackage extends DrawPic {
     let s2x = 0
     let s2y = 0
 
+    const ctx = PaintBrush.getContext()
+
     if (isNS) {
       if (this.isRange) {
         // lLbl = "NORTH"
         // tLbl = "SOUTH"
-        s1x = randomNumber(
-          this.ctx.canvas.width * 0.2,
-          this.ctx.canvas.width * 0.8
-        )
-        s1y = randomNumber(
-          this.ctx.canvas.height * 0.5,
-          this.ctx.canvas.height * 0.59
-        )
+        s1x = randomNumber(ctx.canvas.width * 0.2, ctx.canvas.width * 0.8)
+        s1y = randomNumber(ctx.canvas.height * 0.5, ctx.canvas.height * 0.59)
 
         s2x = s1x
-        s2y = randomNumber(
-          this.ctx.canvas.height * 0.7,
-          this.ctx.canvas.height * 0.8
-        )
+        s2y = randomNumber(ctx.canvas.height * 0.7, ctx.canvas.height * 0.8)
       } else {
-        s1x = randomNumber(
-          this.ctx.canvas.width * 0.2,
-          this.ctx.canvas.width * 0.3
-        )
-        s1y = randomNumber(
-          this.ctx.canvas.height * 0.5,
-          this.ctx.canvas.height * 0.8
-        )
+        s1x = randomNumber(ctx.canvas.width * 0.2, ctx.canvas.width * 0.3)
+        s1y = randomNumber(ctx.canvas.height * 0.5, ctx.canvas.height * 0.8)
 
         s2y = s1y
-        s2x = randomNumber(
-          this.ctx.canvas.width * 0.7,
-          this.ctx.canvas.width * 0.8
-        )
+        s2x = randomNumber(ctx.canvas.width * 0.7, ctx.canvas.width * 0.8)
       }
     } else {
       if (this.isRange) {
-        s1x = randomNumber(
-          this.ctx.canvas.width * 0.5,
-          this.ctx.canvas.width * 0.59
-        )
-        s1y = randomNumber(
-          this.ctx.canvas.height * 0.2,
-          this.ctx.canvas.width * 0.4
-        )
+        s1x = randomNumber(ctx.canvas.width * 0.5, ctx.canvas.width * 0.59)
+        s1y = randomNumber(ctx.canvas.height * 0.2, ctx.canvas.width * 0.4)
 
-        s2x = randomNumber(
-          this.ctx.canvas.width * 0.2,
-          this.ctx.canvas.width * 0.35
-        )
+        s2x = randomNumber(ctx.canvas.width * 0.2, ctx.canvas.width * 0.35)
         s2y = s1y
       } else {
         //     tLbl = "NORTH"
         //     lLbl = "SOUTH"
-        s1x = randomNumber(
-          this.ctx.canvas.width * 0.25,
-          this.ctx.canvas.width * 0.5
-        )
-        s1y = randomNumber(
-          this.ctx.canvas.height * 0.6,
-          this.ctx.canvas.height * 0.7
-        )
+        s1x = randomNumber(ctx.canvas.width * 0.25, ctx.canvas.width * 0.5)
+        s1y = randomNumber(ctx.canvas.height * 0.6, ctx.canvas.height * 0.7)
         s2x = s1x
-        s2y = randomNumber(
-          this.ctx.canvas.height * 0.25,
-          this.ctx.canvas.height * 0.4
-        )
+        s2y = randomNumber(ctx.canvas.height * 0.25, ctx.canvas.height * 0.4)
       }
     }
 
@@ -203,10 +169,10 @@ export default class DrawPackage extends DrawPic {
       .map((grp) => grp.getStrength())
       .reduce((a, b) => a + b)
     const nCts = nPkgContacts + sPkgContacts
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
-    drawBullseye(this.ctx, this.state.bullseye)
-    this.state.blueAir.draw(this.ctx, this.props.dataStyle)
-    return this.draw(this.ctx, false, nCts)
+    PaintBrush.clearCanvas()
+    PaintBrush.drawBullseye(this.state.bullseye)
+    this.state.blueAir.draw(this.props.dataStyle)
+    return this.draw(false, nCts)
   }
 
   _isAnchorNPkg = (

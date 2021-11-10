@@ -25,7 +25,6 @@ import { BRAA } from "../braa"
  * Everything not provided is randomized or defaulted.
  */
 export interface GroupParams {
-  ctx: CanvasRenderingContext2D
   dataTrailType: SensorType
   sx?: number
   sy?: number
@@ -400,11 +399,11 @@ export class AircraftGroup extends Array<Aircraft> {
    * @param context Current drawing context
    * @param dataStyle The type of DataTrail to use
    */
-  draw(context: CanvasRenderingContext2D, dataStyle: SensorType): void {
+  draw(dataStyle: SensorType): void {
     if (this.isCapping()) {
-      drawGroupCap(context, this)
+      drawGroupCap(this)
     } else {
-      this.forEach((ac) => ac.draw(context, dataStyle))
+      this.forEach((ac) => ac.draw(dataStyle))
     }
   }
 

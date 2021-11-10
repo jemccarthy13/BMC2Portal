@@ -9,7 +9,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -29,7 +29,6 @@ export default class DrawRange extends DrawPic {
       deep: drawDistance,
       wide: -1,
       start: getRestrictedStartPos(
-        this.ctx,
         this.state.blueAir,
         this.props.orientation.orient,
         this.props.dataStyle,
@@ -46,7 +45,6 @@ export default class DrawRange extends DrawPic {
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
     const tg = GroupFactory.randomGroupAtLoc(
-      this.ctx,
       this.props,
       this.state,
       startPos,
@@ -62,7 +60,6 @@ export default class DrawRange extends DrawPic {
 
     //const tgPos = tg.getCenterOfMass(this.props.dataStyle)
     const lg = new AircraftGroup({
-      ctx: this.ctx,
       sx: isNS ? startPos.x : startPos.x + this.deep,
       sy: isNS ? startPos.y + this.deep : startPos.y,
       hdg: heading,
@@ -98,29 +95,17 @@ export default class DrawRange extends DrawPic {
     }
     this.deep = m2.getBR(tPos).range
 
-    drawMeasurement(this.ctx, tPos, m2, this.deep, showMeasurements)
+    PaintBrush.drawMeasurement(tPos, m2, this.deep, showMeasurements)
 
-    drawAltitudes(this.ctx, lPos, lg.getAltitudes(), offsetX, offsetY)
-    drawAltitudes(this.ctx, tPos, tg.getAltitudes(), offsetX2, offsetY2)
+    PaintBrush.drawAltitudes(lPos, lg.getAltitudes(), offsetX, offsetY)
+    PaintBrush.drawAltitudes(tPos, tg.getAltitudes(), offsetX2, offsetY2)
 
     const bluePos = blueAir.getCenterOfMass(dataStyle)
     lg.setBraaseye(new Braaseye(lPos, bluePos, bullseye))
     tg.setBraaseye(new Braaseye(tPos, bluePos, bullseye))
 
-    lg.getBraaseye().draw(
-      this.ctx,
-      showMeasurements,
-      braaFirst,
-      offsetX,
-      offsetY
-    )
-    tg.getBraaseye().draw(
-      this.ctx,
-      showMeasurements,
-      braaFirst,
-      offsetX2,
-      offsetY2
-    )
+    lg.getBraaseye().draw(showMeasurements, braaFirst, offsetX, offsetY)
+    tg.getBraaseye().draw(showMeasurements, braaFirst, offsetX2, offsetY2)
   }
 
   getAnswer(): string {

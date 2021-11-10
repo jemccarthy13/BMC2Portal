@@ -27,7 +27,6 @@ export abstract class DrawPic {
   numGroups = 0
   groups: AircraftGroup[] = []
   answer = ""
-  ctx!: CanvasRenderingContext2D
   props!: PictureCanvasProps
   state!: PictureCanvasState
   pInfo!: PictureInfo
@@ -38,18 +37,12 @@ export abstract class DrawPic {
     return this.numGroups
   }
 
-  initialize = (
-    ctx: CanvasRenderingContext2D,
-    props: PictureCanvasProps,
-    state: PictureCanvasState
-  ): void => {
-    this.ctx = ctx
+  initialize = (props: PictureCanvasProps, state: PictureCanvasState): void => {
     this.props = props
     this.state = state
   }
 
   draw = (
-    ctx: CanvasRenderingContext2D,
     hasCaps: boolean,
     desiredNumContacts: number,
     start?: Point
@@ -57,8 +50,6 @@ export abstract class DrawPic {
     this.chooseNumGroups(desiredNumContacts)
 
     const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
-
-    this.ctx = ctx
 
     this.pInfo = this.getPictureInfo(start)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -74,7 +65,7 @@ export abstract class DrawPic {
     checkCaps(hasCaps, this.groups)
 
     this.groups.forEach((grp) => {
-      grp.draw(ctx, this.props.dataStyle)
+      grp.draw(this.props.dataStyle)
     })
 
     this.drawInfo()

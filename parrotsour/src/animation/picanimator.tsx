@@ -3,8 +3,8 @@ import { AircraftGroup } from "../classes/groups/group"
 import { PictureCanvasState } from "../canvas/canvastypes"
 
 import { randomNumber } from "../utils/psmath"
-import { drawAltitudes } from "../canvas/draw/drawutils"
 import { SensorType } from "../classes/aircraft/datatrail/sensortype"
+import { PaintBrush } from "../canvas/draw/paintbrush"
 
 /**
  * This Handler implements applyLogic to drive towards a desired point
@@ -20,7 +20,6 @@ export class PicAnimationHandler extends AnimationHandler {
    * @param blueAir The blue aircraft group
    * @param groups The rest of the aircraft groups
    * @param dataStyle SensorType for data trail
-   * @param _ctx Current drawing context (unused for this handler)
    */
   applyBlueLogic(
     blueAir: AircraftGroup,
@@ -44,15 +43,12 @@ export class PicAnimationHandler extends AnimationHandler {
    * @param state Current state of canvas
    * @param dataStyle Current DataTrail style
    * @param resetCallback (Optional) call back to perform on animate pause
-   * @param ctx (Optional) current drawing context. If undefined,
-   * uses curRef from Canvas
    */
   applyLogic(
     grp: AircraftGroup,
     state: PictureCanvasState,
     dataStyle: SensorType,
-    resetCallback?: () => void,
-    ctx?: CanvasRenderingContext2D
+    resetCallback?: () => void
   ): void {
     const bluePos = state.blueAir.getCenterOfMass(dataStyle)
     const startPos = grp.getCenterOfMass(dataStyle)
@@ -89,11 +85,11 @@ export class PicAnimationHandler extends AnimationHandler {
     }
 
     // draw altitudes during the animation
-    if (ctx && this.continueAnimate) {
+    if (this.continueAnimate) {
       const grpPos = grp.getCenterOfMass(dataStyle)
-      drawAltitudes(ctx, grpPos, grp.getAltitudes())
+      PaintBrush.drawAltitudes(grpPos, grp.getAltitudes())
 
-      if (this._isNearBounds(ctx, grp, dataStyle)) {
+      if (this._isNearBounds(grp, dataStyle)) {
         grp.updateIntent({
           desiredHeading: grpPos.getBR(bluePos).bearingNum,
         })

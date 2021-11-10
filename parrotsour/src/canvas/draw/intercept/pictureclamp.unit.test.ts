@@ -7,16 +7,17 @@ import { PIXELS_TO_NM } from "../../../utils/psmath"
 import { _howFarOut } from "./pictureclamp"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
+import { PaintBrush } from "../paintbrush"
 
 const TEN_NM = PIXELS_TO_NM * 10
 
-let ctx: CanvasRenderingContext2D
 beforeAll(() => {
   const canvas = document.createElement("canvas")
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ctx = canvas.getContext("2d")!
+  const ctx = canvas.getContext("2d")!
   canvas.width = 800
   canvas.height = 500
+  PaintBrush.use(ctx)
 })
 
 /**
@@ -80,7 +81,6 @@ describe("_clampPictureInContext", () => {
   it("clampAZ_negX_posY_BlueInEast", () => {
     const startPt = new Point(-400, 1000)
     const result = _clampPictureInContext(
-      ctx,
       {
         wide: TEN_NM,
         start: startPt,
@@ -88,6 +88,7 @@ describe("_clampPictureInContext", () => {
       BlueInThe.EAST
     )
 
+    const ctx = PaintBrush.getContext()
     expect(result.x).toEqual(1 + 7 * PIXELS_TO_NM)
     expect(result.y).toEqual(
       startPt.y -
@@ -99,7 +100,6 @@ describe("_clampPictureInContext", () => {
     const drawDistance = PIXELS_TO_NM * 19
     const startPt = new Point(-400, -1000)
     const result = _clampPictureInContext(
-      ctx,
       {
         wide: drawDistance,
         start: startPt,
@@ -114,7 +114,6 @@ describe("_clampPictureInContext", () => {
   it("clampRng_posX_negY_BlueInEast", () => {
     const startPt = new Point(1000, -500)
     const result = _clampPictureInContext(
-      ctx,
       {
         deep: TEN_NM,
         start: startPt,
@@ -122,6 +121,7 @@ describe("_clampPictureInContext", () => {
       BlueInThe.EAST
     )
 
+    const ctx = PaintBrush.getContext()
     expect(result.x).toEqual(
       startPt.x - (startPt.x - (ctx.canvas.width - 1 - TEN_NM))
     )
@@ -131,7 +131,6 @@ describe("_clampPictureInContext", () => {
   it("clampRng_posX_posY_BlueInEast", () => {
     const startPt = new Point(1000, 1000)
     const result = _clampPictureInContext(
-      ctx,
       {
         deep: TEN_NM,
         start: startPt,
@@ -139,6 +138,7 @@ describe("_clampPictureInContext", () => {
       BlueInThe.EAST
     )
 
+    const ctx = PaintBrush.getContext()
     expect(result.x).toEqual(
       startPt.x - (startPt.x - (ctx.canvas.width - 1 - TEN_NM))
     )
@@ -152,13 +152,13 @@ describe("_clampPictureInContext", () => {
   it("clampAz_posX_posY_BlueInNorth", () => {
     const startPt = new Point(1000, 1000)
     const result = _clampPictureInContext(
-      ctx,
       {
         deep: TEN_NM,
         start: startPt,
       },
       BlueInThe.NORTH
     )
+    const ctx = PaintBrush.getContext()
 
     expect(result.x).toEqual(
       startPt.x - (startPt.x - (ctx.canvas.width - 1 - 7 * PIXELS_TO_NM))
@@ -172,11 +172,12 @@ describe("_clampPictureInContext", () => {
 
   it("clamp_warns_no_point_provided", () => {
     const warnSpy = jest.spyOn(global.console, "warn").mockImplementation()
-    const result = _clampPictureInContext(ctx, {}, BlueInThe.EAST)
+    const result = _clampPictureInContext({}, BlueInThe.EAST)
 
     expect(warnSpy).toBeCalledTimes(1)
     warnSpy.mockRestore()
 
+    const ctx = PaintBrush.getContext()
     expect(result.x).toBeLessThanOrEqual(ctx.canvas.width - 1)
     expect(result.x).toBeGreaterThanOrEqual(1)
     expect(result.y).toBeLessThanOrEqual(ctx.canvas.height - 1)
@@ -199,7 +200,6 @@ describe("getRestrictedStartPos", () => {
 
   it("runs", () => {
     const startPos = getRestrictedStartPos(
-      ctx,
       blueAir,
       BlueInThe.NORTH,
       SensorType.ARROW,

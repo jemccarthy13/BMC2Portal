@@ -11,13 +11,6 @@ import {
 import { AircraftGroup } from "../classes/groups/group"
 import { Point } from "../classes/point"
 
-// Functions
-import {
-  drawAltitudes,
-  drawBullseye,
-  drawFullInfo,
-  drawText,
-} from "./draw/drawutils"
 import { randomNumber } from "../utils/psmath"
 
 // Interfaces
@@ -64,22 +57,20 @@ export default class CloseCanvas extends ParrotSourCanvas {
       ) {
         this.animationHandler.pauseFight()
       }
-      ctx.fillStyle = "white"
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      drawBullseye(PaintBrush.getContext(), this.state.bullseye)
+      PaintBrush.clearCanvas()
+      PaintBrush.drawBullseye(this.state.bullseye)
       animateImage = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
       this.state.answer.groups.forEach((grp) => {
-        grp.draw(ctx, this.props.dataStyle)
+        grp.draw(this.props.dataStyle)
       })
-      this.state.blueAir.draw(PaintBrush.getContext(), this.props.dataStyle)
-      drawFullInfo(ctx, this.state, this.props, this.state.answer.groups)
+      this.state.blueAir.draw(this.props.dataStyle)
+      PaintBrush.drawFullInfo(this.state, this.props, this.state.answer.groups)
       if (
         this.props.animate === prevProps.animate &&
         prevProps.animate === true
       ) {
         this.animationHandler.animate(
-          ctx,
           this.props,
           this.state,
           this.state.answer.groups,
@@ -98,12 +89,12 @@ export default class CloseCanvas extends ParrotSourCanvas {
    * @param _start (optional) start position for the picture
    */
   drawPicture = (
-    context: CanvasRenderingContext2D,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _forced?: boolean,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _start?: Point
   ): PictureAnswer => {
+    const context = PaintBrush.getContext()
     let xPos = context.canvas.width - 20
     let yPos = randomNumber(
       context.canvas.height * 0.33,
@@ -129,26 +120,25 @@ export default class CloseCanvas extends ParrotSourCanvas {
       id: IDMatrix.FRIEND,
     })
     fighter.setLabel("VR01")
-    fighter.draw(context, SensorType.RAW)
+    fighter.draw(SensorType.RAW)
 
     const target = new AircraftGroup({
-      ctx: context,
       sx: 500,
       sy: 200,
       hdg: 90,
       nContacts: 1,
       id: IDMatrix.FRIEND,
     })
-    target.draw(context, SensorType.RAW)
+    target.draw(SensorType.RAW)
     target.setLabel("VR02")
 
     const ftrPos = fighter.getCenterOfMass(SensorType.RAW)
-    drawAltitudes(context, ftrPos, fighter.getAltitudes())
-    drawText(context, fighter.getLabel(), ftrPos.x, ftrPos.y + 35, 12)
+    PaintBrush.drawAltitudes(ftrPos, fighter.getAltitudes())
+    PaintBrush.drawText(fighter.getLabel(), ftrPos.x, ftrPos.y + 35, 12)
 
     const grpPos = target.getCenterOfMass(SensorType.RAW)
-    drawAltitudes(context, grpPos, target.getAltitudes())
-    drawText(context, target.getLabel(), grpPos.x, grpPos.y + 35, 12)
+    PaintBrush.drawAltitudes(grpPos, target.getAltitudes())
+    PaintBrush.drawText(target.getLabel(), grpPos.x, grpPos.y + 35, 12)
 
     return {
       pic: "",
@@ -161,19 +151,20 @@ export default class CloseCanvas extends ParrotSourCanvas {
    * (i.e. blue arrows, bullseye, and image 'snap' for mouse draw)
    * @param context the Context to draw in
    */
-  draw = async (ctx: CanvasRenderingContext2D): Promise<void> => {
-    const bullseye = drawBullseye(ctx)
+  draw = async (): Promise<void> => {
+    const bullseye = PaintBrush.drawBullseye()
 
     const blueAir = new AircraftGroup({ sx: -1000, sy: -1000, nContacts: 0 })
 
     await this.setState({ blueAir, bullseye })
 
+    const ctx = PaintBrush.getContext()
     const blueOnly = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-    const answer: PictureAnswer = this.drawPicture(ctx)
+    const answer: PictureAnswer = this.drawPicture()
     this.props.setAnswer(answer)
 
-    this.setState({ ctx, answer, animateCanvas: blueOnly })
+    this.setState({ answer, animateCanvas: blueOnly })
   }
 
   state: PictureCanvasState = {

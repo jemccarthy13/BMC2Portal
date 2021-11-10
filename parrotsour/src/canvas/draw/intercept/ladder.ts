@@ -8,7 +8,7 @@ import {
   randomNumber,
 } from "../../../utils/psmath"
 import { FightAxis } from "../../canvastypes"
-import { drawAltitudes, drawMeasurement } from "../drawutils"
+import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
 import { getRestrictedStartPos, PictureInfo } from "./pictureclamp"
 
@@ -46,7 +46,6 @@ export default class DrawLadder extends DrawPic {
       wide,
     }
     const startPos = getRestrictedStartPos(
-      this.ctx,
       this.state.blueAir,
       this.props.orientation.orient,
       this.props.dataStyle,
@@ -80,7 +79,6 @@ export default class DrawLadder extends DrawPic {
         )
 
       const grp = new AircraftGroup({
-        ctx: this.ctx,
         sx: isNS ? startPos.x : startPos.x + totalArrowOffset,
         sy: isNS ? startPos.y + totalArrowOffset : startPos.y,
         hdg: heading + offsetHeading,
@@ -110,8 +108,7 @@ export default class DrawLadder extends DrawPic {
       const grp = this.groups[x]
       const grpPos = grp.getCenterOfMass(this.props.dataStyle)
 
-      drawAltitudes(
-        this.ctx,
+      PaintBrush.drawAltitudes(
         grpPos,
         this.groups[x].getAltitudes(),
         altOffsetX,
@@ -120,7 +117,7 @@ export default class DrawLadder extends DrawPic {
       grp.setBraaseye(new Braaseye(grpPos, bluePos, bullseye))
       grp
         .getBraaseye()
-        .draw(this.ctx, showMeasurements, braaFirst, altOffsetX, altOffsetY)
+        .draw(showMeasurements, braaFirst, altOffsetX, altOffsetY)
     }
     let actualDeep
     const prevGpPos =
@@ -128,8 +125,7 @@ export default class DrawLadder extends DrawPic {
     const gpPos = this.groups[0].getCenterOfMass(dataStyle)
     if (isNS) {
       actualDeep = Math.floor(Math.abs(gpPos.y - prevGpPos.y) / PIXELS_TO_NM)
-      drawMeasurement(
-        this.ctx,
+      PaintBrush.drawMeasurement(
         new Point(gpPos.x - 30, gpPos.y),
         new Point(gpPos.x - 30, prevGpPos.y),
         actualDeep,
@@ -137,8 +133,7 @@ export default class DrawLadder extends DrawPic {
       )
     } else {
       actualDeep = Math.floor(Math.abs(gpPos.x - prevGpPos.x) / PIXELS_TO_NM)
-      drawMeasurement(
-        this.ctx,
+      PaintBrush.drawMeasurement(
         new Point(gpPos.x, gpPos.y + 40),
         new Point(prevGpPos.x, gpPos.y + 40),
         actualDeep,

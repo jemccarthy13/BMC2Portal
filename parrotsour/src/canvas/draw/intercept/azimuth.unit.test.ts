@@ -2,10 +2,10 @@ import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { BlueInThe, PictureCanvasState } from "../../canvastypes"
+import { PaintBrush } from "../paintbrush"
 import DrawAzimuth from "./azimuth"
 import { testProps } from "./mockutils.unit.test"
 
-let ctx: CanvasRenderingContext2D
 let testState: PictureCanvasState
 let p: Partial<GroupParams>
 let azimuth: DrawAzimuth
@@ -13,9 +13,10 @@ let azimuth: DrawAzimuth
 beforeAll(() => {
   const canvas = document.createElement("canvas")
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  ctx = canvas.getContext("2d")!
+  const ctx = canvas.getContext("2d")!
   canvas.width = 800
   canvas.height = 500
+  PaintBrush.use(ctx)
 
   testState = {
     bullseye: new Point(400, 400),
@@ -36,7 +37,7 @@ beforeAll(() => {
   }
 
   azimuth = new DrawAzimuth()
-  azimuth.initialize(ctx, testProps, testState)
+  azimuth.initialize(testProps, testState)
 })
 
 /**
@@ -100,7 +101,7 @@ describe("DrawAzimuth", () => {
     const updatedProps = testProps
     updatedProps.orientation.orient = BlueInThe.NORTH
 
-    azimuth.initialize(ctx, updatedProps, testState)
+    azimuth.initialize(updatedProps, testState)
 
     const ng = new AircraftGroup({ ...p, sx: 200, sy: 200, hdg: 1 })
     const sg = new AircraftGroup({
@@ -131,7 +132,7 @@ describe("DrawAzimuth", () => {
       hdg: 270,
       nContacts: 4,
     })
-    azimuth.initialize(ctx, updatedProps, testState)
+    azimuth.initialize(updatedProps, testState)
 
     const ng = new AircraftGroup({ ...p, sx: 200, sy: 180, hdg: 1 })
     const sg = new AircraftGroup({
@@ -152,7 +153,7 @@ describe("DrawAzimuth", () => {
   })
 
   it("includes_stacks", () => {
-    azimuth.initialize(ctx, testProps, testState)
+    azimuth.initialize(testProps, testState)
 
     const ng = new AircraftGroup({
       ...p,
@@ -181,7 +182,7 @@ describe("DrawAzimuth", () => {
   })
 
   it("includes_stacks", () => {
-    azimuth.initialize(ctx, testProps, testState)
+    azimuth.initialize(testProps, testState)
 
     const ng = new AircraftGroup({
       ...p,

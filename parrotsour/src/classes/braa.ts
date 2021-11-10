@@ -1,4 +1,4 @@
-import { drawText } from "../canvas/draw/drawutils"
+import { PaintBrush } from "../canvas/draw/paintbrush"
 
 /**
  * BRAA is a class that contains a bearing and range
@@ -34,15 +34,9 @@ export class BRAA {
    * @param color
    * @param showMeasurements
    */
-  draw(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    color?: string,
-    showMeasurements?: boolean
-  ): void {
+  draw(x: number, y: number, color?: string, showMeasurements?: boolean): void {
     if (showMeasurements) {
-      drawText(ctx, this.toString(), x, y, 11, color)
+      PaintBrush.drawText(this.toString(), x, y, 11, color)
     }
   }
 }

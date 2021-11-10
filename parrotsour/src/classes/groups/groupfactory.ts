@@ -7,7 +7,6 @@ import { getStartPos } from "../../canvas/draw/intercept/pictureclamp"
 
 export class GroupFactory {
   public static randomGroupAtLoc(
-    ctx: CanvasRenderingContext2D,
     props: PictureCanvasProps,
     state: PictureCanvasState,
     startLoc: Point,
@@ -19,31 +18,22 @@ export class GroupFactory {
       : randomHeading(props.format, state.blueAir.getHeading())
     const startPos = startLoc
 
-    const p = { sx: startPos.x, sy: startPos.y, hdg, ctx, nContacts }
+    const p = { sx: startPos.x, sy: startPos.y, hdg, nContacts }
     const grp = new AircraftGroup(p)
     return grp
   }
 
   public static randomGroup(
-    ctx: CanvasRenderingContext2D,
     props: PictureCanvasProps,
     state: PictureCanvasState,
     heading?: number,
     numContacts?: number
   ): AircraftGroup {
     const startLoc = getStartPos(
-      ctx,
       state.blueAir,
       props.orientation.orient,
       props.dataStyle
     )
-    return this.randomGroupAtLoc(
-      ctx,
-      props,
-      state,
-      startLoc,
-      heading,
-      numContacts
-    )
+    return this.randomGroupAtLoc(props, state, startLoc, heading, numContacts)
   }
 }
