@@ -57,7 +57,6 @@ export abstract class DrawPic {
       this.numGroupsToCreate,
       desiredNumContacts
     )
-    console.log(contactList)
 
     this.pInfo = this.getPictureInfo(start)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -85,7 +84,6 @@ export abstract class DrawPic {
   }
 
   assignContacts = (grps: number, contacts: number): number[] => {
-    console.log(grps, contacts)
     let cntSoFar = 0
     const answer = []
     if (grps > contacts && contacts !== 0) {
