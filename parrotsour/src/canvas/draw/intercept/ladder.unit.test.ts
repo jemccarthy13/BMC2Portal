@@ -92,5 +92,7 @@ describe("DrawChamp", () => {
     )
   })
 
+  // TODO -- write 4/5 group tests
+  // TODO -- write create/chooseNumGroups for all DrawPic classes
   // TODO -- write echelon tests
 })
