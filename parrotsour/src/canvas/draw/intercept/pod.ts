@@ -13,7 +13,7 @@ export default class DrawPOD extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = randomNumber(3, 11)
+    this.numGroupsToCreate = randomNumber(3, 11)
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -40,17 +40,34 @@ export default class DrawPOD extends DrawPic {
 
     this.groups.forEach((grp) => {
       const grpPos = grp.getCenterOfMass(this.props.dataStyle)
-
-      grp.setLabel("GROUP")
       grp.setBraaseye(new Braaseye(grpPos, bPos, this.state.bullseye))
       grp.getBraaseye().draw(showMeasurements, braaFirst)
       PaintBrush.drawAltitudes(grpPos, grp.getAltitudes())
     })
   }
 
+  applyLabels(): void {
+    this.groups.forEach((grp) => {
+      grp.setLabel("GROUP")
+    })
+  }
+
+  formatWeighted(): string {
+    return ""
+  }
+  formatPicTitle(): string {
+    return "CORE"
+  }
+  formatDimensions(): string {
+    return "CORE"
+  }
+
   getAnswer(): string {
     const { dataStyle } = this.props
     const { blueAir } = this.state
+
+    this.applyLabels()
+
     function sortFun(a: AircraftGroup, b: AircraftGroup) {
       const bluePos = blueAir.getCenterOfMass(dataStyle)
       const aBR = bluePos.getBR(a.getCenterOfMass(dataStyle))

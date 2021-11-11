@@ -1,5 +1,6 @@
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
+import RangeBack from "../../../classes/groups/rangeback"
 import { Point } from "../../../classes/point"
 import { FORMAT } from "../../../classes/supportedformats"
 import {
@@ -25,14 +26,14 @@ export default class DrawLadder extends DrawPic {
       maxGrps = nCts
     }
     if (nCts === 0) maxGrps = 5
-    this.numGroups = randomNumber(3, maxGrps)
+    this.numGroupsToCreate = randomNumber(3, maxGrps)
   }
 
   seps: number[] = [0]
 
   getPictureInfo(start?: Point): PictureInfo {
     let depth = 0
-    for (let x = 1; x < this.numGroups; x++) {
+    for (let x = 1; x < this.groups.length; x++) {
       const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
       this.seps.push(nextSep)
       depth += nextSep
@@ -68,7 +69,7 @@ export default class DrawLadder extends DrawPic {
     let totalArrowOffset = 0
 
     const groups: AircraftGroup[] = []
-    for (let x = 0; x < this.numGroups; x++) {
+    for (let x = 0; x < this.numGroupsToCreate; x++) {
       const offsetHeading = randomNumber(-10, 10)
       totalArrowOffset += this.seps[x]
 
@@ -96,13 +97,13 @@ export default class DrawLadder extends DrawPic {
     const { blueAir, bullseye } = this.state
     const bluePos = blueAir.getCenterOfMass(dataStyle)
 
-    for (let x = 0; x < this.numGroups; x++) {
+    for (let x = 0; x < this.groups.length; x++) {
       let altOffsetX = 0
       let altOffsetY = 0
 
       if (!isNS) {
-        altOffsetX = -40 + -5 * (this.numGroups - x)
-        altOffsetY = -20 + -11 * (this.numGroups - x)
+        altOffsetX = -40 + -5 * (this.groups.length - x)
+        altOffsetY = -20 + -11 * (this.groups.length - x)
       }
 
       const grp = this.groups[x]
@@ -143,8 +144,8 @@ export default class DrawLadder extends DrawPic {
     this.deep = actualDeep
   }
 
-  getAnswer(): string {
-    switch (this.numGroups) {
+  applyLabels(): void {
+    switch (this.groups.length) {
       case 3:
         this.groups[0].setLabel("TRAIL GROUP")
         this.groups[1].setLabel("MIDDLE GROUP")
@@ -164,27 +165,45 @@ export default class DrawLadder extends DrawPic {
         this.groups[4].setLabel("LEAD GROUP")
         break
     }
+    this.groups.reverse()
+  }
 
-    let answer = this.numGroups + " GROUP LADDER " + this.deep + " DEEP, "
+  formatPicTitle(): string {
+    return this.groups.length + " GROUP LADDER "
+  }
 
-    answer += this.picTrackDir()
+  formatDimensions(): string {
+    return this.deep + " DEEP, "
+  }
 
-    const rangeBack = {
-      label: this.props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
-      range: this.groups[this.groups.length - 2]
+  formatWeighted(): string {
+    return ""
+  }
+
+  getAnswer(): string {
+    this.applyLabels()
+
+    let answer = this.formatPicTitle() + " "
+    answer += this.formatDimensions() + " "
+    answer += this.picTrackDir() + " "
+
+    const rangeBack: RangeBack = new RangeBack(
+      this.props.format === FORMAT.ALSA ? "SEPARATION" : "RANGE",
+      this.groups[this.groups.length - 2]
         .getCenterOfMass(this.props.dataStyle)
         .getBR(
           this.groups[this.groups.length - 1].getCenterOfMass(
             this.props.dataStyle
           )
-        ).range,
-    }
+        ).range
+    )
 
-    for (let g = this.groups.length - 1; g >= 0; g--) {
-      if (g !== this.groups.length - 1) {
+    this.groups[0].setUseBull(true)
+    for (let g = 0; g < this.groups.length; g++) {
+      if (g !== 0) {
         // TODO - check echelon from prev group to cur group
       }
-      const rngBackToUse = g === this.groups.length - 2 ? rangeBack : undefined
+      const rngBackToUse = g === 1 ? rangeBack : undefined
       answer += this.groups[g].format(this.props.format, rngBackToUse) + " "
     }
 

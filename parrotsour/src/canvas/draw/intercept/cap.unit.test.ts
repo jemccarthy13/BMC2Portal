@@ -1,28 +1,28 @@
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
+import { PaintBrush } from "../paintbrush"
 import { checkCaps } from "./cap"
 
 describe("cap_util", () => {
-  let ctx: CanvasRenderingContext2D
-  //let testState: PictureCanvasState
-  let p: Partial<GroupParams>
   let grps: AircraftGroup[]
+
+  const p: Partial<GroupParams> = {
+    dataTrailType: SensorType.ARROW,
+    sx: 200,
+    sy: 200,
+    nContacts: 4,
+    hdg: 90,
+    alts: [20, 20, 20, 20],
+  }
 
   beforeAll(() => {
     const canvas = document.createElement("canvas")
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    ctx = canvas.getContext("2d")!
+    const ctx = canvas.getContext("2d")!
     canvas.width = 800
     canvas.height = 500
-    p = {
-      ctx,
-      dataTrailType: SensorType.ARROW,
-      sx: 200,
-      sy: 200,
-      nContacts: 4,
-      hdg: 90,
-      alts: [20, 20, 20, 20],
-    }
+    PaintBrush.use(ctx)
+
     const ng = new AircraftGroup(p)
     grps = [ng]
   })

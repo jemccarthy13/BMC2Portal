@@ -1,7 +1,6 @@
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -26,14 +25,14 @@ export default class DrawWall extends DrawPic {
       maxGrps = nCts
     }
     if (nCts === 0) maxGrps = 5
-    this.numGroups = randomNumber(3, maxGrps)
+    this.numGroupsToCreate = randomNumber(3, maxGrps)
   }
 
   seps: number[] = [0]
 
   getPictureInfo(start?: Point): PictureInfo {
     let width = 0
-    for (let x = 1; x < this.numGroups; x++) {
+    for (let x = 1; x < this.numGroupsToCreate; x++) {
       const nextSep = randomNumber(7 * PIXELS_TO_NM, 15 * PIXELS_TO_NM)
       this.seps.push(nextSep)
       width += nextSep
@@ -69,7 +68,7 @@ export default class DrawWall extends DrawPic {
     let totalArrowOffset = 0
 
     const groups: AircraftGroup[] = []
-    for (let x = 0; x < this.numGroups; x++) {
+    for (let x = 0; x < this.numGroupsToCreate; x++) {
       const offsetHeading = randomNumber(-10, 10)
       totalArrowOffset += this.seps[x]
 
@@ -85,6 +84,7 @@ export default class DrawWall extends DrawPic {
         hdg: heading + offsetHeading,
         nContacts: contactList[x],
       })
+
       groups.push(grp)
     }
 
@@ -97,13 +97,13 @@ export default class DrawWall extends DrawPic {
 
     const bluePos = this.state.blueAir.getCenterOfMass(dataStyle)
 
-    for (let x = 0; x < this.numGroups; x++) {
+    for (let x = 0; x < this.groups.length; x++) {
       let altOffsetX = 30
       let altOffsetY = 0
 
       if (isNS) {
-        altOffsetX = -15 * (this.numGroups - x)
-        altOffsetY = 40 + 11 * (this.numGroups - (this.numGroups - x))
+        altOffsetX = -15 * (this.groups.length - x)
+        altOffsetY = 40 + 11 * (this.groups.length - (this.groups.length - x))
       }
       const grp = this.groups[x]
       const grpPos = grp.getCenterOfMass(dataStyle)
@@ -135,11 +135,11 @@ export default class DrawWall extends DrawPic {
     this.wide = widthNM
   }
 
-  getAnswer(): string {
+  applyLabels(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
     const nLbl = isNS ? "WEST" : "NORTH"
     const sLbl = isNS ? "EAST" : "SOUTH"
-    switch (this.numGroups) {
+    switch (this.groups.length) {
       case 3:
         this.groups[0].setLabel(nLbl + " GROUP")
         this.groups[1].setLabel("MIDDLE GROUP")
@@ -159,29 +159,49 @@ export default class DrawWall extends DrawPic {
         this.groups[4].setLabel(sLbl + " GROUP")
         break
     }
+    this.groups[0].setUseBull(true)
+    this.groups[this.groups.length - 1].setUseBull(this.isAnchorOutriggers())
 
-    const openClose = getOpenCloseAzimuth(
-      this.groups[0],
-      this.groups[this.groups.length - 1]
-    )
-    let answer =
-      this.numGroups + " GROUP WALL " + this.wide + " WIDE " + openClose + ", "
+    if (!this.groups[0].isAnchor()) {
+      this.groups.reverse()
+    }
+  }
 
-    answer += this.picTrackDir()
+  formatPicTitle(): string {
+    return this.groups.length + " GROUP WALL"
+  }
 
+  formatDimensions(): string {
+    return this.wide + " WIDE"
+  }
+
+  formatWeighted(): string {
+    console.warn("Check weighted for wall")
+    const split = this.wide / this.groups.length
+    this.seps.forEach((sep) => {
+      if (sep > split) {
+        console.log("weighted")
+      }
+    })
+    return ""
+  }
+
+  getAnswer(): string {
     this.checkAnchor(this.groups[0], this.groups[this.groups.length - 1])
+    this.applyLabels()
 
-    // TODO -- WEIGHTED WALL
-    // since we have all the seps[], we could check if any are within weighted criteria
+    let answer = this.formatPicTitle() + " "
+    answer += this.formatDimensions() + " "
+    answer += this.formatWeighted() + " "
 
-    const anchorOutriggers = this.wide > 10 && this.props.format !== FORMAT.IPE
+    answer +=
+      getOpenCloseAzimuth(this.groups[0], this.groups[this.groups.length - 1]) +
+      ", "
 
-    for (let g = 0; g < this.numGroups; g++) {
-      const idx: number = this.groups[0].isAnchor() ? g : this.numGroups - 1 - g
+    answer += this.picTrackDir() + " "
+
+    for (let idx = 0; idx < this.groups.length; idx++) {
       const group = this.groups[idx]
-      group.setUseBull(
-        g === 0 || (g === this.numGroups - 1 && anchorOutriggers)
-      )
       answer += group.format(this.props.format) + " "
     }
 

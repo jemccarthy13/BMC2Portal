@@ -23,7 +23,7 @@ export class Point {
   /**
    * Get a bearing and range between this point and another point
    *
-   * @param ptTo the "other"/"to" point
+   * @param ptTo the "other" or "to" point
    * @returns the bearing and range between this (ptFrom) and ptTo
    */
   getBR(toPoint: Point): BRAA {

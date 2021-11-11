@@ -23,8 +23,12 @@ export abstract class DrawPic {
   ) => AircraftGroup[]
   abstract drawInfo(): void
   abstract getAnswer(): string
+  abstract applyLabels(): void
+  abstract formatWeighted(): string
+  abstract formatPicTitle(): string
+  abstract formatDimensions(): string
 
-  numGroups = 0
+  public numGroupsToCreate = 0
   groups: AircraftGroup[] = []
   answer = ""
   props!: PictureCanvasProps
@@ -34,7 +38,7 @@ export abstract class DrawPic {
   wide = 0
 
   getNumGroups(): number {
-    return this.numGroups
+    return this.groups.length
   }
 
   initialize = (props: PictureCanvasProps, state: PictureCanvasState): void => {
@@ -49,7 +53,11 @@ export abstract class DrawPic {
   ): PictureAnswer => {
     this.chooseNumGroups(desiredNumContacts)
 
-    const contactList = this.assignContacts(this.numGroups, desiredNumContacts)
+    const contactList = this.assignContacts(
+      this.numGroupsToCreate,
+      desiredNumContacts
+    )
+    console.log(contactList)
 
     this.pInfo = this.getPictureInfo(start)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -77,6 +85,7 @@ export abstract class DrawPic {
   }
 
   assignContacts = (grps: number, contacts: number): number[] => {
+    console.log(grps, contacts)
     let cntSoFar = 0
     const answer = []
     if (grps > contacts && contacts !== 0) {
@@ -199,5 +208,9 @@ export abstract class DrawPic {
     }
     group1.setAnchor(anchorN)
     group2.setAnchor(!anchorN)
+  }
+
+  isAnchorOutriggers(): boolean {
+    return this.wide >= 10 && this.props.format !== FORMAT.IPE
   }
 }

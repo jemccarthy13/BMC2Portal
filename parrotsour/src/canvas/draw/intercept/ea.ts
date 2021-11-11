@@ -188,7 +188,7 @@ export default class DrawEA extends DrawPic {
     let aspect = aspectH.toString()
     aspect += aspectH !== Aspect.HOT ? toCardinal(cGrp.getHeading()) : ""
     let response: string = cGrp.getLabel()
-    response += " BRAA " + braa.bearing + "/" + braa.range + " "
+    response += " BRAA " + braa.toString() + " "
     response += altStack.stack + ", "
     response += aspect + " HOSTILE "
     if (cGrp.getStrength() > 1) {
@@ -199,6 +199,19 @@ export default class DrawEA extends DrawPic {
     }
     response += altStack.fillIns
     return response
+  }
+
+  applyLabels(): void {
+    console.warn("apply labels does nothing for EA")
+  }
+  formatWeighted(): string {
+    return ""
+  }
+  formatPicTitle(): string {
+    return ""
+  }
+  formatDimensions(): string {
+    return ""
   }
 
   getAnswer(): string {

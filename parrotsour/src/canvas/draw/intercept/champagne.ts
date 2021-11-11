@@ -1,7 +1,6 @@
 import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -19,7 +18,7 @@ export default class DrawChampagne extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = 3
+    this.numGroupsToCreate = 3
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -153,64 +152,76 @@ export default class DrawChampagne extends DrawPic {
     slg.getBraaseye().draw(showMeasurements, braaFirst)
   }
 
-  getAnswer(): string {
-    const tg = this.groups[0]
-    const nlg = this.groups[1]
-    const slg = this.groups[2]
-
-    // TODO -- CHAMP ANSWER -- cleanup
-    const openClose = getOpenCloseAzimuth(nlg, slg)
-
-    let answer =
-      "THREE GROUP CHAMPAGNE " +
-      this.wide +
-      " WIDE" +
-      openClose +
-      " " +
-      this.deep +
-      " DEEP, "
-
+  applyLabels(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
     const nLbl = isNS ? "WEST" : "NORTH"
     const sLbl = isNS ? "EAST" : "SOUTH"
+    this.groups[1].setLabel(nLbl + " LEAD GROUP")
+    this.groups[2].setLabel(sLbl + " LEAD GROUP")
+    this.groups[0].setLabel("TRAIL GROUP")
 
-    nlg.draw(this.props.dataStyle)
-    const nlgPos = nlg.getCenterOfMass(this.props.dataStyle)
-    const slgPos = slg.getCenterOfMass(this.props.dataStyle)
-    const tgPos = tg.getCenterOfMass(this.props.dataStyle)
-    // determine if weighted
-    let frmNPt = new Point(nlgPos.x, tgPos.y)
-    let fromSPt = new Point(slgPos.x, tgPos.y)
-    if (isNS) {
-      frmNPt = new Point(tgPos.x, nlgPos.y)
-      fromSPt = new Point(tgPos.x, slgPos.y)
-    }
-    if (frmNPt.getBR(nlgPos).range < this.wide / 3) {
-      answer += " WEIGHTED " + nLbl + ", "
-    } else if (fromSPt.getBR(slgPos).range < this.wide / 3) {
-      answer += " WEIGHTED " + sLbl + ", "
-    }
+    let group1 = this.groups[1]
+    let group2 = this.groups[2]
 
-    answer += this.picTrackDir()
-
-    const anchorOutriggers = this.wide >= 10 && this.props.format !== FORMAT.IPE
-
-    this.checkAnchor(nlg, slg)
-
-    let group1 = nlg
-    let group2 = slg
-
-    if (nlg.isAnchor()) {
-      slg.setUseBull(anchorOutriggers)
+    if (group1.isAnchor()) {
+      group2.setUseBull(this.isAnchorOutriggers())
     } else {
-      slg.setUseBull(true)
-      nlg.setUseBull(anchorOutriggers)
-      group1 = slg
-      group2 = nlg
+      group1 = this.groups[2]
+      group2 = this.groups[1]
+      group1.setUseBull(true)
+      group2.setUseBull(this.isAnchorOutriggers())
     }
-    answer += group1.format(this.props.format)
-    answer += group2.format(this.props.format)
-    answer += tg.format(this.props.format)
+    this.groups = [group1, group2, this.groups[0]]
+  }
+
+  formatWeighted(): string {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const grp0Pos = this.groups[0].getCenterOfMass(this.props.dataStyle)
+    const grp1Pos = this.groups[1].getCenterOfMass(this.props.dataStyle)
+    const grp2Pos = this.groups[2].getCenterOfMass(this.props.dataStyle)
+    // determine if weighted
+    let frmNPt = new Point(grp0Pos.x, grp2Pos.y)
+    let fromSPt = new Point(grp1Pos.x, grp2Pos.y)
+    let weighted = ""
+    if (isNS) {
+      frmNPt = new Point(grp2Pos.x, grp0Pos.y)
+      fromSPt = new Point(grp2Pos.x, grp1Pos.y)
+    }
+    if (frmNPt.getBR(grp0Pos).range < this.wide / 3) {
+      weighted =
+        " WEIGHTED " +
+        this.groups[0].getLabel().replace(" LEAD GROUP", "") +
+        ", "
+    } else if (fromSPt.getBR(grp1Pos).range < this.wide / 3) {
+      weighted =
+        " WEIGHTED " +
+        this.groups[1].getLabel().replace(" LEAD GROUP", "") +
+        ", "
+    }
+    return weighted
+  }
+
+  formatPicTitle(): string {
+    return "THREE GROUP CHAMPAGNE"
+  }
+
+  formatDimensions(): string {
+    const openClose = getOpenCloseAzimuth(this.groups[1], this.groups[2])
+    return this.wide + " WIDE" + openClose + " " + this.deep + " DEEP, "
+  }
+
+  getAnswer(): string {
+    this.checkAnchor(this.groups[1], this.groups[2])
+    this.applyLabels()
+
+    let answer = this.formatPicTitle() + " "
+    answer += this.formatDimensions() + " "
+    answer += this.formatWeighted() + " "
+    answer += this.picTrackDir() + " "
+
+    for (let x = 0; x < this.groups.length; x++) {
+      answer += this.groups[x].format(this.props.format) + " "
+    }
 
     return answer.replace(/\s+/g, " ").trim()
   }

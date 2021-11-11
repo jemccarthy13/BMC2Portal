@@ -18,7 +18,7 @@ export default class DrawVic extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = 3
+    this.numGroupsToCreate = 3
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -130,9 +130,42 @@ export default class DrawVic extends DrawPic {
     ntg.getBraaseye().draw(showMeasurements, braaFirst, offsetX)
   }
 
-  getAnswer(): string {
+  formatPicTitle(): string {
+    return "3 GROUP VIC"
+  }
+
+  formatDimensions(): string {
+    return this.deep + " DEEP, " + this.wide + " WIDE"
+  }
+
+  formatWeighted(): string {
+    // nothing
+    let answer = ""
+    const { dataStyle } = this.props
+    const lgPos = this.groups[0].getCenterOfMass(dataStyle)
+    const ntgPos = this.groups[1].getCenterOfMass(dataStyle)
+    const stgPos = this.groups[2].getCenterOfMass(dataStyle)
+
+    if (new Point(lgPos.x, ntgPos.y).getBR(lgPos).range < this.wide / 3) {
+      answer +=
+        " WEIGHTED " +
+        this.groups[1].getLabel().replace("TRAIL GROUP", "") +
+        ", "
+    } else if (
+      new Point(lgPos.x, stgPos.y).getBR(lgPos).range <
+      this.wide / 3
+    ) {
+      answer +=
+        " WEIGHTED " +
+        this.groups[2].getLabel().replace("TRAIL GROUP", "") +
+        ", "
+    }
+
+    return answer
+  }
+
+  applyLabels(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
-    const { dataStyle, format } = this.props
 
     const lg = this.groups[0]
     const ntg = this.groups[1]
@@ -148,46 +181,37 @@ export default class DrawVic extends DrawPic {
     ntg.setLabel(nLbl + " TRAIL GROUP")
     stg.setLabel(sLbl + " TRAIL GROUP")
 
-    const openClose = getOpenCloseAzimuth(ntg, stg)
-
-    let answer =
-      "THREE GROUP VIC " +
-      this.deep +
-      " DEEP, " +
-      this.wide +
-      " WIDE" +
-      openClose +
-      ", "
-
-    const lgPos = lg.getCenterOfMass(dataStyle)
-    const ntgPos = ntg.getCenterOfMass(dataStyle)
-    const stgPos = stg.getCenterOfMass(dataStyle)
-
-    if (new Point(lgPos.x, ntgPos.y).getBR(lgPos).range < this.wide / 3) {
-      answer += " WEIGHTED " + nLbl + ", "
-    } else if (
-      new Point(lgPos.x, stgPos.y).getBR(lgPos).range <
-      this.wide / 3
-    ) {
-      answer += " WEIGHTED " + sLbl + ", "
+    if (!ntg.isAnchor) {
+      const tmp = this.groups[1]
+      this.groups[1] = this.groups[2]
+      this.groups[2] = tmp
     }
+  }
+
+  getAnswer(): string {
+    const { format } = this.props
+    const ntg = this.groups[1]
+    const stg = this.groups[2]
+
+    this.checkAnchor(this.groups[1], this.groups[2])
+    this.applyLabels()
+
+    let answer = this.formatPicTitle() + " "
+    answer += this.formatDimensions() + " "
+
+    answer += getOpenCloseAzimuth(ntg, stg) + ", "
+
+    answer += this.formatWeighted() + " "
 
     // TODO -- SPEED -- Opening/closing pic with range component
 
-    answer += this.picTrackDir()
+    answer += this.picTrackDir() + " "
 
-    lg.setAnchor(true)
-    answer += lg.format(format) + " "
+    this.groups[0].setAnchor(true)
 
-    this.checkAnchor(ntg, stg)
-
-    if (ntg.isAnchor()) {
-      answer += ntg.format(format) + " "
-      answer += stg.format(format)
-    } else {
-      answer += stg.format(format) + " "
-      answer += ntg.format(format)
-    }
+    this.groups.forEach((grp) => {
+      answer += grp.format(format) + " "
+    })
 
     return answer.replace(/\s+/g, " ").trim()
   }

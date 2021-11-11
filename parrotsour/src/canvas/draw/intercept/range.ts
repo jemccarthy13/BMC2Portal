@@ -19,7 +19,7 @@ export default class DrawRange extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = 2
+    this.numGroupsToCreate = 2
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -108,33 +108,24 @@ export default class DrawRange extends DrawPic {
     tg.getBraaseye().draw(showMeasurements, braaFirst, offsetX2, offsetY2)
   }
 
-  getAnswer(): string {
-    const isNS = FightAxis.isNS(this.props.orientation.orient)
+  formatPicTitle(): string {
+    return "TWO GROUPS RANGE"
+  }
 
+  formatDimensions(): string {
+    return this.deep.toString()
+  }
+
+  formatWeighted(): string {
+    return ""
+  }
+
+  applyLabels(): void {
     const tg = this.groups[0]
     const lg = this.groups[1]
 
     tg.setLabel("TRAIL GROUP")
     lg.setLabel("LEAD GROUP")
-
-    const tgPos = tg.getCenterOfMass(this.props.dataStyle)
-    const lgPos = lg.getCenterOfMass(this.props.dataStyle)
-
-    let answer: string = "TWO GROUPS RANGE " + this.deep + ", "
-    if (
-      (!isNS && new Point(tgPos.x, lgPos.y).getBR(tgPos).range > 5) ||
-      (isNS && tgPos.getBR(new Point(lgPos.x, tgPos.y)).range > 5)
-    ) {
-      if (!isNS) {
-        answer += " ECHELON " + toCardinal(lgPos.getBR(tgPos).bearingNum) + ", "
-      } else {
-        answer += " ECHELON " + toCardinal(tgPos.getBR(lgPos).bearingNum) + ", "
-      }
-    }
-
-    answer += this.picTrackDir()
-
-    // TODO -- DETERMINE IF OPENING/CLOSING
 
     let firstGroup = lg
     let secondGroup = tg
@@ -148,8 +139,42 @@ export default class DrawRange extends DrawPic {
     firstGroup.setUseBull(true)
     secondGroup.setUseBull(false)
 
-    answer += firstGroup.format(this.props.format) + " "
-    answer += secondGroup.format(this.props.format)
+    this.groups = [firstGroup, secondGroup]
+  }
+
+  isEchelon = (grp1: AircraftGroup, grp2: AircraftGroup): string => {
+    let answer = ""
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+    const tgPos = grp2.getCenterOfMass(this.props.dataStyle)
+    const lgPos = grp1.getCenterOfMass(this.props.dataStyle)
+    if (
+      (!isNS && new Point(tgPos.x, lgPos.y).getBR(tgPos).range > 5) ||
+      (isNS && tgPos.getBR(new Point(lgPos.x, tgPos.y)).range > 5)
+    ) {
+      if (!isNS) {
+        answer += " ECHELON " + toCardinal(lgPos.getBR(tgPos).bearingNum) + ", "
+      } else {
+        answer += " ECHELON " + toCardinal(tgPos.getBR(lgPos).bearingNum) + ", "
+      }
+    }
+    return answer
+  }
+
+  getAnswer(): string {
+    this.applyLabels()
+
+    let answer: string = this.formatPicTitle() + " "
+
+    answer += this.formatDimensions() + ", "
+
+    // TODO -- determine open/close
+    answer += this.isEchelon(this.groups[0], this.groups[1]) + " "
+
+    answer += this.picTrackDir() + " "
+
+    this.groups.forEach((group) => {
+      answer += group.format(this.props.format) + " "
+    })
 
     return answer.replace(/\s+/g, " ").trim()
   }

@@ -19,7 +19,7 @@ export default class DrawThreat extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = 1
+    this.numGroupsToCreate = 1
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -77,10 +77,26 @@ export default class DrawThreat extends DrawPic {
     sg.getBraaseye().draw(showMeasurements, braaFirst)
   }
 
+  formatPicTitle(): string {
+    return "[FTR C/S], THREAT GROUP BRAA "
+  }
+
+  applyLabels(): void {
+    this.groups[0].setLabel("SINGLE GROUP")
+  }
+
+  formatWeighted(): string {
+    return ""
+  }
+
+  formatDimensions(): string {
+    return ""
+  }
+
   getAnswer(): string {
     const sg = this.groups[0]
 
-    sg.setLabel("SINGLE GROUP")
+    this.applyLabels()
 
     const { blueAir } = this.state
     const { dataStyle } = this.props
@@ -91,25 +107,12 @@ export default class DrawThreat extends DrawPic {
 
     const sgAlts: AltStack = sg.getAltStack(this.props.format)
 
-    let answer: string =
-      "[FTR C/S], THREAT GROUP BRAA " +
-      braaseye.braa.bearing +
-      "/" +
-      braaseye.braa.range +
-      " " +
-      sgAlts.stack +
-      " " +
-      aspectH +
-      " " +
-      (aspectH !== "HOT" ? trackDir : "") +
-      " HOSTILE "
+    let answer: string = this.formatPicTitle()
+    answer += braaseye.braa.toString() + " "
+    answer += sgAlts.stack + " "
+    answer += aspectH + " " + trackDir + " HOSTILE "
 
-    if (sg.getStrength() > 1) {
-      answer +=
-        (sg.getStrength() >= 3 ? "HEAVY " : "") +
-        sg.getStrength() +
-        " CONTACTS "
-    }
+    answer += sg.formatNumContacts()
 
     answer += sgAlts.fillIns
 

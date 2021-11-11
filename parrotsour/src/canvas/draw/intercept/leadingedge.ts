@@ -13,6 +13,8 @@ export default class DrawLeadEdge extends DrawPic {
 
   private furthestLeadGroup!: AircraftGroup
 
+  private rngBack = -1
+
   create(): DrawPic {
     return new DrawLeadEdge()
   }
@@ -31,7 +33,6 @@ export default class DrawLeadEdge extends DrawPic {
 
     this.leadEdge.chooseNumGroups(nCt)
     this.followOn.chooseNumGroups(sCt)
-    this.numGroups = this.leadEdge.numGroups + this.followOn.numGroups
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -130,7 +131,15 @@ export default class DrawLeadEdge extends DrawPic {
     return this.draw(false, nCts)
   }
 
-  getAnswer(): string {
+  formatPicTitle(): string {
+    return this.getNumGroups() + " GROUPS, LEADING EDGE"
+  }
+
+  /**
+   * In leading edge the dimension is the straight distance to
+   * "follow on" groups
+   */
+  formatDimensions(): string {
     const { dataStyle } = this.props
     const { blueAir } = this.state
     const groups2 = this.followOn.groups
@@ -154,18 +163,37 @@ export default class DrawLeadEdge extends DrawPic {
       pic2Pos,
       this.props.orientation.orient
     )
+    this.rngBack = rngBack
+
+    let answer = "FOLLOW ON "
+    if (this.props.format === FORMAT.IPE) {
+      answer += "GROUPS " + rngBack + " MILES"
+    } else {
+      answer += rngBack
+    }
+    return answer
+  }
+
+  formatWeighted(): string {
+    return ""
+  }
+
+  applyLabels(): void {
+    //nothing
+  }
+
+  getAnswer(): string {
     let answer = ""
 
-    if (rngBack > 40) {
+    answer = this.formatPicTitle() + " "
+    answer += this.leadEdge.getAnswer()
+    answer += " FOLLOW ON "
+    answer += this.formatDimensions()
+
+    if (this.rngBack > 40) {
       answer = this.tryAgain().pic
-    } else {
-      answer = this.getNumGroups() + " GROUPS, "
-      answer += "LEADING EDGE " + this.leadEdge.getAnswer()
-      answer += " FOLLOW ON "
-      answer += this.props.format === FORMAT.IPE ? " GROUPS " : ""
-      answer += rngBack
-      answer += this.props.format === FORMAT.IPE ? " MILES " : ""
     }
+
     return answer.replace(/\s+/g, " ").trim()
   }
 }

@@ -17,7 +17,7 @@ export default class DrawSingleGroup extends DrawPic {
    * @returns # of groups in this picture
    */
   chooseNumGroups = (): void => {
-    this.numGroups = 1
+    this.numGroupsToCreate = 1
   }
 
   /**
@@ -82,6 +82,20 @@ export default class DrawSingleGroup extends DrawPic {
       offsetX,
       offsetY
     )
+  }
+
+  formatDimensions(): string {
+    return ""
+  }
+  formatPicTitle(): string {
+    return ""
+  }
+  applyLabels(): void {
+    throw new Error("applyLabels to single group has no effect")
+  }
+
+  formatWeighted(): string {
+    return ""
   }
 
   getAnswer = (): string => {

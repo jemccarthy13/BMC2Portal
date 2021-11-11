@@ -18,6 +18,7 @@ import { drawGroupCap } from "./groupcap"
 import { Braaseye } from "../braaseye"
 import { Aspect, aspectFromCATA, toCardinal } from "../../utils/aspect"
 import { BRAA } from "../braa"
+import RangeBack from "./rangeback"
 
 /**
  * The types of data that can be used to seed a group.
@@ -34,11 +35,6 @@ export interface GroupParams {
   desiredHdg?: number
   id?: IDMatrix
   type?: ACType
-}
-
-type RangeBack = {
-  label: string
-  range: number
 }
 
 /**
@@ -121,29 +117,38 @@ export class AircraftGroup extends Array<Aircraft> {
     return this.useBull
   }
 
-  /**
- * Return the string formatted answer for this group based on properties of the group
+  formatNumContacts(): string {
+    let answer = ""
+    if (this.getStrength() > 1) {
+      if (this.getStrength() >= 3) {
+        answer += "HEAVY "
+      }
+      answer += this.getStrength() + " CONTACTS"
+    }
+    return answer
+  }
 
- */
+  /**
+   * Return the string formatted answer for this group based on properties of the group
+   */
   format(format: FORMAT, rangeBack?: RangeBack): string {
     // format label
     let answer = this.getLabel() + " "
 
     // format separation
-    if (rangeBack !== null && rangeBack !== undefined) {
-      answer += rangeBack.label + " " + rangeBack.range + " "
+    if (rangeBack) {
+      answer += rangeBack.toString() + " "
     }
 
     // format bullseye if anchor priority
     const braaseye = this.getBraaseye()
     if (this.useBull || false) {
-      answer +=
-        "BULLSEYE " + braaseye.bull.bearing + "/" + braaseye.bull.range + ", "
+      answer += "BULLSEYE " + braaseye.bull.toString() + ", "
     }
 
     // format altitude stack
     const altStack = this.getAltStack(format)
-    answer += altStack.stack
+    answer += altStack.stack + " "
 
     // format track direction
     const trackDir = this.getTrackDir()
@@ -151,14 +156,10 @@ export class AircraftGroup extends Array<Aircraft> {
     answer += trackDir !== undefined ? trackDir : ""
 
     // apply ID
-    answer += " HOSTILE"
+    answer += " HOSTILE "
 
     // apply fill-in for # contacts
-    const numContacts = this.getStrength()
-    if (numContacts > 1) {
-      answer +=
-        " " + (numContacts >= 3 ? "HEAVY " : "") + numContacts + " CONTACTS"
-    }
+    answer += this.formatNumContacts() + " "
 
     // apply fill-ins (HI/FAST/etc)
     answer += " " + altStack.fillIns

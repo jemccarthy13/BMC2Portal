@@ -2,7 +2,6 @@ import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { GroupFactory } from "../../../classes/groups/groupfactory"
 import { Point } from "../../../classes/point"
-import { FORMAT } from "../../../classes/supportedformats"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -20,7 +19,7 @@ export default class DrawAzimuth extends DrawPic {
   }
 
   chooseNumGroups(): void {
-    this.numGroups = 2
+    this.numGroupsToCreate = 2
   }
 
   getPictureInfo(start?: Point): PictureInfo {
@@ -111,38 +110,22 @@ export default class DrawAzimuth extends DrawPic {
     sg.getBraaseye().draw(showMeasurements, braaFirst, offsetX2, offsetY2)
   }
 
-  getAnswer(): string {
-    const ng = this.groups[0]
-    const sg = this.groups[1]
-
-    // anchor both outrigger with bullseye if >10 az and !ipe
-    const includeBull = this.wide >= 10 && this.props.format !== FORMAT.IPE
-
-    let answer = "TWO GROUPS AZIMUTH " + this.wide + " "
-
-    answer += getOpenCloseAzimuth(ng, sg)
-
-    answer += this.isEchelon(ng, sg)
-
-    answer += this.picTrackDir()
-
-    this.checkAnchor(ng, sg)
-
+  applyLabels(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
     // if Anchor N and NS, SG = "EAST", NG = "WEST"
-    let firstGroup = sg
-    let secondGroup = ng
+    let firstGroup = this.groups[1]
+    let secondGroup = this.groups[0]
     firstGroup.setLabel("EAST GROUP")
     secondGroup.setLabel("WEST GROUP")
-    if (!ng.isAnchor()) {
+    if (!this.groups[0].isAnchor()) {
       if (!isNS) {
         firstGroup.setLabel("SOUTH GROUP")
         secondGroup.setLabel("NORTH GROUP")
       }
     } else {
-      firstGroup = ng
-      secondGroup = sg
+      firstGroup = this.groups[0]
+      secondGroup = this.groups[1]
       if (isNS) {
         firstGroup.setLabel("WEST GROUP")
         secondGroup.setLabel("EAST GROUP")
@@ -151,12 +134,36 @@ export default class DrawAzimuth extends DrawPic {
         secondGroup.setLabel("SOUTH GROUP")
       }
     }
+    this.groups = [firstGroup, secondGroup]
+  }
 
-    secondGroup.setUseBull(includeBull)
+  formatWeighted(): string {
+    return ""
+  }
 
-    answer += firstGroup.format(this.props.format)
-    answer += " " + secondGroup.format(this.props.format)
+  formatPicTitle(): string {
+    return "TWO GROUPS AZIMUTH"
+  }
 
+  formatDimensions(): string {
+    return this.wide.toString()
+  }
+
+  getAnswer(): string {
+    this.checkAnchor(this.groups[0], this.groups[1])
+    this.applyLabels()
+
+    let answer = this.formatPicTitle() + " "
+    answer += this.formatDimensions() + " "
+    answer += getOpenCloseAzimuth(this.groups[0], this.groups[1]) + " "
+    answer += this.isEchelon(this.groups[0], this.groups[1]) + " "
+    answer += this.picTrackDir() + " "
+
+    this.groups[1].setUseBull(this.isAnchorOutriggers())
+
+    for (let x = 0; x < this.groups.length; x++) {
+      answer += this.groups[x].format(this.props.format) + " "
+    }
     return answer.replace(/\s+/g, " ").trim()
   }
 }

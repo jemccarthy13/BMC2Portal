@@ -1,15 +1,22 @@
+import { BRAA } from "../../../classes/braa"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { randomNumber } from "../../../utils/psmath"
 import { FightAxis, PictureAnswer } from "../../canvastypes"
 import { PaintBrush } from "../paintbrush"
 import { DrawPic } from "./drawpic"
+import { Package } from "./package"
 import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
 
 export default class DrawPackage extends DrawPic {
-  private nPkg!: DrawPic
-  private sPkg!: DrawPic
+  private packages!: Package[]
+
+  private nPkgBe: BRAA = new BRAA(-1, -1)
+  private sPkgBe: BRAA = new BRAA(-1, -1)
+  private rngBack: BRAA = new BRAA(-1, -1)
+  private bullPt1 = new Point(-1, -1)
+  private bullPt2 = new Point(-1, -1)
 
   create(): DrawPic {
     return new DrawPackage()
@@ -19,16 +26,18 @@ export default class DrawPackage extends DrawPic {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt
 
-    this.nPkg = PictureFactory.getPictureDraw("random", nCt, true)
-    this.sPkg = PictureFactory.getPictureDraw("random", sCt, true)
+    this.packages.push(
+      PictureFactory.getPictureDraw("random", nCt, true) as Package
+    )
+    this.packages.push(
+      PictureFactory.getPictureDraw("random", sCt, true) as Package
+    )
 
-    this.nPkg.initialize(this.props, this.state)
-    this.sPkg.initialize(this.props, this.state)
+    this.packages[0].initialize(this.props, this.state)
+    this.packages[1].initialize(this.props, this.state)
 
-    this.nPkg.chooseNumGroups(nCt)
-    this.sPkg.chooseNumGroups(sCt)
-
-    this.numGroups = this.nPkg.numGroups + this.sPkg.numGroups
+    this.packages[0].chooseNumGroups(nCt)
+    this.packages[1].chooseNumGroups(sCt)
   }
 
   private start2: Point = Point.DEFAULT
@@ -82,19 +91,19 @@ export default class DrawPackage extends DrawPic {
     const start1 = new Point(s1x, s1y)
     const start2 = new Point(s2x, s2y)
 
-    const nPkgInfo = this.nPkg.getPictureInfo(start1)
-    this.nPkg.pInfo = nPkgInfo
+    const nPkgInfo = this.packages[0].getPictureInfo(start1)
+    this.packages[0].pInfo = nPkgInfo
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.nPkg.deep = nPkgInfo.deep!
+    this.packages[0].deep = nPkgInfo.deep!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.nPkg.wide = nPkgInfo.wide!
+    this.packages[0].wide = nPkgInfo.wide!
 
-    const sPkgInfo = this.sPkg.getPictureInfo(start2)
-    this.sPkg.pInfo = sPkgInfo
+    const sPkgInfo = this.packages[1].getPictureInfo(start2)
+    this.packages[1].pInfo = sPkgInfo
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.sPkg.deep = sPkgInfo.deep!
+    this.packages[1].deep = sPkgInfo.deep!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.sPkg.wide = sPkgInfo.wide!
+    this.packages[1].wide = sPkgInfo.wide!
 
     this.start2 = start2
 
@@ -104,24 +113,24 @@ export default class DrawPackage extends DrawPic {
   }
 
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
-    const nGrps = this.nPkg.createGroups(
+    const nGrps = this.packages[0].createGroups(
       startPos,
-      contactList.slice(0, this.nPkg.getNumGroups())
+      contactList.slice(0, this.packages[0].getNumGroups())
     )
-    const sGrps = this.sPkg.createGroups(
+    const sGrps = this.packages[1].createGroups(
       this.start2,
-      contactList.slice(this.nPkg.getNumGroups())
+      contactList.slice(this.packages[1].getNumGroups())
     )
 
-    this.nPkg.groups = nGrps
-    this.sPkg.groups = sGrps
+    this.packages[0].groups = nGrps
+    this.packages[1].groups = sGrps
 
     return nGrps.concat(sGrps)
   }
 
   drawInfo(): void {
-    this.nPkg.drawInfo()
-    this.sPkg.drawInfo()
+    this.packages[0].drawInfo()
+    this.packages[1].drawInfo()
   }
 
   _getPicBull = (groups: AircraftGroup[]): Point => {
@@ -162,10 +171,10 @@ export default class DrawPackage extends DrawPic {
 
   tryAgain(): PictureAnswer {
     console.log("need to redraw pkgs")
-    const nPkgContacts = this.nPkg.groups
+    const nPkgContacts = this.packages[0].groups
       .map((grp) => grp.getStrength())
       .reduce((a, b) => a + b)
-    const sPkgContacts = this.sPkg.groups
+    const sPkgContacts = this.packages[1].groups
       .map((grp) => grp.getStrength())
       .reduce((a, b) => a + b)
     const nCts = nPkgContacts + sPkgContacts
@@ -175,30 +184,25 @@ export default class DrawPackage extends DrawPic {
     return this.draw(false, nCts)
   }
 
-  _isAnchorNPkg = (
-    nBR: number,
-    sBR: number,
-    nGrps: AircraftGroup[],
-    sGrps: AircraftGroup[]
-  ): boolean => {
+  _isAnchorNPkg = (nBR: number, sBR: number): boolean => {
     let anchorNorth = true
     if (sBR < nBR) {
       anchorNorth = false
     } else if (sBR === nBR) {
       const maxAlt1 = Math.max(
-        ...nGrps.map((grp) => {
+        ...this.packages[0].groups.map((grp) => {
           return Math.max(...grp.getAltitudes())
         })
       )
       const maxAlt2 = Math.max(
-        ...sGrps.map((grp) => {
+        ...this.packages[1].groups.map((grp) => {
           return Math.max(...grp.getAltitudes())
         })
       )
       if (maxAlt2 > maxAlt1) {
         anchorNorth = false
       } else if (maxAlt2 === maxAlt1) {
-        if (sGrps.length > nGrps.length) {
+        if (this.packages[1].groups.length > this.packages[0].groups.length) {
           anchorNorth = false
         }
       }
@@ -206,65 +210,84 @@ export default class DrawPackage extends DrawPic {
     return anchorNorth
   }
 
-  getAnswer(): string {
-    const bull1 = this._getPicBull(this.nPkg.groups)
-    const bull2 = this._getPicBull(this.sPkg.groups)
+  formatPicTitle(): string {
+    return "2 PACKAGES "
+  }
 
-    let nPkgBe = this.state.bullseye.getBR(bull1)
-    let sPkgBe = this.state.bullseye.getBR(bull2)
-
+  formatDimensions(): string {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
+    this.packages[0].setBullseye(this.state.bullseye.getBR(this.bullPt1))
+    this.packages[1].setBullseye(this.state.bullseye.getBR(this.bullPt2))
+
     // default deep
-    let rngBack = isNS
-      ? new Point(bull1.x, bull2.y).getBR(bull1)
-      : new Point(bull2.x, bull1.y).getBR(bull1)
+    this.rngBack = isNS
+      ? new Point(this.bullPt1.x, this.bullPt2.y).getBR(this.bullPt1)
+      : new Point(this.bullPt2.x, this.bullPt1.y).getBR(this.bullPt1)
     // measure wide if az
     if (!this.isRange) {
-      rngBack = isNS
-        ? new Point(bull2.x, bull1.y).getBR(bull1)
-        : new Point(bull1.x, bull2.y).getBR(bull1)
+      this.rngBack = isNS
+        ? new Point(this.bullPt2.x, this.bullPt1.y).getBR(this.bullPt1)
+        : new Point(this.bullPt1.x, this.bullPt2.y).getBR(this.bullPt1)
+    }
+    return (this.isRange ? " RANGE " : " AZIMUTH ") + this.rngBack.range + " "
+  }
+
+  formatWeighted(): string {
+    return ""
+  }
+
+  applyLabels(): void {
+    const isNS = FightAxis.isNS(this.props.orientation.orient)
+
+    let nLbl = isNS ? "WEST" : "SOUTH"
+    let sLbl = isNS ? "EAST" : "NORTH"
+    if (this.isRange) {
+      nLbl = "LEAD"
+      sLbl = "TRAIL"
     }
 
+    this.packages[0].setLabel(nLbl)
+    this.packages[1].setLabel(sLbl)
+
+    if (!this.packages[0].isAnchor()) {
+      this.packages[0].setLabel(sLbl)
+      this.packages[1].setLabel(nLbl)
+      this.packages.reverse()
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  checkAnchor = (grp1: AircraftGroup, grp2: AircraftGroup): void => {
+    // TODO -- anchoring P's for closer package && comment
+    const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
+
+    const isAnchNorth = this._isAnchorNPkg(
+      bPos.getBR(this.bullPt1).range,
+      bPos.getBR(this.bullPt2).range
+    )
+    this.packages[0].setAnchor(isAnchNorth)
+    this.packages[1].setAnchor(!isAnchNorth)
+  }
+
+  getAnswer(): string {
+    this.packages[0].setBullseyePt(this._getPicBull(this.packages[0].groups))
+    this.packages[1].setBullseyePt(this._getPicBull(this.packages[1].groups))
+
+    this.checkAnchor(this.packages[0].groups[0], this.packages[1].groups[0])
+    this.applyLabels()
     let answer = ""
-    if (rngBack.range < 40) {
+
+    answer = this.formatPicTitle()
+    answer += this.formatDimensions()
+    answer += this.packages[0].format()
+    answer += " "
+    answer += this.packages[1].format()
+
+    if (this.rngBack.range < 40) {
       answer = this.tryAgain().pic
-    } else {
-      let nLbl = isNS ? "WEST" : "SOUTH"
-      let sLbl = isNS ? "EAST" : "NORTH"
-      if (this.isRange) {
-        nLbl = "LEAD"
-        sLbl = "TRAIL"
-      }
-
-      // TODO -- anchoring P's for closer package
-      const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
-      const nBR = bPos.getBR(bull1).range
-      const sBR = bPos.getBR(bull2).range
-      const anchorNPkg = this._isAnchorNPkg(
-        nBR,
-        sBR,
-        this.nPkg.groups,
-        this.sPkg.groups
-      )
-
-      if (!anchorNPkg) {
-        const tmpPkgBe = nPkgBe
-        nPkgBe = sPkgBe
-        sPkgBe = tmpPkgBe
-        const tmpLbl = nLbl
-        nLbl = sLbl
-        sLbl = tmpLbl
-      }
-
-      answer = "2 PACKAGES "
-      answer += (this.isRange ? " RANGE " : " AZIMUTH ") + rngBack.range + " "
-      answer +=
-        nLbl + " PACKAGE BULLSEYE " + nPkgBe.bearing + "/" + nPkgBe.range
-      answer += " "
-      answer +=
-        sLbl + " PACKAGE BULLSEYE " + sPkgBe.bearing + "/" + sPkgBe.range
     }
+
     return answer.replace(/\s+/g, " ").trim()
   }
 }
