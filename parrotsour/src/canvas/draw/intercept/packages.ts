@@ -243,8 +243,8 @@ export default class DrawPackage extends DrawPic {
     let nLbl = isNS ? "EAST" : "NORTH"
     let sLbl = isNS ? "WEST" : "SOUTH"
     if (this.isRange) {
-      nLbl = "TRAIL"
-      sLbl = "LEAD"
+      nLbl = isNS ? "LEAD" : "TRAIL"
+      sLbl = isNS ? "TRAIL" : "LEAD"
     }
 
     this.packages[0].setLabel(sLbl)
