@@ -10,13 +10,10 @@ import { PictureInfo } from "./pictureclamp"
 import { PictureFactory } from "./picturefactory"
 
 export default class DrawPackage extends DrawPic {
-  private packages!: Package[]
+  public pictures: DrawPic[] = []
+  private packages: Package[] = []
 
-  private nPkgBe: BRAA = new BRAA(-1, -1)
-  private sPkgBe: BRAA = new BRAA(-1, -1)
   private rngBack: BRAA = new BRAA(-1, -1)
-  private bullPt1 = new Point(-1, -1)
-  private bullPt2 = new Point(-1, -1)
 
   create(): DrawPic {
     return new DrawPackage()
@@ -26,18 +23,14 @@ export default class DrawPackage extends DrawPic {
     const nCt = Math.floor(nCts / 2)
     const sCt = nCts - nCt
 
-    this.packages.push(
-      PictureFactory.getPictureDraw("random", nCt, true) as Package
-    )
-    this.packages.push(
-      PictureFactory.getPictureDraw("random", sCt, true) as Package
-    )
+    this.pictures.push(PictureFactory.getPictureDraw("random", nCt, true))
+    this.pictures.push(PictureFactory.getPictureDraw("random", sCt, true))
 
-    this.packages[0].initialize(this.props, this.state)
-    this.packages[1].initialize(this.props, this.state)
+    this.pictures[0].initialize(this.props, this.state)
+    this.pictures[1].initialize(this.props, this.state)
 
-    this.packages[0].chooseNumGroups(nCt)
-    this.packages[1].chooseNumGroups(sCt)
+    this.pictures[0].chooseNumGroups(nCt)
+    this.pictures[1].chooseNumGroups(sCt)
   }
 
   private start2: Point = Point.DEFAULT
@@ -91,19 +84,19 @@ export default class DrawPackage extends DrawPic {
     const start1 = new Point(s1x, s1y)
     const start2 = new Point(s2x, s2y)
 
-    const nPkgInfo = this.packages[0].getPictureInfo(start1)
-    this.packages[0].pInfo = nPkgInfo
+    const nPkgInfo = this.pictures[0].getPictureInfo(start1)
+    this.pictures[0].pInfo = nPkgInfo
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.packages[0].deep = nPkgInfo.deep!
+    this.pictures[0].deep = nPkgInfo.deep!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.packages[0].wide = nPkgInfo.wide!
+    this.pictures[0].wide = nPkgInfo.wide!
 
-    const sPkgInfo = this.packages[1].getPictureInfo(start2)
-    this.packages[1].pInfo = sPkgInfo
+    const sPkgInfo = this.pictures[1].getPictureInfo(start2)
+    this.pictures[1].pInfo = sPkgInfo
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.packages[1].deep = sPkgInfo.deep!
+    this.pictures[1].deep = sPkgInfo.deep!
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.packages[1].wide = sPkgInfo.wide!
+    this.pictures[1].wide = sPkgInfo.wide!
 
     this.start2 = start2
 
@@ -113,24 +106,24 @@ export default class DrawPackage extends DrawPic {
   }
 
   createGroups = (startPos: Point, contactList: number[]): AircraftGroup[] => {
-    const nGrps = this.packages[0].createGroups(
+    const nGrps = this.pictures[0].createGroups(
       startPos,
-      contactList.slice(0, this.packages[0].getNumGroups())
+      contactList.slice(0, this.pictures[0].getNumGroups())
     )
-    const sGrps = this.packages[1].createGroups(
+    const sGrps = this.pictures[1].createGroups(
       this.start2,
-      contactList.slice(this.packages[1].getNumGroups())
+      contactList.slice(this.pictures[1].getNumGroups())
     )
 
-    this.packages[0].groups = nGrps
-    this.packages[1].groups = sGrps
+    this.pictures[0].groups = nGrps
+    this.pictures[1].groups = sGrps
 
     return nGrps.concat(sGrps)
   }
 
   drawInfo(): void {
-    this.packages[0].drawInfo()
-    this.packages[1].drawInfo()
+    this.pictures[0].drawInfo()
+    this.pictures[1].drawInfo()
   }
 
   _getPicBull = (groups: AircraftGroup[]): Point => {
@@ -171,10 +164,14 @@ export default class DrawPackage extends DrawPic {
 
   tryAgain(): PictureAnswer {
     console.log("need to redraw pkgs")
-    const nPkgContacts = this.packages[0].groups
-      .map((grp) => grp.getStrength())
+    const nPkgContacts = this.pictures[0].groups
+      .map((grp) => {
+        console.log(grp.getLabel())
+        console.log(grp.getStrength())
+        return grp.getStrength()
+      })
       .reduce((a, b) => a + b)
-    const sPkgContacts = this.packages[1].groups
+    const sPkgContacts = this.pictures[1].groups
       .map((grp) => grp.getStrength())
       .reduce((a, b) => a + b)
     const nCts = nPkgContacts + sPkgContacts
@@ -190,19 +187,19 @@ export default class DrawPackage extends DrawPic {
       anchorNorth = false
     } else if (sBR === nBR) {
       const maxAlt1 = Math.max(
-        ...this.packages[0].groups.map((grp) => {
+        ...this.pictures[0].groups.map((grp) => {
           return Math.max(...grp.getAltitudes())
         })
       )
       const maxAlt2 = Math.max(
-        ...this.packages[1].groups.map((grp) => {
+        ...this.pictures[1].groups.map((grp) => {
           return Math.max(...grp.getAltitudes())
         })
       )
       if (maxAlt2 > maxAlt1) {
         anchorNorth = false
       } else if (maxAlt2 === maxAlt1) {
-        if (this.packages[1].groups.length > this.packages[0].groups.length) {
+        if (this.pictures[1].groups.length > this.pictures[0].groups.length) {
           anchorNorth = false
         }
       }
@@ -217,18 +214,21 @@ export default class DrawPackage extends DrawPic {
   formatDimensions(): string {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-    this.packages[0].setBullseye(this.state.bullseye.getBR(this.bullPt1))
-    this.packages[1].setBullseye(this.state.bullseye.getBR(this.bullPt2))
+    const bullPt1 = this.packages[0].getBullseyePt()
+    const bullPt2 = this.packages[1].getBullseyePt()
+
+    this.packages[0].setBullseye(this.state.bullseye.getBR(bullPt1))
+    this.packages[1].setBullseye(this.state.bullseye.getBR(bullPt2))
 
     // default deep
     this.rngBack = isNS
-      ? new Point(this.bullPt1.x, this.bullPt2.y).getBR(this.bullPt1)
-      : new Point(this.bullPt2.x, this.bullPt1.y).getBR(this.bullPt1)
+      ? new Point(bullPt1.x, bullPt2.y).getBR(bullPt1)
+      : new Point(bullPt2.x, bullPt1.y).getBR(bullPt1)
     // measure wide if az
     if (!this.isRange) {
       this.rngBack = isNS
-        ? new Point(this.bullPt2.x, this.bullPt1.y).getBR(this.bullPt1)
-        : new Point(this.bullPt1.x, this.bullPt2.y).getBR(this.bullPt1)
+        ? new Point(bullPt2.x, bullPt1.y).getBR(bullPt1)
+        : new Point(bullPt1.x, bullPt2.y).getBR(bullPt1)
     }
     return (this.isRange ? " RANGE " : " AZIMUTH ") + this.rngBack.range + " "
   }
@@ -251,8 +251,7 @@ export default class DrawPackage extends DrawPic {
     this.packages[1].setLabel(sLbl)
 
     if (!this.packages[0].isAnchor()) {
-      this.packages[0].setLabel(sLbl)
-      this.packages[1].setLabel(nLbl)
+      this.pictures.reverse()
       this.packages.reverse()
     }
   }
@@ -263,19 +262,24 @@ export default class DrawPackage extends DrawPic {
     const bPos = this.state.blueAir.getCenterOfMass(this.props.dataStyle)
 
     const isAnchNorth = this._isAnchorNPkg(
-      bPos.getBR(this.bullPt1).range,
-      bPos.getBR(this.bullPt2).range
+      bPos.getBR(this.packages[0].getBullseyePt()).range,
+      bPos.getBR(this.packages[1].getBullseyePt()).range
     )
     this.packages[0].setAnchor(isAnchNorth)
     this.packages[1].setAnchor(!isAnchNorth)
   }
 
   getAnswer(): string {
-    this.packages[0].setBullseyePt(this._getPicBull(this.packages[0].groups))
-    this.packages[1].setBullseyePt(this._getPicBull(this.packages[1].groups))
+    const pkg1 = new Package()
+    const pkg2 = new Package()
 
-    this.checkAnchor(this.packages[0].groups[0], this.packages[1].groups[0])
+    this.packages = [pkg1, pkg2]
+    this.packages[0].setBullseyePt(this._getPicBull(this.pictures[0].groups))
+    this.packages[1].setBullseyePt(this._getPicBull(this.pictures[1].groups))
+
+    this.checkAnchor(this.pictures[0].groups[0], this.pictures[1].groups[0])
     this.applyLabels()
+
     let answer = ""
 
     answer = this.formatPicTitle()

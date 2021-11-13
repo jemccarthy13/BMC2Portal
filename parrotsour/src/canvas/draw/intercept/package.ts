@@ -1,8 +1,8 @@
+/* istanbul ignore file */
 import { BRAA } from "../../../classes/braa"
 import { Point } from "../../../classes/point"
-import { DrawPic } from "./drawpic"
 
-export abstract class Package extends DrawPic {
+export class Package {
   private label = ""
   private anchor = true
   private bullseye: BRAA = new BRAA(-1, -1)

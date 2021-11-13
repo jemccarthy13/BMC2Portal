@@ -63,10 +63,13 @@ export class PictureFactory {
     let complexity = desiredNumContacts
     if (complexity === 0) complexity = 4
     if (complexity > 4) complexity = 4
-    if (forced) complexity = Math.min(desiredNumContacts, 3)
+    if (forced)
+      complexity =
+        desiredNumContacts === 0 ? 3 : Math.min(desiredNumContacts, 3)
     if (picType === "cap") complexity = 2
 
     let type = picType || "azimuth"
+
     if (picType === "random" || picType === "cap") {
       type = this._getRandomPicType(complexity)
     }
