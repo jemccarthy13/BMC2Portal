@@ -92,7 +92,83 @@ describe("DrawChamp", () => {
     )
   })
 
-  // TODO -- write 4/5 group tests
+  it("ladder_4_grps", () => {
+    testProps.orientation.orient = BlueInThe.EAST
+    ladder.initialize(testProps, testState)
+
+    const lg = new AircraftGroup({ ...p })
+    const grp2 = new AircraftGroup({
+      ...p,
+      sx: 225,
+      alts: [15, 15, 15, 15],
+    })
+    const grp3 = new AircraftGroup({
+      ...p,
+      sx: 250,
+      alts: [17],
+      nContacts: 1,
+    })
+    const tg = new AircraftGroup({
+      ...p,
+      sx: 275,
+      alts: [15, 15],
+      nContacts: 2,
+    })
+
+    ladder.groups = [lg, grp2, grp3, tg]
+    ladder.drawInfo()
+
+    expect(ladder.getAnswer()).toEqual(
+      "4 GROUP LADDER 18 DEEP, TRACK EAST. " +
+        "LEAD GROUP BULLSEYE 333/55, 15k HOSTILE 2 CONTACTS " +
+        "2ND GROUP SEPARATION 6 17k HOSTILE " +
+        "3RD GROUP 15k HOSTILE HEAVY 4 CONTACTS " +
+        "TRAIL GROUP 20k HOSTILE HEAVY 4 CONTACTS"
+    )
+  })
+
+  it("ladder_5_grps", () => {
+    testProps.orientation.orient = BlueInThe.EAST
+    ladder.initialize(testProps, testState)
+
+    const lg = new AircraftGroup({ ...p })
+    const grp2 = new AircraftGroup({
+      ...p,
+      sx: 225,
+      alts: [15, 15, 15, 15],
+    })
+    const grp3 = new AircraftGroup({
+      ...p,
+      sx: 250,
+      alts: [17],
+      nContacts: 1,
+    })
+    const grp4 = new AircraftGroup({
+      ...p,
+      sx: 275,
+      alts: [10],
+      nContacts: 1,
+    })
+    const tg = new AircraftGroup({
+      ...p,
+      sx: 300,
+      alts: [15, 15],
+      nContacts: 2,
+    })
+
+    ladder.groups = [lg, grp2, grp3, grp4, tg]
+    ladder.drawInfo()
+
+    expect(ladder.getAnswer()).toEqual(
+      "5 GROUP LADDER 25 DEEP, TRACK EAST. " +
+        "LEAD GROUP BULLSEYE 339/52, 15k HOSTILE 2 CONTACTS " +
+        "2ND GROUP SEPARATION 6 10k HOSTILE " +
+        "3RD GROUP 17k HOSTILE " +
+        "4TH GROUP 15k HOSTILE HEAVY 4 CONTACTS " +
+        "TRAIL GROUP 20k HOSTILE HEAVY 4 CONTACTS"
+    )
+  })
+
   // TODO -- write create/chooseNumGroups for all DrawPic classes
   // TODO -- write echelon tests
 })
