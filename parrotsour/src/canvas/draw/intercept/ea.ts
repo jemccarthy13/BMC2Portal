@@ -191,12 +191,9 @@ export default class DrawEA extends DrawPic {
     response += " BRAA " + braa.toString() + " "
     response += altStack.stack + ", "
     response += aspect + " HOSTILE "
-    if (cGrp.getStrength() > 1) {
-      response +=
-        (cGrp.getStrength() >= 3 ? "HEAVY " : "") +
-        cGrp.getStrength() +
-        " CONTACTS "
-    }
+
+    response += cGrp.formatNumContacts()
+
     response += altStack.fillIns
     return response
   }

@@ -62,7 +62,13 @@ describe("DrawEA", () => {
     draw.requestType = 1
     draw.getAnswer()
     expect(draw.getAnswer()).toEqual(
-      "GROUP BRAA 297/98 20k, HOT HOSTILE HEAVY 4 CONTACTS "
+      "GROUP BRAA 297/98 20k, HOT HOSTILE HEAVY 4 CONTACTS"
     )
   })
+
+  // TODO -- write test for strobe
+  // TODO -- write test for music
+
+  // TODO -- write test for edge cases
+  // TODO -- write test for drawInfo
 })
