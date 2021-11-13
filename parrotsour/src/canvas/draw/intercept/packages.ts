@@ -50,8 +50,6 @@ export default class DrawPackage extends DrawPic {
 
     if (isNS) {
       if (this.isRange) {
-        // lLbl = "NORTH"
-        // tLbl = "SOUTH"
         s1x = randomNumber(ctx.canvas.width * 0.2, ctx.canvas.width * 0.8)
         s1y = randomNumber(ctx.canvas.height * 0.5, ctx.canvas.height * 0.59)
 
@@ -72,8 +70,6 @@ export default class DrawPackage extends DrawPic {
         s2x = randomNumber(ctx.canvas.width * 0.2, ctx.canvas.width * 0.35)
         s2y = s1y
       } else {
-        //     tLbl = "NORTH"
-        //     lLbl = "SOUTH"
         s1x = randomNumber(ctx.canvas.width * 0.25, ctx.canvas.width * 0.5)
         s1y = randomNumber(ctx.canvas.height * 0.6, ctx.canvas.height * 0.7)
         s2x = s1x
@@ -81,27 +77,21 @@ export default class DrawPackage extends DrawPic {
       }
     }
 
-    const start1 = new Point(s1x, s1y)
-    const start2 = new Point(s2x, s2y)
+    const starts = [new Point(s1x, s1y), new Point(s2x, s2y)]
 
-    const nPkgInfo = this.pictures[0].getPictureInfo(start1)
-    this.pictures[0].pInfo = nPkgInfo
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.pictures[0].deep = nPkgInfo.deep!
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.pictures[0].wide = nPkgInfo.wide!
+    this.pictures.forEach((pic, idx) => {
+      const info = pic.getPictureInfo(starts[idx])
+      pic.pInfo = info
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      pic.deep = info.deep!
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      pic.wide = info.wide!
+    })
 
-    const sPkgInfo = this.pictures[1].getPictureInfo(start2)
-    this.pictures[1].pInfo = sPkgInfo
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.pictures[1].deep = sPkgInfo.deep!
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.pictures[1].wide = sPkgInfo.wide!
-
-    this.start2 = start2
+    this.start2 = starts[1]
 
     return {
-      start: start1,
+      start: starts[0],
     }
   }
 
