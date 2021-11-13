@@ -240,15 +240,15 @@ export default class DrawPackage extends DrawPic {
   applyLabels(): void {
     const isNS = FightAxis.isNS(this.props.orientation.orient)
 
-    let nLbl = isNS ? "WEST" : "SOUTH"
-    let sLbl = isNS ? "EAST" : "NORTH"
+    let nLbl = isNS ? "EAST" : "NORTH"
+    let sLbl = isNS ? "WEST" : "SOUTH"
     if (this.isRange) {
-      nLbl = "LEAD"
-      sLbl = "TRAIL"
+      nLbl = "TRAIL"
+      sLbl = "LEAD"
     }
 
-    this.packages[0].setLabel(nLbl)
-    this.packages[1].setLabel(sLbl)
+    this.packages[0].setLabel(sLbl)
+    this.packages[1].setLabel(nLbl)
 
     if (!this.packages[0].isAnchor()) {
       this.pictures.reverse()

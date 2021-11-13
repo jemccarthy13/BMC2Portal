@@ -1,7 +1,7 @@
 import { SensorType } from "../../../classes/aircraft/datatrail/sensortype"
 import { AircraftGroup, GroupParams } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
-import { PictureCanvasState } from "../../canvastypes"
+import { BlueInThe, PictureCanvasState } from "../../canvastypes"
 import { PaintBrush } from "../paintbrush"
 import { testProps } from "./mockutils.unit.test"
 import { PictureFactory } from "./picturefactory"
@@ -24,7 +24,7 @@ describe("DrawPackages", () => {
 
     testState = {
       bullseye: new Point(400, 400),
-      blueAir: new AircraftGroup({ sx: 600, sy: 350, hdg: 270, nContacts: 4 }),
+      blueAir: new AircraftGroup({ sx: 600, sy: 200, hdg: 270, nContacts: 4 }),
       answer: { pic: "3 grp ladder", groups: [] },
       reDraw: jest.fn(),
     }
@@ -37,6 +37,8 @@ describe("DrawPackages", () => {
       hdg: 90,
       alts: [20, 20, 20, 20],
     }
+
+    testProps.orientation.orient = BlueInThe.EAST
 
     pkg = PictureFactory.getPictureDraw("package") as DrawPackage
     pkg.initialize(testProps, testState)
@@ -53,7 +55,6 @@ describe("DrawPackages", () => {
   })
 
   it("2_pkgs_az_single_groups", () => {
-    expect(true).toEqual(true)
     const sg1 = new AircraftGroup({
       ...p,
       sy: 380,
@@ -66,12 +67,12 @@ describe("DrawPackages", () => {
       alts: [10],
       nContacts: 1,
     })
-    pkg.pictures[0].groups = [sg1]
-    pkg.pictures[1].groups = [sg2]
+    pkg.pictures[0].groups = [sg2]
+    pkg.pictures[1].groups = [sg1]
 
     expect(pkg.getAnswer()).toEqual(
-      "2 PACKAGES AZIMUTH 50 NORTH PACKAGE BULLSEYE 319/66 " +
-        "SOUTH PACKAGE BULLSEYE 270/44"
+      "2 PACKAGES AZIMUTH 42 NORTH PACKAGE BULLSEYE 276/44 " +
+        "SOUTH PACKAGE BULLSEYE 230/57"
     )
   })
 
@@ -79,15 +80,15 @@ describe("DrawPackages", () => {
     expect(true).toEqual(true)
     const sg1 = new AircraftGroup({
       ...p,
-      sx: 150,
-      sy: 200,
+      sx: 225,
+      sy: 420,
       alts: [15],
       nContacts: 1,
     })
     const sg2 = new AircraftGroup({
       ...p,
-      sx: 225,
-      sy: 420,
+      sx: 150,
+      sy: 200,
       alts: [10],
       nContacts: 1,
     })
@@ -95,8 +96,16 @@ describe("DrawPackages", () => {
     pkg.pictures[1].groups = [sg2]
 
     expect(pkg.getAnswer()).toEqual(
-      "2 PACKAGES AZIMUTH 50 NORTH PACKAGE BULLSEYE 319/66 " +
-        "SOUTH PACKAGE BULLSEYE 270/44"
+      "2 PACKAGES AZIMUTH 55 SOUTH PACKAGE BULLSEYE 262/38 " +
+        "NORTH PACKAGE BULLSEYE 312/75"
     )
   })
+
+  // TODO -- az BlueInThe.NORTH
+  // TODO -- rng BlueInThe.EAST
+  // TODO -- rng BlueInThe.NORTH
+  // TODO -- equidistant, anchor highest
+  // TODO -- equidistant, equal height, anchor heaviest
+  // TODO -- >40, tryAgain
+  // TODO -- get picture info??
 })
