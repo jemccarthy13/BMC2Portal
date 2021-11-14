@@ -3,6 +3,7 @@ import { Braaseye } from "../../../classes/braaseye"
 import { AircraftGroup } from "../../../classes/groups/group"
 import { Point } from "../../../classes/point"
 import { FORMAT } from "../../../classes/supportedformats"
+import { Aspect } from "../../../utils/aspect"
 import {
   PIXELS_TO_NM,
   randomHeading,
@@ -101,8 +102,8 @@ export default class DrawThreat extends DrawPic {
     const { blueAir } = this.state
     const { dataStyle } = this.props
 
-    const aspectH = blueAir.getAspect(sg, dataStyle)
-    const trackDir = sg.getTrackDir()
+    let aspectH = blueAir.getAspect(sg, dataStyle).toString()
+    if (aspectH !== Aspect.HOT) aspectH += " " + sg.getTrackDir()
     const braaseye = sg.getBraaseye()
 
     const sgAlts: AltStack = sg.getAltStack(this.props.format)
@@ -110,7 +111,7 @@ export default class DrawThreat extends DrawPic {
     let answer: string = this.formatPicTitle()
     answer += braaseye.braa.toString() + " "
     answer += sgAlts.stack + " "
-    answer += aspectH + " " + trackDir + " HOSTILE "
+    answer += aspectH + " HOSTILE "
 
     answer += sg.formatNumContacts()
 
