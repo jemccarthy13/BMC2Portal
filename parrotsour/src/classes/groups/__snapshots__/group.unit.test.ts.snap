@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`AircraftGroup draw_group draws_all_groups 1`] = `<canvas />`;

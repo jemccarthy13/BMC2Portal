@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`IssueReport_Component closes_dialog_on_cancel_click 1`] = `ReactWrapper {}`;
-
-exports[`IssueReport_Component opens_dialog_on_button_click 1`] = `ReactWrapper {}`;
