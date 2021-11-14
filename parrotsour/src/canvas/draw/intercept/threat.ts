@@ -34,12 +34,6 @@ export default class DrawThreat extends DrawPic {
           : randomNumber(bPos.y - 25 * PIXELS_TO_NM, bPos.y + 25 * PIXELS_TO_NM)
       )
     }
-    if (start && start.y === undefined) {
-      start.y = randomNumber(bPos.y - 100, bPos.y + 40)
-    }
-    if (start && start.x === undefined) {
-      start.x = randomNumber(bPos.x - 100, bPos.x - 40)
-    }
 
     return {
       start,
@@ -103,7 +97,10 @@ export default class DrawThreat extends DrawPic {
     const { dataStyle } = this.props
 
     let aspectH = blueAir.getAspect(sg, dataStyle).toString()
-    if (aspectH !== Aspect.HOT) aspectH += " " + sg.getTrackDir()
+    const trackDir = sg.getTrackDir()
+
+    if (aspectH !== Aspect.HOT && trackDir)
+      aspectH += " " + trackDir.replace("TRACK", "")
     const braaseye = sg.getBraaseye()
 
     const sgAlts: AltStack = sg.getAltStack(this.props.format)
